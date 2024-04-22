@@ -7,7 +7,7 @@ class TextLightStyles {
   BuildContext? context;
 
   static const TextStyle defaultStyle = TextStyle(
-    fontSize: 15.0,
+    fontSize: 17.0,
     color: ColorLightMode.text,
     fontWeight: FontWeight.w400,
     fontFamily: 'Sanfrancisco',
@@ -20,7 +20,7 @@ class TextDarkStyles {
   BuildContext? context;
 
   static const TextStyle defaultStyle = TextStyle(
-    fontSize: 15.0,
+    fontSize: 17.0,
     color: ColorDarkMode.text,
     fontWeight: FontWeight.w400,
     fontFamily: 'Sanfrancisco',
