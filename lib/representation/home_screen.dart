@@ -29,9 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Center(
                 child: Text(
                   'Click me',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.secondary,
-                  ),
+                  style: Theme.of(context).textTheme.labelMedium,
                 ),
               ),
             ),
