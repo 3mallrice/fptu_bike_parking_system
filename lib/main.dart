@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'core/theme/theme_provider.dart';
 import 'representation/home_screen.dart';
+import 'route.dart';
 
 void main() {
   runApp(
@@ -23,7 +24,13 @@ class MyApp extends StatelessWidget {
       title: 'BAI',
       debugShowCheckedModeBanner: false,
       theme: Provider.of<ThemeProvider>(context).themeData,
-      home: const HomeScreen(),
+      home: const AspectRatio(
+        aspectRatio: 1,
+        child: HomeScreen(),
+        //child: SplashScreen(),
+      ),
+      // initialRoute: HomeScreen.routeName,
+      routes: routes,
     );
   }
 }

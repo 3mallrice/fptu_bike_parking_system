@@ -11,6 +11,7 @@ ThemeData lightMode = ThemeData(
     outline: ColorLightMode.primaryText,
   ),
   dividerColor: ColorLightMode.primaryText,
+  useMaterial3: true,
   //Display: H1
   //headline: H2
   //title: H3
@@ -20,15 +21,15 @@ ThemeData lightMode = ThemeData(
   textTheme: const TextTheme(
     //display
     displayMedium: TextStyle(
-      color: ColorLightMode.primaryText,
+      color: ColorLightMode.primaryOrange,
       fontSize: 22,
       fontWeight: FontWeight.w700,
       fontFamily: 'SFProDisplay',
     ),
 
-    //headline
+    //headline: chữ cho appbar
     headlineMedium: TextStyle(
-      color: ColorLightMode.primaryText,
+      color: ColorLightMode.secondaryText,
       fontSize: 20,
       fontWeight: FontWeight.w700,
       fontFamily: 'SFProDisplay',
@@ -52,7 +53,7 @@ ThemeData lightMode = ThemeData(
 
     //label
     labelMedium: TextStyle(
-      color: ColorLightMode.primaryText,
+      color: ColorLightMode.secondaryText,
       fontSize: 16,
       fontWeight: FontWeight.w400,
       fontFamily: 'SFProText',
@@ -70,6 +71,7 @@ ThemeData darkMode = ThemeData(
     outline: ColorDarkMode.text,
   ),
   dividerColor: ColorDarkMode.text,
+  useMaterial3: true,
   textTheme: const TextTheme(
     //display
     displayMedium: TextStyle(

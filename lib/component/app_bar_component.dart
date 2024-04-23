@@ -47,8 +47,7 @@ class AppBarCom extends StatelessWidget implements PreferredSizeWidget {
                 )
             : null,
         iconTheme: IconThemeData(color: Theme.of(context).colorScheme.outline),
-        backgroundColor:
-            backgroundColor ?? Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.background,
         title: Text(appBarTitle ?? ""),
         titleTextStyle: Theme.of(context).textTheme.titleMedium,
         elevation: 4, //like z-index in css
