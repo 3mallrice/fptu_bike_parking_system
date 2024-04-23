@@ -80,7 +80,7 @@ flutter:
         - asset: assets/fonts/SFProDisplay-Light.ttf
         - asset: assets/fonts/Schyler-LightItalic.ttf
           style: italic
-          
+
     - family: SFProText
       fonts:
         - asset: assets/fonts/SFProText-Light.ttf

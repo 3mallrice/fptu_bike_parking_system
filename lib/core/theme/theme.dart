@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import '../const/frondend/color_const.dart';
 
 ThemeData lightMode = ThemeData(
@@ -9,6 +8,7 @@ ThemeData lightMode = ThemeData(
     background: ColorLightMode.background,
     primary: ColorLightMode.primaryOrange,
     secondary: ColorLightMode.secondaryOrange,
+    outline: ColorLightMode.primaryText,
   ),
   dividerColor: ColorLightMode.primaryText,
   //Display: H1
@@ -67,6 +67,7 @@ ThemeData darkMode = ThemeData(
     background: ColorDarkMode.background,
     primary: ColorDarkMode.primaryGray,
     secondary: ColorDarkMode.secondaryGray,
+    outline: ColorDarkMode.text,
   ),
   dividerColor: ColorDarkMode.text,
   textTheme: const TextTheme(

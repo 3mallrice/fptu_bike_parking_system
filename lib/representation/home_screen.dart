@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fptu_bike_parking_system/representation/home.dart';
 import 'package:provider/provider.dart';
 
 import '../core/theme/theme_provider.dart';
@@ -16,24 +17,38 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            // change theme here
-            Provider.of<ThemeProvider>(context, listen: false).toggleTheme();
-          },
-          child: Container(
-            color: Theme.of(context).colorScheme.primary,
-            child: SizedBox(
-              width: 100,
-              height: 50,
-              child: Center(
-                child: Text(
-                  'Click me',
-                  style: Theme.of(context).textTheme.labelMedium,
+        child: Column(
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                // change dark/light here
+                Provider.of<ThemeProvider>(context, listen: false)
+                    .toggleTheme();
+              },
+              child: Container(
+                color: Theme.of(context).colorScheme.primary,
+                child: SizedBox(
+                  width: 100,
+                  height: 50,
+                  child: Center(
+                    child: Text(
+                      'Click me',
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed(HomeAppScreen.routeName);
+              },
+              child: Text(
+                'Next',
+                style: Theme.of(context).textTheme.displayMedium,
+              ),
+            ),
+          ],
         ),
       ),
     );
