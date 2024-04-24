@@ -4,6 +4,11 @@ import '../const/frondend/color_const.dart';
 ThemeData lightMode = ThemeData(
   primarySwatch: Colors.blue,
   brightness: Brightness.light,
+
+  appBarTheme: const AppBarTheme(
+    color: ColorLightMode.background,
+  ),
+
   colorScheme: const ColorScheme.light(
     background: ColorLightMode.background,
     primary: ColorLightMode.primaryOrange,
@@ -21,7 +26,7 @@ ThemeData lightMode = ThemeData(
   textTheme: const TextTheme(
     //display
     displayMedium: TextStyle(
-      color: ColorLightMode.primaryOrange,
+      color: ColorLightMode.primaryText,
       fontSize: 22,
       fontWeight: FontWeight.w700,
       fontFamily: 'SFProDisplay',
@@ -29,7 +34,7 @@ ThemeData lightMode = ThemeData(
 
     //headline: chữ cho appbar
     headlineMedium: TextStyle(
-      color: ColorLightMode.secondaryText,
+      color: ColorLightMode.primaryOrange,
       fontSize: 20,
       fontWeight: FontWeight.w700,
       fontFamily: 'SFProDisplay',
@@ -99,7 +104,7 @@ ThemeData darkMode = ThemeData(
 
     //body
     bodyMedium: TextStyle(
-      color: ColorLightMode.primaryText,
+      color: ColorDarkMode.text,
       fontSize: 16,
       fontWeight: FontWeight.w400,
       fontFamily: 'SFProText',

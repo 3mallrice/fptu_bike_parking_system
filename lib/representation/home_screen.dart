@@ -18,7 +18,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: const AppBarCom(
         leading: false,
       ),
@@ -31,18 +30,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 Provider.of<ThemeProvider>(context, listen: false)
                     .toggleTheme();
               },
-              child: Container(
-                color: Theme.of(context).colorScheme.primary,
-                child: SizedBox(
-                  width: 100,
-                  height: 50,
-                  child: Center(
-                    child: Text(
-                      'Click me',
-                      style: Theme.of(context).textTheme.labelMedium,
-                    ),
-                  ),
-                ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+              ),
+              child: Text(
+                'Click me',
+                style: Theme.of(context).textTheme.labelMedium,
               ),
             ),
             ElevatedButton(
@@ -54,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               child: Text(
                 'Next to home real',
-                style: Theme.of(context).textTheme.headlineMedium,
+                style: Theme.of(context).textTheme.labelMedium,
               ),
             ),
           ],

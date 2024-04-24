@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppBarCom extends StatelessWidget implements PreferredSizeWidget {
-  final String? appBarTitle;
+  final String? appBarText;
   final bool leading;
   final Widget? leftIcon;
   final String? routeName;
@@ -11,7 +11,7 @@ class AppBarCom extends StatelessWidget implements PreferredSizeWidget {
 
   const AppBarCom({
     super.key,
-    this.appBarTitle,
+    this.appBarText,
     required this.leading,
     this.leftIcon,
     this.backgroundColor,
@@ -37,20 +37,28 @@ class AppBarCom extends StatelessWidget implements PreferredSizeWidget {
                         : Navigator.of(context)
                             .pushReplacementNamed(routeName!);
                   },
-                  icon: const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Icon(
-                      Icons.arrow_back_ios_outlined,
+                  icon: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.secondary,
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.secondary,
+                        width: 1.5,
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.arrow_back_ios_new_rounded,
                       size: 16,
                     ),
                   ),
                 )
             : null,
         iconTheme: IconThemeData(color: Theme.of(context).colorScheme.outline),
-        backgroundColor: Theme.of(context).colorScheme.background,
-        title: Text(appBarTitle ?? ""),
-        titleTextStyle: Theme.of(context).textTheme.titleMedium,
-        elevation: 4, //like z-index in css
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        title: Text(appBarText ?? ""),
+        titleTextStyle: Theme.of(context).textTheme.displayMedium,
+        elevation: 4,
         actions: action,
       ),
     );
