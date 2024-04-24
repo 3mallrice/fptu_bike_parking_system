@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
-import 'package:fptu_bike_parking_system/core/helper/image_helper.dart';
 
 class HomeAppScreen extends StatefulWidget {
   const HomeAppScreen({super.key});

@@ -1,5 +1,5 @@
 name: fptu_bike_parking_system
-description: "A new Flutter project."
+description: "A FPTU campus bike parking system"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
@@ -35,6 +35,12 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
   provider: ^6.0.1
+  firebase_core: ^2.30.0
+  firebase_crashlytics: ^3.5.2
+  logger: ^2.2.0
+  firebase_analytics: ^10.10.2
+  firebase_storage: ^11.7.2
+  image_picker: ^1.1.0
 
 dev_dependencies:
   flutter_test:
