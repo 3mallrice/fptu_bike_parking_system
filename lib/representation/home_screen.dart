@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
-import 'package:fptu_bike_parking_system/core/helper/firebase_storage_helper.dart';
+import 'package:fptu_bike_parking_system/core/helper/firebase_image_storage_helper.dart';
 import 'package:fptu_bike_parking_system/representation/home.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/web.dart';
@@ -81,7 +81,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 }
 
                 //step 2: upload image to firebase storage
-                FirebaseStorageHelper storageHelper = FirebaseStorageHelper();
+                FirebaseImageStorageHelper storageHelper =
+                    FirebaseImageStorageHelper();
                 String? url = await storageHelper.uploadImage(
                   file,
                   storageHelper.avatarFoler,

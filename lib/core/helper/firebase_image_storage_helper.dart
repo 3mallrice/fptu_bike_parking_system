@@ -4,7 +4,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 
-class FirebaseStorageHelper {
+class FirebaseImageStorageHelper {
   final FirebaseStorage _storage = FirebaseStorage.instance;
   var log = Logger();
 
