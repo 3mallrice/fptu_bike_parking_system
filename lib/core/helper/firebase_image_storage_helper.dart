@@ -37,6 +37,7 @@ class FirebaseImageStorageHelper {
   }
 
   ///Still not tested
+  ///Make sure the savePath is correct
   Future<File?> downloadImage(String imageUrl, String savePath) async {
     try {
       // Create a reference to the file you want to download

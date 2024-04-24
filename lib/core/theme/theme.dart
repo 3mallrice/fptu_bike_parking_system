@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../const/frondend/color_const.dart';
 
 ThemeData lightMode = ThemeData(
@@ -6,7 +7,19 @@ ThemeData lightMode = ThemeData(
   brightness: Brightness.light,
 
   appBarTheme: const AppBarTheme(
-    color: ColorLightMode.background,
+    // color: Colors.white,
+    backgroundColor: ColorLightMode.background,
+    elevation: 4,
+    iconTheme: IconThemeData(
+      color: ColorLightMode.primaryText,
+    ),
+    // shape: RoundedRectangleBorder(
+    //   borderRadius: BorderRadius.only(
+    //     bottomLeft: Radius.circular(20),
+    //     bottomRight: Radius.circular(20),
+    //   ),
+    // ),
+    surfaceTintColor: ColorLightMode.background,
   ),
 
   colorScheme: const ColorScheme.light(
