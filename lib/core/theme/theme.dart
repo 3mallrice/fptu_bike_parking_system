@@ -13,13 +13,15 @@ ThemeData lightMode = ThemeData(
     iconTheme: IconThemeData(
       color: ColorLightMode.primaryText,
     ),
-    // shape: RoundedRectangleBorder(
-    //   borderRadius: BorderRadius.only(
-    //     bottomLeft: Radius.circular(20),
-    //     bottomRight: Radius.circular(20),
-    //   ),
-    // ),
     surfaceTintColor: ColorLightMode.background,
+  ),
+
+  bottomAppBarTheme: const BottomAppBarTheme(
+    color: ColorLightMode.background,
+    elevation: 4,
+    surfaceTintColor: ColorLightMode.background,
+    //auto fit with child
+    height: 70,
   ),
 
   colorScheme: const ColorScheme.light(
@@ -64,7 +66,7 @@ ThemeData lightMode = ThemeData(
     //body
     bodyMedium: TextStyle(
       color: ColorLightMode.primaryText,
-      fontSize: 16,
+      fontSize: 14,
       fontWeight: FontWeight.w400,
       fontFamily: 'SFProText',
     ),
@@ -73,6 +75,13 @@ ThemeData lightMode = ThemeData(
     labelMedium: TextStyle(
       color: ColorLightMode.secondaryText,
       fontSize: 16,
+      fontWeight: FontWeight.w400,
+      fontFamily: 'SFProText',
+    ),
+
+    labelSmall: TextStyle(
+      color: ColorLightMode.primaryText,
+      fontSize: 12,
       fontWeight: FontWeight.w400,
       fontFamily: 'SFProText',
     ),
@@ -90,6 +99,18 @@ ThemeData darkMode = ThemeData(
   ),
   dividerColor: ColorDarkMode.text,
   useMaterial3: true,
+  appBarTheme: const AppBarTheme(
+    // surfaceTintColor: ,
+    elevation: 5,
+    iconTheme: IconThemeData(
+      color: ColorDarkMode.text,
+    ),
+  ),
+  bottomAppBarTheme: const BottomAppBarTheme(
+    color: ColorDarkMode.background,
+    elevation: 4,
+    height: 70,
+  ),
   textTheme: const TextTheme(
     //display
     displayMedium: TextStyle(
@@ -127,6 +148,13 @@ ThemeData darkMode = ThemeData(
     labelMedium: TextStyle(
       color: ColorDarkMode.text,
       fontSize: 16,
+      fontWeight: FontWeight.w400,
+      fontFamily: 'SFProText',
+    ),
+
+    labelSmall: TextStyle(
+      color: ColorDarkMode.text,
+      fontSize: 12,
       fontWeight: FontWeight.w400,
       fontFamily: 'SFProText',
     ),
