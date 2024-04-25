@@ -20,7 +20,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
           alignment: Alignment.bottomCenter,
           children: <Widget>[
             Container(
-              padding: const EdgeInsets.only(bottom: 125),
+              padding: const EdgeInsets.only(bottom: 115),
               child: ImageSlideshow(
                 indicatorColor: Theme.of(context).colorScheme.secondary,
                 indicatorBottomPadding: 45,
