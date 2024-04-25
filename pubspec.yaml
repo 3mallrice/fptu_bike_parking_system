@@ -42,6 +42,7 @@ dependencies:
   firebase_storage: ^11.7.2
   image_picker: ^1.1.0
   flutter_image_slideshow: ^0.1.6
+  stylish_bottom_bar: ^1.1.0
 
 dev_dependencies:
   flutter_test:

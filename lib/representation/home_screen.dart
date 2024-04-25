@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
 import 'package:fptu_bike_parking_system/core/helper/firebase_image_storage_helper.dart';
-import 'package:fptu_bike_parking_system/representation/home.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/web.dart';
-import 'package:provider/provider.dart';
 
-import '../core/theme/theme_provider.dart';
+import 'navigation_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,17 +20,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppBarCom(
-        leading: false,
-      ),
+      // appBar: const MainAppBar(),
       body: Center(
         child: Column(
           children: [
             ElevatedButton(
               onPressed: () {
-                // change dark/light here
-                Provider.of<ThemeProvider>(context, listen: false)
-                    .toggleTheme();
+                Navigator.of(context).pushNamed(MyNavigationBar.routeName);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.primary,
@@ -43,18 +36,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: Theme.of(context).textTheme.labelMedium,
               ),
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed(HomeAppScreen.routeName);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary,
-              ),
-              child: Text(
-                'Next to home real',
-                style: Theme.of(context).textTheme.labelMedium,
-              ),
-            ),
+            // ElevatedButton(
+            //   onPressed: () {
+            //     Navigator.of(context).pushNamed(HomeAppScreen.routeName);
+            //   },
+            //   style: ElevatedButton.styleFrom(
+            //     backgroundColor: Theme.of(context).colorScheme.primary,
+            //   ),
+            //   child: Text(
+            //     'Next to home real',
+            //     style: Theme.of(context).textTheme.labelMedium,
+            //   ),
+            // ),
             IconButton(
               onPressed: () async {
                 //let user choose image from gallery or camera
