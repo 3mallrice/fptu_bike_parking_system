@@ -1,8 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
 import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
+import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
 
 class HomeAppScreen extends StatefulWidget {
   const HomeAppScreen({super.key});
@@ -24,7 +22,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
               alignment: Alignment.bottomCenter,
               children: <Widget>[
                 Container(
-                  padding: const EdgeInsets.only(bottom: 115),
+                  padding: const EdgeInsets.only(bottom: 130),
                   child: ImageSlideshow(
                     indicatorColor: Theme.of(context).colorScheme.secondary,
                     indicatorBottomPadding: 45,
@@ -148,6 +146,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                   padding: const EdgeInsets.all(16),
                   margin: EdgeInsets.symmetric(
                     horizontal: MediaQuery.of(context).size.width * 0.05,
+                    vertical: MediaQuery.of(context).size.width * 0.025,
                   ),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(11),
@@ -177,7 +176,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                           ),
                           Expanded(
                             child: Text(
-                              '45.000',
+                              '45.000 bic',
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
                           ),
@@ -347,7 +346,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
               padding: const EdgeInsets.all(16),
               margin: EdgeInsets.symmetric(
                 horizontal: MediaQuery.of(context).size.width * 0.05,
-                vertical: MediaQuery.of(context).size.width * 0.03,
+                vertical: MediaQuery.of(context).size.width * 0.025,
               ),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(11),
@@ -389,6 +388,26 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                       image: AssetImage(AssetHelper.bai),
                       fit: BoxFit.fitHeight,
                     ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              height: MediaQuery.of(context).size.height * 0.2,
+              padding: const EdgeInsets.all(16),
+              margin: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.05,
+                vertical: MediaQuery.of(context).size.width * 0.025,
+              ),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(11),
+                color: Theme.of(context).colorScheme.background,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 2,
+                    blurRadius: 7,
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),

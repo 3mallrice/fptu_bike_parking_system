@@ -7,4 +7,7 @@ class AssetHelper {
   static const String banner5 = 'assets/imgs/banner5.jpg';
   static const String bic = 'assets/imgs/BIC.png';
   static const String bai = 'assets/imgs/Bai_poster.png';
+  static const String fptedu = 'assets/imgs/fptedu.png';
+  static const String fptu = 'assets/imgs/fptu.png';
+  static const String baiLogo = 'assets/imgs/bai.png';
 }
