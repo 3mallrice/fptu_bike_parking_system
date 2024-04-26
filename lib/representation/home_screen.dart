@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fptu_bike_parking_system/component/main_app_bar.dart';
 import 'package:fptu_bike_parking_system/core/helper/firebase_image_storage_helper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/web.dart';
@@ -20,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: const MainAppBar(),
+      appBar: const MainAppBar(),
       body: Center(
         child: Column(
           children: [
