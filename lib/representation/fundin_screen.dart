@@ -34,20 +34,21 @@ class _FundinScreenState extends State<FundinScreen> {
         child: Align(
           alignment: Alignment.center,
           child: Container(
-              width: MediaQuery.of(context).size.width * 0.9,
-              padding: const EdgeInsets.all(10),
-              color: Colors.red,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'NUMBER',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  TextField()
-                ],
-              )),
+            width: MediaQuery.of(context).size.width * 0.9,
+            padding: const EdgeInsets.all(10),
+            color: Colors.red,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'NUMBER',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                TextField()
+              ],
+            ),
+          ),
         ),
       ),
     );
