@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
 import 'package:fptu_bike_parking_system/representation/qr_code.dart';
-import 'package:provider/provider.dart';
-
-import '../core/theme/theme_provider.dart';
 
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   const MainAppBar({super.key});
@@ -14,6 +11,8 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
       child: AppBar(
         automaticallyImplyLeading: false,
         elevation: 5,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        // shadowColor: Theme.of(context).colorScheme.background,
         flexibleSpace: FractionallySizedBox(
           widthFactor: 0.9,
           child: Container(
@@ -63,13 +62,21 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                         color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
+                    // IconButton(
+                    //   onPressed: () =>
+                    //       // change dark/light here
+                    //       Provider.of<ThemeProvider>(context, listen: false)
+                    //           .toggleTheme(),
+                    //   icon: Icon(
+                    //     Icons.brightness_4,
+                    //     color: Theme.of(context).colorScheme.primary,
+                    //   ),
+                    // ),
+                    //Customer support
                     IconButton(
-                      onPressed: () =>
-                          // change dark/light here
-                          Provider.of<ThemeProvider>(context, listen: false)
-                              .toggleTheme(),
+                      onPressed: () {},
                       icon: Icon(
-                        Icons.brightness_4,
+                        Icons.headset_mic_rounded,
                         color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
@@ -79,7 +86,6 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
         ),
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
       ),
     );
   }

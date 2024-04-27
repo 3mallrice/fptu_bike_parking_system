@@ -28,6 +28,7 @@ ThemeData lightMode = ThemeData(
     background: ColorLightMode.background,
     primary: ColorLightMode.primaryOrange,
     secondary: ColorLightMode.secondaryOrange,
+    inversePrimary: ColorLightMode.background,
     outline: ColorLightMode.primaryText,
   ),
   dividerColor: ColorLightMode.primaryText,
@@ -93,14 +94,15 @@ ThemeData darkMode = ThemeData(
   brightness: Brightness.dark,
   colorScheme: const ColorScheme.dark(
     background: ColorDarkMode.background,
-    primary: ColorDarkMode.primaryGray,
+    primary: ColorLightMode.primaryOrange,
     secondary: ColorDarkMode.secondaryGray,
+    inversePrimary: ColorDarkMode.primaryGray,
     outline: ColorDarkMode.text,
   ),
   dividerColor: ColorDarkMode.text,
   useMaterial3: true,
   appBarTheme: const AppBarTheme(
-    // surfaceTintColor: ,
+    backgroundColor: ColorDarkMode.primaryGray,
     elevation: 5,
     iconTheme: IconThemeData(
       color: ColorDarkMode.text,
