@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
+import 'package:fptu_bike_parking_system/representation/fundin_screen.dart';
 
 class HomeAppScreen extends StatefulWidget {
   const HomeAppScreen({super.key});
@@ -187,7 +188,8 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                         children: [
                           GestureDetector(
                             onTap: () {
-                              //
+                              Navigator.of(context)
+                                  .pushNamed(FundinScreen.routeName);
                             },
                             child: Container(
                               padding: const EdgeInsets.all(10),
