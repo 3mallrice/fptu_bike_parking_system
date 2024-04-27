@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fptu_bike_parking_system/representation/fundin_screen.dart';
 import 'package:fptu_bike_parking_system/representation/navigation_bar.dart';
 import 'package:fptu_bike_parking_system/representation/qr_code.dart';
 
@@ -10,4 +11,5 @@ final Map<String, WidgetBuilder> routes = {
   HomeAppScreen.routeName: (context) => const HomeAppScreen(),
   MyNavigationBar.routeName: (context) => const MyNavigationBar(),
   QrCodeScreen.routeName: (context) => const QrCodeScreen(),
+  FundinScreen.routeName: (context) => const FundinScreen(),
 };
