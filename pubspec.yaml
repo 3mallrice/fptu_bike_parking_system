@@ -44,6 +44,10 @@ dependencies:
   flutter_image_slideshow: ^0.1.6
   stylish_bottom_bar: ^1.1.0
   pretty_qr_code: ^3.3.0
+  geolocator: ^11.0.0
+  http: ^1.2.1
+  font_awesome_flutter: ^10.7.0
+  intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:

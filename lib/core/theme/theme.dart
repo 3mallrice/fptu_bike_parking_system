@@ -39,9 +39,9 @@ ThemeData lightMode = ThemeData(
   //body: normal
   //label: list
 
-  textTheme: const TextTheme(
+  textTheme: TextTheme(
     //display
-    displayMedium: TextStyle(
+    displayMedium: const TextStyle(
       color: ColorLightMode.primaryText,
       fontSize: 22,
       fontWeight: FontWeight.w700,
@@ -49,7 +49,7 @@ ThemeData lightMode = ThemeData(
     ),
 
     //headline: chữ cho appbar
-    headlineMedium: TextStyle(
+    headlineMedium: const TextStyle(
       color: ColorLightMode.primaryOrange,
       fontSize: 20,
       fontWeight: FontWeight.w700,
@@ -57,30 +57,37 @@ ThemeData lightMode = ThemeData(
     ),
 
     //title
-    titleMedium: TextStyle(
+    titleMedium: const TextStyle(
       color: ColorLightMode.primaryText,
-      fontSize: 18,
+      fontSize: 16,
       fontWeight: FontWeight.w700,
       fontFamily: 'SFProDisplay',
     ),
 
     //body
     bodyMedium: TextStyle(
-      color: ColorLightMode.primaryText,
+      color: ColorLightMode.primaryText.withOpacity(0.5),
       fontSize: 14,
       fontWeight: FontWeight.w400,
       fontFamily: 'SFProText',
     ),
 
+    bodySmall: const TextStyle(
+      color: ColorLightMode.secondaryText,
+      fontSize: 13,
+      fontWeight: FontWeight.w400,
+      fontFamily: 'SFProText',
+    ),
+
     //label
-    labelMedium: TextStyle(
+    labelMedium: const TextStyle(
       color: ColorLightMode.secondaryText,
       fontSize: 16,
       fontWeight: FontWeight.w400,
       fontFamily: 'SFProText',
     ),
 
-    labelSmall: TextStyle(
+    labelSmall: const TextStyle(
       color: ColorLightMode.primaryText,
       fontSize: 12,
       fontWeight: FontWeight.w400,
@@ -133,7 +140,7 @@ ThemeData darkMode = ThemeData(
     //title
     titleMedium: TextStyle(
       color: ColorDarkMode.text,
-      fontSize: 18,
+      fontSize: 16,
       fontWeight: FontWeight.w700,
       fontFamily: 'SFProDisplay',
     ),
@@ -141,7 +148,14 @@ ThemeData darkMode = ThemeData(
     //body
     bodyMedium: TextStyle(
       color: ColorDarkMode.text,
-      fontSize: 16,
+      fontSize: 14,
+      fontWeight: FontWeight.w400,
+      fontFamily: 'SFProText',
+    ),
+
+    bodySmall: TextStyle(
+      color: ColorDarkMode.text,
+      fontSize: 12,
       fontWeight: FontWeight.w400,
       fontFamily: 'SFProText',
     ),
