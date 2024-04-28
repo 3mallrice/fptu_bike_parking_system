@@ -432,7 +432,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Ouside weather',
+                          'Outside weather',
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                         Row(
@@ -721,7 +721,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                         children: [
                           const Image(
                             image: AssetImage(AssetHelper.imgLogo),
-                            fit: BoxFit.fitWidth,
+                            fit: BoxFit.contain,
                             width: 60,
                           ),
                           Text(
@@ -737,7 +737,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                       ),
                       child: const Image(
                         image: AssetImage(AssetHelper.bai),
-                        fit: BoxFit.fitHeight,
+                        fit: BoxFit.contain,
                       ),
                     ),
                   ],
