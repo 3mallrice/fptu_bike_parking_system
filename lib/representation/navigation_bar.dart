@@ -55,20 +55,12 @@ class _MyNavigationBarState extends State<MyNavigationBar> {
         iconSpace: 10,
         items: [
           BottomBarItem(
-            icon: Image.asset(
-              AssetHelper.imgLogo,
-              height: 25,
-              width: 25,
-              color: _selectedIndex == 0
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.secondary,
-            ),
-            selectedColor: Theme.of(context).colorScheme.primary,
-            // unSelectedColor: Theme.of(context).colorScheme.secondary,
+            icon: const Icon(Icons.home_rounded),
             title: Text(
               'Home',
               style: Theme.of(context).textTheme.labelSmall,
             ),
+            selectedColor: Theme.of(context).colorScheme.primary,
           ),
           BottomBarItem(
             icon: const Icon(Icons.motorcycle_rounded),
