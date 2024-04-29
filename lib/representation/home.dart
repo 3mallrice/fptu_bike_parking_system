@@ -1,7 +1,10 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:flutter/material.dart';
 import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:fptu_bike_parking_system/api/model/weather/weather.dart';
+import 'package:fptu_bike_parking_system/component/shadow_container.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
 import 'package:fptu_bike_parking_system/representation/fundin_screen.dart';
 import 'package:geolocator/geolocator.dart';
@@ -85,132 +88,15 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                     autoPlayInterval: 5000,
                     isLoop: true,
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return const FullScreenImageDialog(
-                                imagePath: AssetHelper.banner1,
-                              );
-                            },
-                          );
-                        },
-                        child: const ClipRRect(
-                          child: Image(
-                            width: double.infinity,
-                            image: AssetImage(
-                              AssetHelper.banner1,
-                            ),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return const FullScreenImageDialog(
-                                imagePath: AssetHelper.banner2,
-                              );
-                            },
-                          );
-                        },
-                        child: const ClipRRect(
-                          child: Image(
-                            width: double.infinity,
-                            image: AssetImage(
-                              AssetHelper.banner2,
-                            ),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return const FullScreenImageDialog(
-                                imagePath: AssetHelper.banner3,
-                              );
-                            },
-                          );
-                        },
-                        child: const ClipRRect(
-                          child: Image(
-                            width: double.infinity,
-                            image: AssetImage(
-                              AssetHelper.banner3,
-                            ),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return const FullScreenImageDialog(
-                                imagePath: AssetHelper.banner4,
-                              );
-                            },
-                          );
-                        },
-                        child: const ClipRRect(
-                          child: Image(
-                            width: double.infinity,
-                            image: AssetImage(
-                              AssetHelper.banner4,
-                            ),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return const FullScreenImageDialog(
-                                imagePath: AssetHelper.banner5,
-                              );
-                            },
-                          );
-                        },
-                        child: const ClipRRect(
-                          child: Image(
-                            width: double.infinity,
-                            image: AssetImage(
-                              AssetHelper.banner5,
-                            ),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
+                      BannerSliderItem(context, AssetHelper.banner1),
+                      BannerSliderItem(context, AssetHelper.banner2),
+                      BannerSliderItem(context, AssetHelper.banner3),
+                      BannerSliderItem(context, AssetHelper.banner4),
+                      BannerSliderItem(context, AssetHelper.banner5),
                     ],
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  margin: EdgeInsets.symmetric(
-                    horizontal: MediaQuery.of(context).size.width * 0.05,
-                    vertical: MediaQuery.of(context).size.width * 0.025,
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(11),
-                    color: Theme.of(context).colorScheme.background,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        spreadRadius: 2,
-                        blurRadius: 7,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
+                ShadowContainer(
                   child: Column(
                     children: [
                       Row(
@@ -236,156 +122,21 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.of(context)
-                                  .pushNamed(FundinScreen.routeName);
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.background,
-                                shape: BoxShape.rectangle,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .secondary,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Icon(
-                                      Icons.input_rounded,
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 5),
-                                  Text(
-                                    'Fund in',
-                                    style:
-                                        Theme.of(context).textTheme.bodyMedium,
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              //
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.background,
-                                shape: BoxShape.rectangle,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .secondary,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Icon(
-                                      Icons.history_rounded,
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 5),
-                                  Text(
-                                    'History',
-                                    style:
-                                        Theme.of(context).textTheme.bodyMedium,
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              //
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.background,
-                                shape: BoxShape.rectangle,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .secondary,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Icon(
-                                      //report
-                                      Icons.insert_chart_outlined_rounded,
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 5),
-                                  Text(
-                                    'Report',
-                                    style:
-                                        Theme.of(context).textTheme.bodyMedium,
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              //
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.background,
-                                shape: BoxShape.rectangle,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .secondary,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Icon(
-                                      Icons.motorcycle_rounded,
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 5),
-                                  Text(
-                                    'Bais',
-                                    style:
-                                        Theme.of(context).textTheme.bodyMedium!,
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
+                          HomeMainItem(
+                              context,
+                              () => Navigator.of(context)
+                                  .pushNamed(FundinScreen.routeName),
+                              Icons.input_rounded,
+                              'Fund-in'),
+                          HomeMainItem(context, () {
+                            //TODO: implement
+                          }, Icons.history_rounded, 'History'),
+                          HomeMainItem(context, () {
+                            //TODO: implement
+                          }, Icons.insert_chart_outlined_rounded, 'Statistic'),
+                          HomeMainItem(context, () {
+                            //TODO: implement
+                          }, Icons.motorcycle_rounded, 'Bais'),
                         ],
                       ),
                     ],
@@ -393,27 +144,9 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                 ),
               ],
             ),
-            Container(
-              //height: MediaQuery.of(context).size.height * 0.2,
-              padding: const EdgeInsets.all(16),
-              margin: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width * 0.05,
-                vertical: MediaQuery.of(context).size.width * 0.025,
-              ),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(11),
-                color: Theme.of(context).colorScheme.background,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 2,
-                    blurRadius: 7,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
 
-              //location's weather
+            //Weather
+            ShadowContainer(
               child: Column(
                 children: [
                   Row(
@@ -674,25 +407,10 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                 ],
               ),
             ),
-            Container(
+
+            //Bai Parking
+            ShadowContainer(
               height: MediaQuery.of(context).size.height * 0.2,
-              padding: const EdgeInsets.all(16),
-              margin: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width * 0.05,
-                vertical: MediaQuery.of(context).size.width * 0.025,
-              ),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(11),
-                color: Theme.of(context).colorScheme.background,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 2,
-                    blurRadius: 7,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -727,6 +445,65 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
             ),
             const SizedBox(height: 60),
           ],
+        ),
+      ),
+    );
+  }
+
+  GestureDetector HomeMainItem(
+      BuildContext context, Function()? onTap, IconData icon, String title) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.background,
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.secondary,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              title,
+              style: Theme.of(context).textTheme.bodyMedium,
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  GestureDetector BannerSliderItem(BuildContext context, String imagePath) {
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return FullScreenImageDialog(
+              imagePath: imagePath,
+            );
+          },
+        );
+      },
+      child: ClipRRect(
+        child: Image(
+          width: double.infinity,
+          image: AssetImage(
+            imagePath,
+          ),
+          fit: BoxFit.cover,
         ),
       ),
     );
