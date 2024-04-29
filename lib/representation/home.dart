@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:fptu_bike_parking_system/api/model/weather/weather.dart';
@@ -31,7 +29,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
   String visibility = "null";
   String aqi = "null";
 
-  void getLocation() async {
+  Future getLocation() async {
     await Geolocator.checkPermission();
     await Geolocator.requestPermission();
 
@@ -46,10 +44,16 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
 
   //get data from API
   void getWeather() async {
-    getLocation();
+    await getLocation();
     weatherData = await OpenWeatherApi.fetchWeather(lat, lon);
     visibility = (weatherData!.visibility / 1000).toStringAsFixed(2);
     aqi = await OpenWeatherApi.fetchAirQuality(lat, lon);
+    setState(() {
+      weatherData = weatherData;
+      visibility = visibility;
+      aqi = aqi;
+      log.i('Visibility: $visibility km');
+    });
     log.i('Weather: ${weatherData!.weather[0].main}');
   }
 
@@ -479,11 +483,19 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                                       color:
                                           Theme.of(context).colorScheme.primary,
                                     ),
+                              // const SizedBox(height: 10),
+                              Text(
+                                // '${weatherData?.weather[0].main}: ${weatherData?.weather[0].description}',
+                                '${weatherData?.weather[0].description}',
+                                style: Theme.of(context).textTheme.bodyMedium,
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                              ),
                             ],
                           ),
                         ),
                         Expanded(
-                          flex: 3,
+                          flex: 1,
                           child: Column(
                             children: [
                               Text(
@@ -682,11 +694,11 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                     Align(
                       alignment: Alignment.topRight,
                       child: Text(
-                        'Last updated: ${weatherData?.dt != null ? DateFormat('dd/MM/yyyy HH:mm').format(DateTime.fromMillisecondsSinceEpoch(weatherData!.dt * 1000)) : 'loading...'} Timezone: ',
+                        'Last updated: ${weatherData?.dt != null ? DateFormat('dd/MM/yyyy HH:mm').format(DateTime.fromMillisecondsSinceEpoch(weatherData!.dt * 1000)) : 'loading...'} ${weatherData?.timezone != null ? 'GMT+${(weatherData!.timezone ~/ 3600).toString()}' : ''}',
                         style: Theme.of(context)
                             .textTheme
                             .bodyMedium!
-                            .copyWith(fontSize: 10),
+                            .copyWith(fontSize: 8),
                       ),
                     ),
                   ],
