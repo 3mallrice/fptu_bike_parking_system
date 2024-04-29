@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
 
 import '../component/main_app_bar.dart';
-import '../core/helper/asset_helper.dart';
 import 'history.dart';
 import 'home.dart';
 import 'me.dart';

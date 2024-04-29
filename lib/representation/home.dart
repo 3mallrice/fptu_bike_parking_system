@@ -664,7 +664,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                   Align(
                     alignment: Alignment.topRight,
                     child: Text(
-                      'Last updated: ${weatherData?.dt != null ? DateFormat('dd/MM/yyyy HH:mm').format(DateTime.fromMillisecondsSinceEpoch(weatherData!.dt * 1000)) : 'loading...'} Timezone: ',
+                      'Last updated: ${weatherData?.dt != null ? DateFormat('dd/MM/yyyy HH:mm').format(DateTime.fromMillisecondsSinceEpoch(weatherData!.dt * 1000)) : 'loading...'} ${weatherData?.timezone != null ? 'GMT+${(weatherData!.timezone ~/ 3600).toString()}' : ''}',
                       style: Theme.of(context)
                           .textTheme
                           .bodyMedium!
