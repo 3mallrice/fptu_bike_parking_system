@@ -1,17 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
+
 import '../core/helper/asset_helper.dart';
 
 class FundinScreen extends StatefulWidget {
   const FundinScreen({super.key});
 
   static String routeName = '/fundin_screen';
+
   @override
   State<FundinScreen> createState() => _FundinScreenState();
 }
 
 class _FundinScreenState extends State<FundinScreen> {
+  final List<String> numbers = [
+    '20.000',
+    '50.000',
+    '100.000',
+    '200.000',
+    '500.000'
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -130,97 +140,6 @@ class _FundinScreenState extends State<FundinScreen> {
                   'AMOUNT',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.2,
-                  child: GridView.count(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 20,
-                    crossAxisSpacing: 20,
-                    primary: false,
-                    children: [
-                      ShadowContainer(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '20.000 bic',
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            Text(
-                              'Price: 20.000',
-                              style: Theme.of(context).textTheme.labelMedium,
-                            ),
-                          ],
-                        ),
-                      ),
-                      ShadowContainer(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '50.000 bic',
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            Text(
-                              'Price: 50.000',
-                              style: Theme.of(context).textTheme.labelMedium,
-                            ),
-                          ],
-                        ),
-                      ),
-                      ShadowContainer(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '100.000 bic',
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            Text(
-                              'Price: 97.000',
-                              style: Theme.of(context).textTheme.labelMedium,
-                            ),
-                          ],
-                        ),
-                      ),
-                      ShadowContainer(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '200.000 bic',
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            Text(
-                              'Price: 194.000',
-                              style: Theme.of(context).textTheme.labelMedium,
-                            ),
-                          ],
-                        ),
-                      ),
-                      ShadowContainer(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '500.000 bic',
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            Text(
-                              'Price: 485.000',
-                              style: Theme.of(context).textTheme.labelMedium,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                )
               ],
             ),
           ),

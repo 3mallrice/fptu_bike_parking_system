@@ -100,6 +100,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                   ),
                 ),
                 ShadowContainer(
+                  width: MediaQuery.of(context).size.width * 0.9,
                   child: Column(
                     children: [
                       Row(
@@ -146,6 +147,8 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
 
             //Weather
             ShadowContainer(
+              margin: const EdgeInsetsDirectional.symmetric(vertical: 10),
+              width: MediaQuery.of(context).size.width * 0.9,
               child: Column(
                 children: [
                   Row(
@@ -409,6 +412,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
 
             //Bai Parking
             ShadowContainer(
+              width: MediaQuery.of(context).size.width * 0.9,
               height: MediaQuery.of(context).size.height * 0.2,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class ShadowContainer extends StatelessWidget {
   final double? width;
   final double? height;
+  final EdgeInsetsGeometry? margin;
   final EdgeInsetsGeometry? padding;
   final double? borderRadius;
   final Color? color;
@@ -12,6 +13,7 @@ class ShadowContainer extends StatelessWidget {
     super.key,
     this.width,
     this.height,
+    this.margin,
     this.padding,
     this.borderRadius,
     this.color,
@@ -21,8 +23,9 @@ class ShadowContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
+      width: width ?? double.infinity,
       height: height,
+      margin: margin,
       padding: padding ?? const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(borderRadius ?? 11),
