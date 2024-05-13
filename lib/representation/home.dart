@@ -128,15 +128,11 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                                   .pushNamed(FundinScreen.routeName),
                               Icons.input_rounded,
                               'Fund-in'),
-                          HomeMainItem(context, () {
-                            //TODO: implement
-                          }, Icons.history_rounded, 'History'),
-                          HomeMainItem(context, () {
-                            //TODO: implement
-                          }, Icons.insert_chart_outlined_rounded, 'Statistic'),
-                          HomeMainItem(context, () {
-                            //TODO: implement
-                          }, Icons.motorcycle_rounded, 'Bais'),
+                          HomeMainItem(context, () {}, Icons.wallet, 'Wallet'),
+                          HomeMainItem(context, () {},
+                              Icons.insert_chart_outlined_rounded, 'Insights'),
+                          HomeMainItem(
+                              context, () {}, Icons.motorcycle_rounded, 'Bais'),
                         ],
                       ),
                     ],

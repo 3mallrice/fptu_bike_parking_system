@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../const/frondend/color_const.dart';
 
@@ -41,27 +42,27 @@ ThemeData lightMode = ThemeData(
 
   textTheme: TextTheme(
     //display
-    displayMedium: const TextStyle(
+    displayMedium: TextStyle(
       color: ColorLightMode.primaryText,
       fontSize: 22,
       fontWeight: FontWeight.w700,
-      fontFamily: 'SFProDisplay',
+      fontFamily: GoogleFonts.roboto().fontFamily,
     ),
 
     //headline: chữ cho appbar
-    headlineMedium: const TextStyle(
+    headlineMedium: TextStyle(
       color: ColorLightMode.primaryOrange,
       fontSize: 20,
       fontWeight: FontWeight.w700,
-      fontFamily: 'SFProDisplay',
+      fontFamily: GoogleFonts.roboto().fontFamily,
     ),
 
     //title
-    titleMedium: const TextStyle(
+    titleMedium: TextStyle(
       color: ColorLightMode.primaryText,
       fontSize: 16,
       fontWeight: FontWeight.w700,
-      fontFamily: 'SFProDisplay',
+      fontFamily: GoogleFonts.roboto().fontFamily,
     ),
 
     //body
@@ -69,29 +70,29 @@ ThemeData lightMode = ThemeData(
       color: ColorLightMode.primaryText.withOpacity(0.5),
       fontSize: 14,
       fontWeight: FontWeight.w400,
-      fontFamily: 'SFProText',
+      fontFamily: GoogleFonts.roboto().fontFamily,
     ),
 
-    bodySmall: const TextStyle(
-      color: ColorLightMode.secondaryText,
+    bodySmall: TextStyle(
+      color: ColorLightMode.primaryText,
       fontSize: 13,
       fontWeight: FontWeight.w400,
-      fontFamily: 'SFProText',
+      fontFamily: GoogleFonts.roboto().fontFamily,
     ),
 
     //label
-    labelMedium: const TextStyle(
+    labelMedium: TextStyle(
       color: ColorLightMode.secondaryText,
       fontSize: 16,
       fontWeight: FontWeight.w400,
-      fontFamily: 'SFProText',
+      fontFamily: GoogleFonts.roboto().fontFamily,
     ),
 
-    labelSmall: const TextStyle(
+    labelSmall: TextStyle(
       color: ColorLightMode.primaryText,
       fontSize: 12,
       fontWeight: FontWeight.w400,
-      fontFamily: 'SFProText',
+      fontFamily: GoogleFonts.roboto().fontFamily,
     ),
   ),
 );
