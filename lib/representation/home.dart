@@ -1,10 +1,9 @@
-// ignore_for_file: non_constant_identifier_names
-
 import 'package:flutter/material.dart';
 import 'package:flutter_image_slideshow/flutter_image_slideshow.dart'
     show ImageSlideshow;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart'
     show FontAwesomeIcons;
+import 'package:fptu_bike_parking_system/representation/wallet_screen.dart';
 import 'package:geolocator/geolocator.dart'
     show Geolocator, LocationAccuracy, Position;
 import 'package:intl/intl.dart' show DateFormat;
@@ -91,11 +90,11 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                     autoPlayInterval: 5000,
                     isLoop: true,
                     children: [
-                      BannerSliderItem(context, AssetHelper.banner1),
-                      BannerSliderItem(context, AssetHelper.banner2),
-                      BannerSliderItem(context, AssetHelper.banner3),
-                      BannerSliderItem(context, AssetHelper.banner4),
-                      BannerSliderItem(context, AssetHelper.banner5),
+                      bannerSliderItem(context, AssetHelper.banner1),
+                      bannerSliderItem(context, AssetHelper.banner2),
+                      bannerSliderItem(context, AssetHelper.banner3),
+                      bannerSliderItem(context, AssetHelper.banner4),
+                      bannerSliderItem(context, AssetHelper.banner5),
                     ],
                   ),
                 ),
@@ -126,16 +125,21 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          HomeMainItem(
+                          homeMainItem(
                               context,
                               () => Navigator.of(context)
                                   .pushNamed(FundinScreen.routeName),
                               Icons.input_rounded,
                               'Fund-in'),
-                          HomeMainItem(context, () {}, Icons.wallet, 'Wallet'),
-                          HomeMainItem(context, () {},
+                          homeMainItem(
+                              context,
+                              () => Navigator.of(context)
+                                  .pushNamed(MyWallet.routeName),
+                              Icons.wallet,
+                              'Wallet'),
+                          homeMainItem(context, () {},
                               Icons.insert_chart_outlined_rounded, 'Insights'),
-                          HomeMainItem(
+                          homeMainItem(
                               context, () {}, Icons.motorcycle_rounded, 'Bais'),
                         ],
                       ),
@@ -399,7 +403,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                   Align(
                     alignment: Alignment.topRight,
                     child: Text(
-                      'Last updated: ${weatherData?.dt != null ? DateFormat('dd/MM/yyyy HH:mm').format(DateTime.fromMillisecondsSinceEpoch(weatherData!.dt * 1000)) : 'loading...'} ${weatherData?.timezone != null ? 'GMT+${(weatherData!.timezone ~/ 3600).toString()}' : ''}',
+                      'Last updated: ${weatherData == null ? 'loading...' : getLastUpdated(weatherData!)}',
                       style: Theme.of(context)
                           .textTheme
                           .bodyMedium!
@@ -453,7 +457,20 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
     );
   }
 
-  GestureDetector HomeMainItem(
+  String getLastUpdated(WeatherData weatherData) {
+    String lastUpdated = DateFormat('dd/MM/yyyy HH:mm')
+        .format(DateTime.fromMillisecondsSinceEpoch(weatherData.dt * 1000));
+
+    String timezone = weatherData.timezone ~/ 3600 >= 0
+        ? 'GMT+${weatherData.timezone ~/ 3600}'
+        : 'GMT${weatherData.timezone ~/ 3600}';
+
+    String returnString = '$lastUpdated $timezone';
+
+    return returnString;
+  }
+
+  GestureDetector homeMainItem(
       BuildContext context, Function()? onTap, IconData icon, String title) {
     return GestureDetector(
       onTap: onTap,
@@ -488,7 +505,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
     );
   }
 
-  GestureDetector BannerSliderItem(BuildContext context, String imagePath) {
+  GestureDetector bannerSliderItem(BuildContext context, String imagePath) {
     return GestureDetector(
       onTap: () {
         showDialog(

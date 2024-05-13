@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
+import 'package:fptu_bike_parking_system/representation/wallet_screen.dart';
 
 import '../core/helper/asset_helper.dart';
 
@@ -31,14 +32,15 @@ class _FundinScreenState extends State<FundinScreen> {
         action: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: TextButton(
-                onPressed: () {
-                  //Navigator.of(context).pushNamed();
-                },
-                child: Text(
-                  'History',
-                  style: Theme.of(context).textTheme.titleMedium,
-                )),
+            child: IconButton(
+              onPressed: () =>
+                  Navigator.of(context).pushNamed(MyWallet.routeName),
+              icon: Icon(
+                Icons.wallet,
+                color: Theme.of(context).colorScheme.outline,
+              ),
+              iconSize: 21,
+            ),
           )
         ],
       ),

@@ -10,14 +10,27 @@ class ShadowContainer extends StatelessWidget {
   final Widget? child;
 
   const ShadowContainer({
+    /// A widget that wraps a child with a shadow effect.
+    /// made by [Maotou] with ❤️.
     super.key,
     this.width,
+
+    /// The width of the container.
     this.height,
     this.margin,
     this.padding,
+
+    /// The margin of the container.
     this.borderRadius,
+
+    /// The border radius of the container.
     this.color,
+
+    /// The color of the container.
     this.child,
+
+    /// The child of the container.
+    /// It can be any widget, but it is recommended to use a column or row widget.
   });
 
   @override
