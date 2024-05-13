@@ -1,17 +1,20 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:flutter/material.dart';
-import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:fptu_bike_parking_system/api/model/weather/weather.dart';
-import 'package:fptu_bike_parking_system/component/shadow_container.dart';
-import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
-import 'package:fptu_bike_parking_system/representation/fundin_screen.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:intl/intl.dart';
-import 'package:logger/logger.dart';
+import 'package:flutter_image_slideshow/flutter_image_slideshow.dart'
+    show ImageSlideshow;
+import 'package:font_awesome_flutter/font_awesome_flutter.dart'
+    show FontAwesomeIcons;
+import 'package:geolocator/geolocator.dart'
+    show Geolocator, LocationAccuracy, Position;
+import 'package:intl/intl.dart' show DateFormat;
+import 'package:logger/logger.dart' show Logger;
 
-import '../api/service/weather/open_weather_api.dart';
+import '../api/model/weather/weather.dart' show WeatherData;
+import '../api/service/weather/open_weather_api.dart' show OpenWeatherApi;
+import '../component/shadow_container.dart' show ShadowContainer;
+import '../core/helper/asset_helper.dart' show AssetHelper;
+import 'fundin_screen.dart' show FundinScreen;
 
 class HomeAppScreen extends StatefulWidget {
   const HomeAppScreen({super.key});

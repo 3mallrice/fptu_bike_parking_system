@@ -78,7 +78,7 @@ class _MyNavigationBarState extends State<MyNavigationBar> {
             selectedColor: Theme.of(context).colorScheme.primary,
           ),
           BottomBarItem(
-            icon: const Icon(Icons.person_2_rounded),
+            icon: const Icon(Icons.person_rounded),
             title: Text(
               'Me',
               style: Theme.of(context).textTheme.labelSmall,
