@@ -5,7 +5,9 @@ class ColorLightMode {
   static const Color primaryOrange = Color(0xFFF37021);
   static const Color secondaryOrange = Color(0xFFFFF7EF);
   static const Color primaryText = Color(0xFF0E1830);
-  static const Color secondaryText = Color(0xFFD9D9D9);
+  static const Color dividerColor = Color(0xFFD9D9D9);
+  static Color secondaryText = const Color(0xFF0E1030).withOpacity(0.5);
+  static const Color primaryGray = Color(0xFFE5E5E5);
 }
 
 class ColorDarkMode {
