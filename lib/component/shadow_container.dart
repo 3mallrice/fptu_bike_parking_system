@@ -4,7 +4,6 @@ class ShadowContainer extends StatelessWidget {
   final double? width;
   final double? height;
   final EdgeInsetsGeometry? padding;
-  final EdgeInsetsGeometry? margin;
   final double? borderRadius;
   final Color? color;
   final Widget? child;
@@ -14,7 +13,6 @@ class ShadowContainer extends StatelessWidget {
     this.width,
     this.height,
     this.padding,
-    this.margin,
     this.borderRadius,
     this.color,
     this.child,
@@ -23,14 +21,9 @@ class ShadowContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: width,
+      width: double.infinity,
       height: height,
       padding: padding ?? const EdgeInsets.all(16),
-      margin: margin ??
-          EdgeInsets.symmetric(
-            horizontal: MediaQuery.of(context).size.width * 0.05,
-            vertical: MediaQuery.of(context).size.width * 0.025,
-          ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(borderRadius ?? 11),
         color: color ?? Theme.of(context).colorScheme.background,

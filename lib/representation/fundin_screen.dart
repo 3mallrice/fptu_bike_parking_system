@@ -37,14 +37,13 @@ class _FundinScreenState extends State<FundinScreen> {
         child: Align(
           alignment: Alignment.center,
           child: Container(
-            alignment: Alignment.center,
-            // color: Theme.of(context).colorScheme.primary,
+            width: MediaQuery.of(context).size.width * 0.9,
+            margin: const EdgeInsets.only(top: 10),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ShadowContainer(
-                  width: MediaQuery.of(context).size.width * 0.9,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -111,6 +110,20 @@ class _FundinScreenState extends State<FundinScreen> {
                     ],
                   ),
                 ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  'PROVIDER',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                ShadowContainer(
+                  child: Image(
+                    image: const AssetImage(AssetHelper.baiLogo),
+                    fit: BoxFit.fitHeight,
+                    height: MediaQuery.of(context).size.height * 0.1,
+                  ),
+                )
               ],
             ),
           ),
