@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:fptu_bike_parking_system/representation/bais_Screen.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
 
 import '../component/main_app_bar.dart';
 import 'history.dart';
 import 'home.dart';
 import 'me.dart';
-import 'vehicle.dart';
 
 class MyNavigationBar extends StatefulWidget {
   static const String routeName = '/navigation_bar';
+
   const MyNavigationBar({super.key});
 
   @override
@@ -19,7 +20,7 @@ class _MyNavigationBarState extends State<MyNavigationBar> {
   int _selectedIndex = 0;
   static const List<Widget> _widgetOptions = <Widget>[
     HomeAppScreen(),
-    VehicleScreen(),
+    BaisScreen(),
     HistoryScreen(),
     MeScreen(),
   ];
