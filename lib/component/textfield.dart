@@ -44,12 +44,15 @@ class CustomTextField extends StatelessWidget {
         labelText: labelText,
         suffixIcon: suffixIcon,
         prefixIcon: prefixIcon,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+        errorText: validator != null ? validator!(controller!.text) : null,
+        errorStyle: TextStyle(
+          color: Theme.of(context).colorScheme.error,
         ),
         floatingLabelBehavior:
             floatingLabelBehavior ?? FloatingLabelBehavior.auto,
       ),
+
+      // selectionHeightStyle: BoxHeightStyle.tight,
       cursorColor: Theme.of(context).colorScheme.primary,
       maxLength: maxLength,
       inputFormatters: inputFormatters,
