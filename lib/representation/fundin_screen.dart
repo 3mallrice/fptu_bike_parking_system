@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
 
+import '../component/textfield.dart';
 import '../core/helper/asset_helper.dart';
 
 class FundinScreen extends StatefulWidget {
@@ -13,6 +15,8 @@ class FundinScreen extends StatefulWidget {
 }
 
 class _FundinScreenState extends State<FundinScreen> {
+  TextEditingController _quantityController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
