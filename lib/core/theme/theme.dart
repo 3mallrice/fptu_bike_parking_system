@@ -48,6 +48,13 @@ ThemeData lightMode = ThemeData(
 
   textTheme: TextTheme(
     //display
+    displayLarge: TextStyle(
+      color: ColorLightMode.background,
+      fontSize: 24,
+      fontWeight: FontWeight.w700,
+      fontFamily: GoogleFonts.roboto().fontFamily,
+    ),
+
     displayMedium: TextStyle(
       color: ColorLightMode.primaryText,
       fontSize: 22,

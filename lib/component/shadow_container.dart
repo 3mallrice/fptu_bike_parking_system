@@ -41,7 +41,7 @@ class ShadowContainer extends StatelessWidget {
       margin: margin,
       padding: padding ?? const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(borderRadius ?? 11),
+        borderRadius: BorderRadius.circular(borderRadius ?? 10),
         color: color ?? Theme.of(context).colorScheme.background,
         boxShadow: [
           BoxShadow(

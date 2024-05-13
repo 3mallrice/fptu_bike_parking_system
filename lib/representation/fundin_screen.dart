@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fptu_bike_parking_system/component/shadow_button.dart';
 
 import '../component/app_bar_component.dart';
 import '../component/shadow_container.dart';
@@ -15,12 +16,20 @@ class FundinScreen extends StatefulWidget {
 }
 
 class _FundinScreenState extends State<FundinScreen> {
-  final List<String> numbers = [
+  final List<String> num1 = [
     '20.000',
     '50.000',
     '100.000',
     '200.000',
     '500.000'
+  ];
+
+  final List<String> num2 = [
+    '20.000',
+    '50.000',
+    '97.000',
+    '194.000',
+    '485.000'
   ];
 
   @override
@@ -51,7 +60,6 @@ class _FundinScreenState extends State<FundinScreen> {
             width: MediaQuery.of(context).size.width * 0.9,
             margin: const EdgeInsets.only(top: 10),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ShadowContainer(
@@ -87,8 +95,8 @@ class _FundinScreenState extends State<FundinScreen> {
                         height: 5,
                       ),
                       Divider(
-                        color: Theme.of(context).colorScheme.onTertiary,
-                        thickness: 0.5,
+                        color: Theme.of(context).colorScheme.outlineVariant,
+                        thickness: 1,
                       ),
                       const SizedBox(
                         height: 5,
@@ -122,11 +130,16 @@ class _FundinScreenState extends State<FundinScreen> {
                   ),
                 ),
                 const SizedBox(
-                  height: 20,
+                  height: 30,
                 ),
-                Text(
-                  'PROVIDER',
-                  style: Theme.of(context).textTheme.titleMedium,
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Text(
+                    'PROVIDER',
+                    style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
                 ),
                 ShadowContainer(
                   child: Image(
@@ -136,11 +149,87 @@ class _FundinScreenState extends State<FundinScreen> {
                   ),
                 ),
                 const SizedBox(
-                  height: 20,
+                  height: 30,
                 ),
-                Text(
-                  'AMOUNT',
-                  style: Theme.of(context).textTheme.titleMedium,
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Text(
+                    'AMOUNT',
+                    style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ),
+                GridView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 2.5,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                  ),
+                  itemCount: num1.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Container(
+                      child: GestureDetector(
+                        onTap: () {
+                          //kkk
+                        },
+                        child: ShadowContainer(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                num1[index],
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                              Text(
+                                'Price: ${num2[index]}',
+                                style: Theme.of(context).textTheme.labelMedium,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 30),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.lightbulb_circle,
+                      color: Theme.of(context).colorScheme.outline,
+                      size: 29,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      'Services are provided by Bai Parking.',
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 30),
+                Align(
+                  alignment: Alignment.center,
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.6,
+                    child: Text(
+                      'By tapping CONFIRM you agree to deposit bai coins into your wallet.',
+                      style: Theme.of(context).textTheme.labelMedium,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+                const ShadowButton(
+                  buttonTitle: 'CONFIRM',
+                  margin: EdgeInsets.only(
+                    top: 20,
+                  ),
                 ),
               ],
             ),
