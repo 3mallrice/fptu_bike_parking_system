@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
-import 'package:fptu_bike_parking_system/component/shadow_container.dart';
-import 'package:fptu_bike_parking_system/representation/wallet_screen.dart';
 
+import '../component/app_bar_component.dart';
+import '../component/shadow_container.dart';
 import '../core/helper/asset_helper.dart';
+import 'wallet_screen.dart';
 
 class FundinScreen extends StatefulWidget {
   const FundinScreen({super.key});
