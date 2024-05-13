@@ -7,13 +7,17 @@ ThemeData lightMode = ThemeData(
   primarySwatch: Colors.blue,
   brightness: Brightness.light,
 
-  appBarTheme: const AppBarTheme(
+  appBarTheme: AppBarTheme(
     // color: Colors.white,
+    titleTextStyle: TextStyle(
+      color: ColorLightMode.primaryText,
+      fontSize: 20,
+      fontWeight: FontWeight.w700,
+      fontFamily: GoogleFonts.roboto().fontFamily,
+    ),
+    centerTitle: true,
     backgroundColor: ColorLightMode.background,
     elevation: 4,
-    iconTheme: IconThemeData(
-      color: ColorLightMode.primaryText,
-    ),
     surfaceTintColor: ColorLightMode.background,
   ),
 
@@ -25,12 +29,14 @@ ThemeData lightMode = ThemeData(
     height: 70,
   ),
 
-  colorScheme: const ColorScheme.light(
+  colorScheme: ColorScheme.light(
     background: ColorLightMode.background,
     primary: ColorLightMode.primaryOrange,
     secondary: ColorLightMode.secondaryOrange,
     inversePrimary: ColorLightMode.background,
+    outlineVariant: ColorLightMode.dividerColor,
     outline: ColorLightMode.primaryText,
+    onSecondary: ColorLightMode.secondaryText,
   ),
   dividerColor: ColorLightMode.primaryText,
   useMaterial3: true,
@@ -93,87 +99,6 @@ ThemeData lightMode = ThemeData(
       fontSize: 12,
       fontWeight: FontWeight.w400,
       fontFamily: GoogleFonts.roboto().fontFamily,
-    ),
-  ),
-);
-
-ThemeData darkMode = ThemeData(
-  primarySwatch: Colors.blue,
-  brightness: Brightness.dark,
-  colorScheme: const ColorScheme.dark(
-    background: ColorDarkMode.background,
-    primary: ColorLightMode.primaryOrange,
-    secondary: ColorDarkMode.secondaryGray,
-    inversePrimary: ColorDarkMode.primaryGray,
-    outline: ColorDarkMode.text,
-  ),
-  dividerColor: ColorDarkMode.text,
-  useMaterial3: true,
-  appBarTheme: const AppBarTheme(
-    backgroundColor: ColorDarkMode.primaryGray,
-    elevation: 5,
-    iconTheme: IconThemeData(
-      color: ColorDarkMode.text,
-    ),
-  ),
-  bottomAppBarTheme: const BottomAppBarTheme(
-    color: ColorDarkMode.background,
-    elevation: 4,
-    height: 70,
-  ),
-  textTheme: const TextTheme(
-    //display
-    displayMedium: TextStyle(
-      color: ColorDarkMode.text,
-      fontSize: 22,
-      fontWeight: FontWeight.w700,
-      fontFamily: 'SFProDisplay',
-    ),
-
-    //headline
-    headlineMedium: TextStyle(
-      color: ColorDarkMode.text,
-      fontSize: 20,
-      fontWeight: FontWeight.w700,
-      fontFamily: 'SFProDisplay',
-    ),
-
-    //title
-    titleMedium: TextStyle(
-      color: ColorDarkMode.text,
-      fontSize: 16,
-      fontWeight: FontWeight.w700,
-      fontFamily: 'SFProDisplay',
-    ),
-
-    //body
-    bodyMedium: TextStyle(
-      color: ColorDarkMode.text,
-      fontSize: 14,
-      fontWeight: FontWeight.w400,
-      fontFamily: 'SFProText',
-    ),
-
-    bodySmall: TextStyle(
-      color: ColorDarkMode.text,
-      fontSize: 12,
-      fontWeight: FontWeight.w400,
-      fontFamily: 'SFProText',
-    ),
-
-    //label
-    labelMedium: TextStyle(
-      color: ColorDarkMode.text,
-      fontSize: 16,
-      fontWeight: FontWeight.w400,
-      fontFamily: 'SFProText',
-    ),
-
-    labelSmall: TextStyle(
-      color: ColorDarkMode.text,
-      fontSize: 12,
-      fontWeight: FontWeight.w400,
-      fontFamily: 'SFProText',
     ),
   ),
 );

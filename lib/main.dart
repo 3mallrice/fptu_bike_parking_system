@@ -1,9 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 
 import 'core/theme/theme_provider.dart';
+import 'firebase_options.dart';
 import 'representation/home_screen.dart';
 import 'route.dart';
 
@@ -33,6 +33,7 @@ class MyApp extends StatelessWidget {
       title: 'BAI',
       debugShowCheckedModeBanner: false,
       theme: Provider.of<ThemeProvider>(context).themeData,
+
       home: const AspectRatio(
         aspectRatio: 1,
         child: HomeScreen(),
