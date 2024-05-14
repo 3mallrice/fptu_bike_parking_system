@@ -103,25 +103,27 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                   width: MediaQuery.of(context).size.width * 0.9,
                   child: Column(
                     children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          const Image(
-                            image: AssetImage(AssetHelper.bic),
-                            fit: BoxFit.fitWidth,
-                            width: 30,
-                          ),
-                          const SizedBox(
-                            width: 5,
-                          ),
-                          Expanded(
-                            child: Text(
+                      GestureDetector(
+                        onTap: () =>
+                            Navigator.of(context).pushNamed(MyWallet.routeName),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            const Image(
+                              image: AssetImage(AssetHelper.bic),
+                              fit: BoxFit.fitWidth,
+                              width: 30,
+                            ),
+                            const SizedBox(
+                              width: 5,
+                            ),
+                            Text(
                               '45.000 bic',
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -145,7 +147,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                               () => Navigator.of(context)
                                   .pushNamed(BaisScreen.routeName),
                               Icons.motorcycle_rounded,
-                              'Bais'),
+                              'Bai'),
                         ],
                       ),
                     ],
@@ -170,13 +172,16 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                       Row(
                         children: [
                           Text(
-                              '${weatherData?.name}, ${weatherData?.sys.country}',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium!
-                                  .copyWith(
-                                    fontSize: 12,
-                                  )),
+                            '${weatherData?.name}, ${weatherData?.sys.country}',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(
+                                  fontSize: 12,
+                                  color:
+                                      Theme.of(context).colorScheme.onSecondary,
+                                ),
+                          ),
                           const SizedBox(width: 5),
                           GestureDetector(
                             onTap: () => getWeather(),
@@ -409,10 +414,10 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                     alignment: Alignment.topRight,
                     child: Text(
                       'Last updated: ${weatherData == null ? 'loading...' : getLastUpdated(weatherData!)}',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyMedium!
-                          .copyWith(fontSize: 10),
+                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                            fontSize: 10,
+                            color: Theme.of(context).colorScheme.onSecondary,
+                          ),
                     ),
                   ),
                 ],
