@@ -10,4 +10,5 @@ class AssetHelper {
   static const String fptedu = 'assets/imgs/fptedu.png';
   static const String fptu = 'assets/imgs/fptu.png';
   static const String baiLogo = 'assets/imgs/bai.png';
+  static const String plateNumber = 'assets/imgs/plateNumber.png';
 }
