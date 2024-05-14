@@ -75,7 +75,7 @@ flutter:
   assets:
     - assets/imgs/
     - assets/
-    - assets/fonts/
+    # - assets/fonts/
     # - assets/imgs/Bai_Logo_NoBackground.png
     # - assets/imgs/Bai_Logo.png
     # - assets/imgs/Bai_Logo.svg
@@ -103,6 +103,6 @@ flutter:
 #        - asset: assets/fonts/SFProText-Light.otf
 #        - asset: assets/fonts/SFProText-LightItalic.otf
 #          style: italic
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/custom-fonts/#from-packages
+#
+# For details regarding fonts from package dependencies,
+# see https://flutter.dev/custom-fonts/#from-packages
