@@ -105,6 +105,7 @@ class _BaiScreenState extends State<BaiScreen> {
                   child: ListView.builder(
                     shrinkWrap: true,
                     itemCount: bikes.length,
+                    physics: const NeverScrollableScrollPhysics(),
                     itemBuilder: (context, index) {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 25),

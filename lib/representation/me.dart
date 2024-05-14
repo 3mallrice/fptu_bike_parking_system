@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
+import 'package:fptu_bike_parking_system/representation/profile.dart';
 
 class MeScreen extends StatefulWidget {
   const MeScreen({super.key});
@@ -58,7 +59,10 @@ class _MeScreenState extends State<MeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     GestureDetector(
-                      onTap: () => {},
+                      onTap: () => {
+                        Navigator.of(context)
+                            .pushNamed(ProfileScreen.routeName),
+                      },
                       child: Container(
                         padding: const EdgeInsets.all(10.0),
                         child: Row(

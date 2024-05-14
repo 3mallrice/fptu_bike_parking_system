@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fptu_bike_parking_system/representation/profile.dart';
 import '../representation/bai_screen.dart';
 import 'package:fptu_bike_parking_system/representation/fundin_screen.dart';
 import 'package:fptu_bike_parking_system/representation/me.dart';
@@ -18,4 +19,5 @@ final Map<String, WidgetBuilder> routes = {
   MyWallet.routeName: (context) => const MyWallet(),
   BaiScreen.routeName: (context) => const BaiScreen(),
   MeScreen.routeName: (context) => const MeScreen(),
+  ProfileScreen.routeName: (context) => const ProfileScreen(),
 };

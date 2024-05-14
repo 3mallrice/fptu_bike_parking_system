@@ -171,23 +171,24 @@ class _FundinScreenState extends State<FundinScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              num1[index],
-                              style: Theme.of(context).textTheme.titleMedium,
+                            Expanded(
+                              child: Text(
+                                num1[index],
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
                             ),
-                            const SizedBox(
-                              height: 2,
-                            ),
-                            Text(
-                              'Price: ${num2[index]}',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall!
-                                  .copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSecondary,
-                                  ),
+                            Expanded(
+                              child: Text(
+                                'Price: ${num2[index]}',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSecondary,
+                                    ),
+                              ),
                             ),
                           ],
                         ),
@@ -195,25 +196,6 @@ class _FundinScreenState extends State<FundinScreen> {
                     );
                   },
                 ),
-                const SizedBox(height: 30),
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.center,
-                //   crossAxisAlignment: CrossAxisAlignment.center,
-                //   children: [
-                //     Icon(
-                //       Icons.lightbulb_circle,
-                //       color: Theme.of(context).colorScheme.outline,
-                //       size: 20,
-                //     ),
-                //     const SizedBox(width: 10),
-                //     Text(
-                //       'Services are provided by Bai Parking.',
-                //       style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                //             color: Theme.of(context).colorScheme.onSecondary,
-                //           ),
-                //     ),
-                //   ],
-                // ),
                 const SizedBox(height: 50),
                 Align(
                   alignment: Alignment.center,
@@ -228,10 +210,10 @@ class _FundinScreenState extends State<FundinScreen> {
                     ),
                   ),
                 ),
-                const ShadowButton(
-                  buttonTitle: 'CONFIRM',
-                  margin: EdgeInsets.only(
-                    top: 20,
+                GestureDetector(
+                  child: const ShadowButton(
+                    buttonTitle: 'CONFIRM',
+                    margin: EdgeInsets.symmetric(vertical: 20),
                   ),
                 ),
               ],
