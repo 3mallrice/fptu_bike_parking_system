@@ -79,8 +79,15 @@ ThemeData lightMode = ThemeData(
     ),
 
     //body
+    bodyLarge: TextStyle(
+      color: ColorLightMode.secondaryText,
+      fontSize: 15,
+      fontWeight: FontWeight.w400,
+      fontFamily: GoogleFonts.roboto().fontFamily,
+    ),
+
     bodyMedium: TextStyle(
-      color: ColorLightMode.primaryText.withOpacity(0.5),
+      color: ColorLightMode.primaryText,
       fontSize: 14,
       fontWeight: FontWeight.w400,
       fontFamily: GoogleFonts.roboto().fontFamily,
