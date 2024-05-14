@@ -10,14 +10,26 @@ import 'me.dart';
 class MyNavigationBar extends StatefulWidget {
   static const String routeName = '/navigation_bar';
 
-  const MyNavigationBar({super.key});
+  final int? selectedIndex;
+
+  const MyNavigationBar({
+    super.key,
+    this.selectedIndex = 0,
+  });
 
   @override
   State<MyNavigationBar> createState() => _MyNavigationBarState();
 }
 
 class _MyNavigationBarState extends State<MyNavigationBar> {
-  int _selectedIndex = 0;
+  late int _selectedIndex;
+  
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.selectedIndex!;
+  }
+
   static const List<Widget> _widgetOptions = <Widget>[
     HomeAppScreen(),
     BaiScreen(),

@@ -3,7 +3,7 @@ import 'package:flutter_image_slideshow/flutter_image_slideshow.dart'
     show ImageSlideshow;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart'
     show FontAwesomeIcons;
-import 'package:fptu_bike_parking_system/representation/bai_screen.dart';
+import 'package:fptu_bike_parking_system/representation/navigation_bar.dart';
 import 'package:fptu_bike_parking_system/representation/wallet_screen.dart';
 import 'package:geolocator/geolocator.dart'
     show Geolocator, LocationAccuracy, Position;
@@ -143,11 +143,14 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                           homeMainItem(context, () {},
                               Icons.insert_chart_outlined_rounded, 'Insights'),
                           homeMainItem(
-                              context,
-                              () => Navigator.of(context)
-                                  .pushNamed(BaiScreen.routeName),
-                              Icons.motorcycle_rounded,
-                              'Bai'),
+                            context,
+                            () => Navigator.of(context).pushNamed(
+                              MyNavigationBar.routeName,
+                              arguments: 1, // MainNavigator.Bai,
+                            ),
+                            Icons.motorcycle_rounded,
+                            'Bai',
+                          ),
                         ],
                       ),
                     ],
