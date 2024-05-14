@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 class MeScreen extends StatefulWidget {
   const MeScreen({super.key});
 
+  static String routeName = '/me_screen';
+
   @override
   State<MeScreen> createState() => _MeScreenState();
 }

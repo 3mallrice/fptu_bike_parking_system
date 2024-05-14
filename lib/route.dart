@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/representation/bais_Screen.dart';
 import 'package:fptu_bike_parking_system/representation/fundin_screen.dart';
+import 'package:fptu_bike_parking_system/representation/me.dart';
 import 'package:fptu_bike_parking_system/representation/navigation_bar.dart';
 import 'package:fptu_bike_parking_system/representation/qr_code.dart';
 import 'package:fptu_bike_parking_system/representation/wallet_screen.dart';
@@ -16,4 +17,5 @@ final Map<String, WidgetBuilder> routes = {
   FundinScreen.routeName: (context) => const FundinScreen(),
   MyWallet.routeName: (context) => const MyWallet(),
   BaisScreen.routeName: (context) => const BaisScreen(),
+  MeScreen.routeName: (context) => const MeScreen(),
 };
