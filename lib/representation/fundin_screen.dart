@@ -46,7 +46,7 @@ class _FundinScreenState extends State<FundinScreen> {
                   Navigator.of(context).pushNamed(MyWallet.routeName),
               icon: Icon(
                 Icons.wallet,
-                color: Theme.of(context).colorScheme.outline,
+                color: Theme.of(context).colorScheme.onSecondary,
               ),
               iconSize: 21,
             ),
@@ -72,7 +72,7 @@ class _FundinScreenState extends State<FundinScreen> {
                         children: [
                           Text(
                             'TO',
-                            style: Theme.of(context).textTheme.titleMedium,
+                            style: Theme.of(context).textTheme.bodyLarge,
                           ),
                           const SizedBox(
                             width: 20,
@@ -82,12 +82,7 @@ class _FundinScreenState extends State<FundinScreen> {
                           ),
                           Text(
                             'BAI Wallet',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge!
-                                .copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            style: Theme.of(context).textTheme.displayMedium,
                           ),
                         ],
                       ),
@@ -106,7 +101,7 @@ class _FundinScreenState extends State<FundinScreen> {
                         children: [
                           Text(
                             'Current balance: ',
-                            style: Theme.of(context).textTheme.titleMedium,
+                            style: Theme.of(context).textTheme.bodyLarge,
                           ),
                           Row(
                             children: [
@@ -133,12 +128,10 @@ class _FundinScreenState extends State<FundinScreen> {
                   height: 30,
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
+                  padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
                     'PROVIDER',
-                    style: Theme.of(context).textTheme.labelMedium!.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                    style: Theme.of(context).textTheme.bodyLarge,
                   ),
                 ),
                 ShadowContainer(
@@ -152,12 +145,10 @@ class _FundinScreenState extends State<FundinScreen> {
                   height: 30,
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
+                  padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
                     'AMOUNT',
-                    style: Theme.of(context).textTheme.labelMedium!.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                    style: Theme.of(context).textTheme.bodyLarge,
                   ),
                 ),
                 GridView.builder(
@@ -166,61 +157,73 @@ class _FundinScreenState extends State<FundinScreen> {
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     childAspectRatio: 2.5,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
+                    crossAxisSpacing: 15,
+                    mainAxisSpacing: 11,
                   ),
                   itemCount: num1.length,
                   itemBuilder: (BuildContext context, int index) {
-                    return Container(
-                      child: GestureDetector(
-                        onTap: () {
-                          //kkk
-                        },
-                        child: ShadowContainer(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                num1[index],
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              Text(
-                                'Price: ${num2[index]}',
-                                style: Theme.of(context).textTheme.labelMedium,
-                              ),
-                            ],
-                          ),
+                    return GestureDetector(
+                      onTap: () {
+                        //kkk
+                      },
+                      child: ShadowContainer(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              num1[index],
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            const SizedBox(
+                              height: 2,
+                            ),
+                            Text(
+                              'Price: ${num2[index]}',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSecondary,
+                                  ),
+                            ),
+                          ],
                         ),
                       ),
                     );
                   },
                 ),
                 const SizedBox(height: 30),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.lightbulb_circle,
-                      color: Theme.of(context).colorScheme.outline,
-                      size: 29,
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      'Services are provided by Bai Parking.',
-                      style: Theme.of(context).textTheme.labelMedium,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 30),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.center,
+                //   crossAxisAlignment: CrossAxisAlignment.center,
+                //   children: [
+                //     Icon(
+                //       Icons.lightbulb_circle,
+                //       color: Theme.of(context).colorScheme.outline,
+                //       size: 20,
+                //     ),
+                //     const SizedBox(width: 10),
+                //     Text(
+                //       'Services are provided by Bai Parking.',
+                //       style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                //             color: Theme.of(context).colorScheme.onSecondary,
+                //           ),
+                //     ),
+                //   ],
+                // ),
+                const SizedBox(height: 50),
                 Align(
                   alignment: Alignment.center,
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width * 0.6,
                     child: Text(
                       'By tapping CONFIRM you agree to deposit bai coins into your wallet.',
-                      style: Theme.of(context).textTheme.labelMedium,
+                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                            color: Theme.of(context).colorScheme.onSecondary,
+                          ),
                       textAlign: TextAlign.center,
                     ),
                   ),
