@@ -1,8 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
-import 'package:provider/provider.dart';
 
 class MeScreen extends StatefulWidget {
   const MeScreen({super.key});
