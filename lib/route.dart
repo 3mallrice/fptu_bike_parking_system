@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fptu_bike_parking_system/representation/about_screen.dart';
 import 'package:fptu_bike_parking_system/representation/profile.dart';
 import 'package:flutter/widgets.dart';
 import '../representation/bai_screen.dart';
@@ -26,4 +27,5 @@ final Map<String, WidgetBuilder> routes = {
   BaiScreen.routeName: (context) => const BaiScreen(),
   MeScreen.routeName: (context) => const MeScreen(),
   ProfileScreen.routeName: (context) => const ProfileScreen(),
+  AboutUs.routeName: (context) => const AboutUs(),
 };

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
+import 'package:fptu_bike_parking_system/representation/about_screen.dart';
 import 'package:fptu_bike_parking_system/representation/profile.dart';
 
 class MeScreen extends StatefulWidget {
@@ -91,7 +92,9 @@ class _MeScreenState extends State<MeScreen> {
                       thickness: 1,
                     ),
                     GestureDetector(
-                      onTap: () => {},
+                      onTap: () => {
+                        Navigator.of(context).pushNamed(AboutUs.routeName),
+                      },
                       child: Container(
                         padding: const EdgeInsets.all(10.0),
                         child: Row(
