@@ -41,10 +41,14 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
 
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
-    setState(() {
-      lat = position.latitude;
-      lon = position.longitude;
-    });
+
+    if (mounted) {
+      setState(() {
+        lat = position.latitude;
+        lon = position.longitude;
+      });
+    }
+
     log.i('Latitude: $lat/nLongitude: $lon');
   }
 
@@ -54,12 +58,14 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
     weatherData = await OpenWeatherApi.fetchWeather(lat, lon);
     visibility = (weatherData!.visibility / 1000).toStringAsFixed(2);
     aqi = await OpenWeatherApi.fetchAirQuality(lat, lon);
-    setState(() {
-      weatherData = weatherData;
-      visibility = visibility;
-      aqi = aqi;
-      log.i('Visibility: $visibility km');
-    });
+    if (mounted) {
+      setState(() {
+        weatherData = weatherData;
+        visibility = visibility;
+        aqi = aqi;
+        log.i('Visibility: $visibility km');
+      });
+    }
     log.i('Weather: ${weatherData!.weather[0].main}');
   }
 
