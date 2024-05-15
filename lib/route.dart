@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fptu_bike_parking_system/representation/about_screen.dart';
+import 'package:fptu_bike_parking_system/representation/add_bai_screen.dart';
 import 'package:fptu_bike_parking_system/representation/add_feedback.dart';
 import 'package:fptu_bike_parking_system/representation/feedback.dart';
 import 'package:fptu_bike_parking_system/representation/fundin_screen.dart';
@@ -34,4 +35,5 @@ final Map<String, WidgetBuilder> routes = {
   SplashScreen.routeName: (context) => const SplashScreen(),
   IntroScreen.routeName: (context) => const IntroScreen(),
   LoginScreen.routeName: (context) => const LoginScreen(),
+  AddBai.routeName: (context) => const AddBai(),
 };

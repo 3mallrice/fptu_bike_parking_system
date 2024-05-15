@@ -554,7 +554,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
           image: AssetImage(
             imagePath,
           ),
-          fit: BoxFit.contain,
+          fit: BoxFit.fitWidth,
         ),
       ),
     );

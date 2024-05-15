@@ -1,3 +1,13 @@
+double toDouble(dynamic value) {
+  if (value is int) {
+    return value.toDouble();
+  } else if (value is double) {
+    return value;
+  } else {
+    throw TypeError();
+  }
+}
+
 class WeatherData {
   final List<Weather> weather;
   final Main main;
@@ -73,8 +83,8 @@ class Main {
 
   factory Main.fromJson(Map<String, dynamic> json) {
     return Main(
-      temp: json['temp'],
-      feelsLike: json['feels_like'],
+      temp: toDouble(json['temp']),
+      feelsLike: toDouble(json['feels_like']),
       humidity: json['humidity'],
     );
   }
@@ -89,7 +99,7 @@ class Wind {
 
   factory Wind.fromJson(Map<String, dynamic> json) {
     return Wind(
-      speed: json['speed'],
+      speed: toDouble(json['speed']),
     );
   }
 }
