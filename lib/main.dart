@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/representation/navigation_bar.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
 
 import 'core/theme/theme_provider.dart';
@@ -8,6 +9,9 @@ import 'firebase_options.dart';
 import 'route.dart';
 
 void main() async {
+  //init Hive
+  await Hive.initFlutter();
+
   //flutter init
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
