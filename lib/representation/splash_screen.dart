@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
+import 'package:fptu_bike_parking_system/representation/home.dart';
+import 'package:fptu_bike_parking_system/representation/intro_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -36,7 +39,8 @@ class _SplashScreenState extends State<SplashScreen> with RestorationMixin {
     await Future.delayed(const Duration(milliseconds: 2000));
 
     if (ignoreIntroScreen != null && ignoreIntroScreen) {
-      redirectTo(Login.routeName);
+      //redirectTo(Login.routeName);
+      redirectTo(HomeAppScreen.routeName);
     } else {
       LocalStorageHelper.setValue('ignoreIntroScreen', true);
       redirectTo(IntroScreen.routeName);
@@ -44,6 +48,25 @@ class _SplashScreenState extends State<SplashScreen> with RestorationMixin {
   }
 
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+        body: Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const <Widget>[
+          CircularProgressIndicator(),
+          SizedBox(height: 20),
+          Text('Loading...'),
+        ],
+      ),
+    ));
+  }
+
+  @override
+  // TODO: implement restorationId
+  String? get restorationId => SplashScreen.routeName;
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    // TODO: implement restoreState
   }
 }
