@@ -19,6 +19,7 @@ class _MeScreenState extends State<MeScreen> {
 
   Future<void> _loadHideBalance() async {
     bool? hideBalance = await LocalStorageHelper.getValue('hide_balance');
+    log.i('Hide balance: $hideBalance');
     setState(() {
       _hideBalance = hideBalance ?? false;
     });

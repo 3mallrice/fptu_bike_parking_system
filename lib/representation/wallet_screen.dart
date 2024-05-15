@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:logger/logger.dart';
 
 import '../component/app_bar_component.dart';
 import '../component/shadow_container.dart';
+import '../core/helper/local_storage_helper.dart';
 import 'fundin_screen.dart';
 
 class MyWallet extends StatefulWidget {
@@ -15,7 +17,24 @@ class MyWallet extends StatefulWidget {
 }
 
 class _MyWalletState extends State<MyWallet> {
-  bool isHide = false;
+  bool _hideBalance = false;
+  var log = Logger();
+
+  Future<void> _loadHideBalance() async {
+    bool? hideBalance = await LocalStorageHelper.getValue('hide_balance');
+    log.i('Hide balance: $hideBalance');
+    setState(() {
+      _hideBalance = hideBalance ?? false;
+    });
+  }
+
+  void _toggleHideBalance() async {
+    setState(() {
+      log.i('Toggle hide balance: $_hideBalance');
+      _hideBalance = !_hideBalance;
+    });
+    // await LocalStorageHelper.setValue('hide_balance', _hideBalance);
+  }
 
   // Function to check if a date is today
   bool isToday(DateTime date) {
@@ -98,6 +117,7 @@ class _MyWalletState extends State<MyWallet> {
   @override
   initState() {
     super.initState();
+    _loadHideBalance();
   }
 
   @override
@@ -135,12 +155,7 @@ class _MyWalletState extends State<MyWallet> {
                   child: ShadowContainer(
                     width: MediaQuery.of(context).size.width * 0.9,
                     child: GestureDetector(
-                      onTap: () {
-                        // Hide or show balance
-                        setState(() {
-                          isHide = !isHide;
-                        });
-                      },
+                      onTap: () => _toggleHideBalance(),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -153,7 +168,7 @@ class _MyWalletState extends State<MyWallet> {
                             height: 8,
                           ),
                           Text(
-                            isHide ? '********' : '45.000 bic',
+                            _hideBalance ? '******' : '45.000 bic',
                             style: Theme.of(context)
                                 .textTheme
                                 .displayMedium!
