@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
-import 'package:fptu_bike_parking_system/representation/about_screen.dart';
 import 'package:fptu_bike_parking_system/representation/profile.dart';
 
 class MeScreen extends StatefulWidget {
@@ -13,6 +12,8 @@ class MeScreen extends StatefulWidget {
 }
 
 class _MeScreenState extends State<MeScreen> {
+  bool _hideBalance = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,9 +93,63 @@ class _MeScreenState extends State<MeScreen> {
                       thickness: 1,
                     ),
                     GestureDetector(
-                      onTap: () => {
-                        Navigator.of(context).pushNamed(AboutUs.routeName),
+                      onTap: () {
+                        setState(() {
+                          _hideBalance = !_hideBalance;
+                        });
                       },
+                      child: Container(
+                        padding: const EdgeInsets.all(10.0),
+                        width: double.infinity,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(
+                              _hideBalance
+                                  ? Icons.visibility_off_outlined
+                                  : Icons.visibility_outlined,
+                              color: Theme.of(context).colorScheme.outline,
+                              size: 28,
+                            ),
+                            const SizedBox(width: 20),
+                            Expanded(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Hide Balance',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium!
+                                        .copyWith(fontSize: 18),
+                                  ),
+                                  Text(
+                                    '* Your balances on home screen will appear as ******\n* To reveal, hold on your balance',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSecondary,
+                                          fontSize: 12,
+                                        ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Divider(
+                      color: Theme.of(context).colorScheme.outlineVariant,
+                      thickness: 1,
+                    ),
+                    GestureDetector(
+                      onTap: () => {},
                       child: Container(
                         padding: const EdgeInsets.all(10.0),
                         child: Row(
@@ -118,40 +173,39 @@ class _MeScreenState extends State<MeScreen> {
                         ),
                       ),
                     ),
-                    Divider(
-                      color: Theme.of(context).colorScheme.outlineVariant,
-                      thickness: 1,
-                    ),
-                    GestureDetector(
-                      onTap: () => {},
-                      child: Container(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.logout_rounded,
-                              color: Theme.of(context).colorScheme.primary,
-                              size: 28,
-                            ),
-                            const SizedBox(width: 20),
-                            Text(
-                              'Logout',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium!
-                                  .copyWith(
-                                    fontSize: 18,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
                   ],
+                ),
+              ),
+              const SizedBox(height: 40),
+              ShadowContainer(
+                width: MediaQuery.of(context).size.width * 0.9,
+                child: GestureDetector(
+                  onTap: () => {},
+                  child: Container(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.logout_rounded,
+                          color: Theme.of(context).colorScheme.primary,
+                          size: 28,
+                        ),
+                        const SizedBox(width: 20),
+                        Text(
+                          'Logout',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium!
+                              .copyWith(
+                                fontSize: 18,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                        )
+                      ],
+                    ),
+                  ),
                 ),
               )
             ],

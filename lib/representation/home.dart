@@ -41,10 +41,14 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
 
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
-    setState(() {
-      lat = position.latitude;
-      lon = position.longitude;
-    });
+
+    if (mounted) {
+      setState(() {
+        lat = position.latitude;
+        lon = position.longitude;
+      });
+    }
+
     log.i('Latitude: $lat/nLongitude: $lon');
   }
 
