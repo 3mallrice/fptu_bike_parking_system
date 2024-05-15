@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
+import 'package:fptu_bike_parking_system/representation/add_bai_screen.dart';
 
 class BaiScreen extends StatefulWidget {
   const BaiScreen({super.key});
@@ -84,10 +85,14 @@ class _BaiScreenState extends State<BaiScreen> {
                               bottomRight: Radius.circular(10),
                             ),
                           ),
-                          child: const Icon(
-                            Icons.add_rounded,
-                            color: Colors.white,
-                            size: 35,
+                          child: IconButton(
+                            onPressed: () => Navigator.of(context)
+                                .pushNamed(AddBai.routeName),
+                            icon: const Icon(
+                              Icons.add_rounded,
+                              color: Colors.white,
+                              size: 35,
+                            ),
                           ),
                         ),
                       )
