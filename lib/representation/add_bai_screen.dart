@@ -1,14 +1,22 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
+import 'package:logger/logger.dart';
 
 import '../component/app_bar_component.dart';
 import '../component/shadow_button.dart';
 
-class AddBai extends StatelessWidget {
+class AddBai extends StatefulWidget {
   static String routeName = '/addBai';
   const AddBai({super.key});
+
+  @override
+  State<AddBai> createState() => _AddBaiState();
+}
+
+class _AddBaiState extends State<AddBai> {
+  var log = Logger();
+
+  Future<void> selectImage() async {}
 
   @override
   Widget build(BuildContext context) {
@@ -43,9 +51,7 @@ class AddBai extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: GestureDetector(
-                            onTap: () {
-                              //TODO: Add image picker
-                            },
+                            onTap: () async => await selectImage(),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -76,8 +82,13 @@ class AddBai extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'PLATE NUMBER',
-                            style: Theme.of(context).textTheme.bodyLarge,
+                            'Plate Number',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge!
+                                .copyWith(
+                                  color: Theme.of(context).colorScheme.outline,
+                                ),
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(
@@ -88,15 +99,6 @@ class AddBai extends StatelessWidget {
                             height: MediaQuery.of(context).size.height * 0.065,
                             child: TextField(
                               decoration: InputDecoration(
-                                hintText: 'Enter plate number',
-                                hintStyle: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium!
-                                    .copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSecondary,
-                                    ),
                                 suffixIcon: Icon(
                                   Icons.edit_rounded,
                                   color:
@@ -131,7 +133,7 @@ class AddBai extends StatelessWidget {
                     child: SizedBox(
                       width: MediaQuery.of(context).size.width * 0.6,
                       child: Text(
-                        'By tapping ADD you agree to add new bike to your account.',
+                        'By tapping ADD you agree to submit new bike to your account.',
                         style: Theme.of(context).textTheme.bodySmall!.copyWith(
                               color: Theme.of(context).colorScheme.onSecondary,
                             ),
