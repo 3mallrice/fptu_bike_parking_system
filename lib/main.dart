@@ -1,10 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:fptu_bike_parking_system/representation/navigation_bar.dart';
 import 'package:provider/provider.dart';
 
 import 'core/theme/theme_provider.dart';
 import 'firebase_options.dart';
-import 'representation/home_screen.dart';
 import 'route.dart';
 
 void main() async {
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
 
       home: const AspectRatio(
         aspectRatio: 1,
-        child: HomeScreen(),
+        child: MyNavigationBar(),
         //child: SplashScreen(),
       ),
       // initialRoute: HomeScreen.routeName,

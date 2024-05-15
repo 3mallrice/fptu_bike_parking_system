@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/representation/profile.dart';
+import 'package:flutter/widgets.dart';
 import '../representation/bai_screen.dart';
 import 'package:fptu_bike_parking_system/representation/fundin_screen.dart';
 import 'package:fptu_bike_parking_system/representation/me.dart';
@@ -13,7 +14,12 @@ import 'representation/home_screen.dart';
 final Map<String, WidgetBuilder> routes = {
   HomeScreen.routeName: (context) => const HomeScreen(), //fake
   HomeAppScreen.routeName: (context) => const HomeAppScreen(),
-  MyNavigationBar.routeName: (context) => const MyNavigationBar(),
+  MyNavigationBar.routeName: (context) {
+    final agrs = ModalRoute.of(context)!.settings.arguments as int?;
+    return MyNavigationBar(
+      selectedIndex: agrs ?? 0,
+    );
+  },
   QrCodeScreen.routeName: (context) => const QrCodeScreen(),
   FundinScreen.routeName: (context) => const FundinScreen(),
   MyWallet.routeName: (context) => const MyWallet(),
