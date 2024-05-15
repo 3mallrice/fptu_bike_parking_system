@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
 import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
-import 'package:fptu_bike_parking_system/representation/intro_screen.dart';
 import 'package:fptu_bike_parking_system/representation/navigation_bar.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -13,7 +12,7 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with RestorationMixin {
+class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
@@ -28,8 +27,7 @@ class _SplashScreenState extends State<SplashScreen> with RestorationMixin {
   }
 
   void redirectTo(String redirectTo) {
-    Navigator.restorablePushReplacementNamed(context, redirectTo);
-    // Navigator.of(context).pushReplacementNamed(redirectTo);
+    Navigator.of(context).pushReplacementNamed(redirectTo);
   }
 
   void redirectIntro() async {
@@ -42,7 +40,7 @@ class _SplashScreenState extends State<SplashScreen> with RestorationMixin {
       redirectTo(MyNavigationBar.routeName);
     } else {
       LocalStorageHelper.setValue('ignoreIntroScreen', true);
-      redirectTo(IntroScreen.routeName);
+      redirectTo(MyNavigationBar.routeName);
     }
   }
 
@@ -68,14 +66,5 @@ class _SplashScreenState extends State<SplashScreen> with RestorationMixin {
         ),
       ),
     );
-  }
-
-  @override
-  // TODO: implement restorationId
-  String? get restorationId => SplashScreen.routeName;
-
-  @override
-  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
-    // TODO: implement restoreState
   }
 }

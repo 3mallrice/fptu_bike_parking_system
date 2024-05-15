@@ -10,6 +10,9 @@ import 'firebase_options.dart';
 import 'route.dart';
 
 void main() async {
+  //flutter init
+  WidgetsFlutterBinding.ensureInitialized();
+
   //init Hive
   await Hive.initFlutter();
   await LocalStorageHelper.initLocalStorageHelper();
