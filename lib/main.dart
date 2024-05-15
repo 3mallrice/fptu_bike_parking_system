@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:fptu_bike_parking_system/representation/navigation_bar.dart';
+import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
+import 'package:fptu_bike_parking_system/representation/splash_screen.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
 
@@ -11,6 +12,7 @@ import 'route.dart';
 void main() async {
   //init Hive
   await Hive.initFlutter();
+  await LocalStorageHelper.initLocalStorageHelper();
 
   //flutter init
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,8 +42,8 @@ class MyApp extends StatelessWidget {
 
       home: const AspectRatio(
         aspectRatio: 1,
-        child: MyNavigationBar(),
-        //child: SplashScreen(),
+        //child: MyNavigationBar(),
+        child: SplashScreen(),
       ),
       // initialRoute: HomeScreen.routeName,
       routes: routes,
