@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
+import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
 import 'package:fptu_bike_parking_system/representation/profile.dart';
+import 'package:logger/logger.dart';
 
 class MeScreen extends StatefulWidget {
   const MeScreen({super.key});
@@ -13,6 +15,28 @@ class MeScreen extends StatefulWidget {
 
 class _MeScreenState extends State<MeScreen> {
   bool _hideBalance = false;
+  var log = Logger();
+
+  Future<void> _loadHideBalance() async {
+    bool? hideBalance = await LocalStorageHelper.getValue('hide_balance');
+    setState(() {
+      _hideBalance = hideBalance ?? false;
+    });
+  }
+
+  Future<void> _toggleHideBalance() async {
+    setState(() {
+      log.i('Toggle hide balance: $_hideBalance');
+      _hideBalance = !_hideBalance;
+    });
+    await LocalStorageHelper.setValue('hide_balance', _hideBalance);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadHideBalance();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,11 +117,7 @@ class _MeScreenState extends State<MeScreen> {
                       thickness: 1,
                     ),
                     GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _hideBalance = !_hideBalance;
-                        });
-                      },
+                      onTap: _toggleHideBalance,
                       child: Container(
                         padding: const EdgeInsets.all(10.0),
                         width: double.infinity,
