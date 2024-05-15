@@ -14,6 +14,7 @@ import '../api/model/weather/weather.dart' show WeatherData;
 import '../api/service/weather/open_weather_api.dart' show OpenWeatherApi;
 import '../component/shadow_container.dart' show ShadowContainer;
 import '../core/helper/asset_helper.dart' show AssetHelper;
+import '../core/helper/local_storage_helper.dart';
 import 'fundin_screen.dart' show FundinScreen;
 
 class HomeAppScreen extends StatefulWidget {
@@ -26,7 +27,16 @@ class HomeAppScreen extends StatefulWidget {
 }
 
 class _HomeAppScreenState extends State<HomeAppScreen> {
+  bool _hideBalance = false;
   var log = Logger();
+
+  Future<void> _loadHideBalance() async {
+    bool? hideBalance = await LocalStorageHelper.getValue('hide_balance');
+    log.i('Hide balance: $hideBalance');
+    setState(() {
+      _hideBalance = hideBalance ?? false;
+    });
+  }
 
   //default location: FPT University HCM Hi-tech park Campus
   double lat = 10.8411276;
@@ -73,6 +83,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
   void initState() {
     super.initState();
     getWeather();
+    _loadHideBalance();
   }
 
   @override
@@ -125,7 +136,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                               width: 5,
                             ),
                             Text(
-                              '45.000 bic',
+                              _hideBalance ? '******' : '45.000 BIC',
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
                           ],
