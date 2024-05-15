@@ -45,7 +45,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 15),
                 Container(
                   alignment: Alignment.centerLeft,
                   child: Column(
@@ -61,14 +61,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               color: Theme.of(context).colorScheme.onSecondary,
                             ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 5),
                       ShadowContainer(
                         child: Text(
                           'Phuc Bui',
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 15),
                       Text(
                         'Phone',
                         style: Theme.of(context)
@@ -78,14 +78,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               color: Theme.of(context).colorScheme.onSecondary,
                             ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 5),
                       ShadowContainer(
                         child: Text(
                           '0971226789',
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 15),
                       Text(
                         'Email',
                         style: Theme.of(context)
@@ -95,8 +95,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               color: Theme.of(context).colorScheme.onSecondary,
                             ),
                       ),
-                      const SizedBox(height: 10),
-                      ShadowContainer(
+                      const SizedBox(height: 5),
+                      ShadowContainer(  
                         child: Text(
                           'phucbhse160537@fpt.edu.vn',
                           style: Theme.of(context).textTheme.titleMedium,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
+import 'package:fptu_bike_parking_system/representation/feedback.dart';
 import 'package:fptu_bike_parking_system/representation/qr_code.dart';
 
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -52,36 +53,15 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ],
                 ),
-                Row(
-                  children: [
-                    IconButton(
-                      onPressed: () => Navigator.of(context)
-                          .pushNamed(QrCodeScreen.routeName),
-                      icon: Icon(
-                        Icons.qr_code_rounded,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    // IconButton(
-                    //   onPressed: () =>
-                    //       // change dark/light here
-                    //       Provider.of<ThemeProvider>(context, listen: false)
-                    //           .toggleTheme(),
-                    //   icon: Icon(
-                    //     Icons.brightness_4,
-                    //     color: Theme.of(context).colorScheme.primary,
-                    //   ),
-                    // ),
-                    //Customer support
-                    IconButton(
-                      onPressed: () {},
-                      icon: Icon(
-                        Icons.headset_mic_rounded,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                  ],
-                )
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(FeedbackScreen.routeName);
+                  },
+                  icon: Icon(
+                    Icons.headset_mic_rounded,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
               ],
             ),
           ),
