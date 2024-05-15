@@ -12,4 +12,6 @@ class AssetHelper {
   static const String baiLogo = 'assets/imgs/bai.png';
   static const String plateNumber = 'assets/imgs/plateNumber.png';
   static const String splash = 'assets/imgs/Splash.png';
+  static const String intro2_1 = 'assets/imgs/Parking.png';
+  static const String intro2_2 = 'assets/imgs/Intro_bike.png';
 }
