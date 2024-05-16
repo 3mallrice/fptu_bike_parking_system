@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
 import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
+import 'package:fptu_bike_parking_system/representation/about_screen.dart';
 import 'package:fptu_bike_parking_system/representation/profile.dart';
 import 'package:logger/logger.dart';
 
@@ -46,6 +47,8 @@ class _MeScreenState extends State<MeScreen> {
         child: Align(
           alignment: Alignment.center,
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 20),
               Container(
@@ -170,7 +173,8 @@ class _MeScreenState extends State<MeScreen> {
                       thickness: 1,
                     ),
                     GestureDetector(
-                      onTap: () => {},
+                      onTap: () =>
+                          Navigator.of(context).pushNamed(AboutUs.routeName),
                       child: Container(
                         padding: const EdgeInsets.all(10.0),
                         child: Row(
@@ -197,7 +201,7 @@ class _MeScreenState extends State<MeScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 20),
               ShadowContainer(
                 width: MediaQuery.of(context).size.width * 0.9,
                 child: GestureDetector(
@@ -228,7 +232,8 @@ class _MeScreenState extends State<MeScreen> {
                     ),
                   ),
                 ),
-              )
+              ),
+              const SizedBox(height: 70),
             ],
           ),
         ),

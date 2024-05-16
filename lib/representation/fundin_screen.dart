@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/component/shadow_button.dart';
+import 'package:fptu_bike_parking_system/representation/payos.dart';
 
 import '../component/app_bar_component.dart';
 import '../component/shadow_container.dart';
@@ -211,6 +212,9 @@ class _FundinScreenState extends State<FundinScreen> {
                   ),
                 ),
                 GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pushNamed(PayOsScreen.routeName);
+                  },
                   child: const ShadowButton(
                     buttonTitle: 'CONFIRM',
                     margin: EdgeInsets.symmetric(vertical: 20),
