@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
+import 'package:fptu_bike_parking_system/representation/navigation_bar.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -95,6 +96,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     GestureDetector(
                       onTap: () {
                         //TODO: Implement Google Sign In
+                        Navigator.of(context)
+                            .pushNamed(MyNavigationBar.routeName);
                       },
                       child: ShadowContainer(
                         width: MediaQuery.of(context).size.width * 0.8,
