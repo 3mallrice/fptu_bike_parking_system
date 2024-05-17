@@ -99,11 +99,9 @@ class _BaiScreenState extends State<BaiScreen> {
                     ],
                   ),
                 ),
-
                 const SizedBox(
                   height: 30,
                 ),
-
                 //Bike Information
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.9,

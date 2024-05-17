@@ -8,6 +8,7 @@ class ShadowContainer extends StatelessWidget {
   final double? borderRadius;
   final Color? color;
   final Widget? child;
+  final Border? border;
 
   const ShadowContainer({
     /// A widget that wraps a child with a shadow effect.
@@ -28,6 +29,7 @@ class ShadowContainer extends StatelessWidget {
 
     /// The color of the container.
     this.child,
+    this.border,
 
     /// The child of the container.
     /// It can be any widget, but it is recommended to use a column or row widget.
@@ -42,6 +44,7 @@ class ShadowContainer extends StatelessWidget {
       padding: padding ?? const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(borderRadius ?? 10),
+        border: border,
         color: color ?? Theme.of(context).colorScheme.background,
         boxShadow: [
           BoxShadow(

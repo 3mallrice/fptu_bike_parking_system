@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
+import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
+import 'package:dotted_line/dotted_line.dart';
 
 import '../component/shadow_container.dart';
 
@@ -109,11 +113,220 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(
-                  height: 30,
-                ),
-
+                const SizedBox(height: 30),
                 //History list
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: historyList.length,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 20),
+                        child: ShadowContainer(
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.outline,
+                          ),
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            children: [
+                              Text(
+                                historyList[index].parkingArea,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .copyWith(fontSize: 20),
+                              ),
+                              Container(
+                                margin:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                child: DottedLine(
+                                  direction: Axis.horizontal,
+                                  alignment: WrapAlignment.center,
+                                  lineLength: double.infinity,
+                                  lineThickness: 1.0,
+                                  dashColor:
+                                      Theme.of(context).colorScheme.outline,
+                                ),
+                              ),
+                              Text(
+                                historyList[index].plateNumber,
+                                style:
+                                    Theme.of(context).textTheme.headlineMedium,
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'Time in:',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .labelMedium!
+                                              .copyWith(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSecondary,
+                                              ),
+                                        ),
+                                        Text(
+                                          DateFormat('dd/MM/yyyy HH:mm').format(
+                                              historyList[index].timeIn),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium,
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Text(
+                                          'Time out:',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .labelMedium!
+                                              .copyWith(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSecondary,
+                                              ),
+                                        ),
+                                        Text(
+                                          DateFormat('dd/MM/yyyy HH:mm').format(
+                                              historyList[index].timeOut),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          'Gate in:',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .labelMedium!
+                                              .copyWith(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSecondary,
+                                              ),
+                                        ),
+                                        Text(
+                                          historyList[index].gateIn.toString(),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium,
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Text(
+                                          'Gate out:',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .labelMedium!
+                                              .copyWith(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSecondary,
+                                              ),
+                                        ),
+                                        Text(
+                                          historyList[index].gateOut.toString(),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Container(
+                                margin:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                child: DottedLine(
+                                  direction: Axis.horizontal,
+                                  alignment: WrapAlignment.center,
+                                  lineLength: double.infinity,
+                                  lineThickness: 1.0,
+                                  dashColor:
+                                      Theme.of(context).colorScheme.outline,
+                                ),
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  IconButton(
+                                    onPressed: () {},
+                                    icon: const Icon(Icons.share_rounded),
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
+                                  ),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          historyList[index]
+                                              .paymentMethod
+                                              .toString(),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyLarge!
+                                              .copyWith(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .outline,
+                                              ),
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Image.asset(
+                                              AssetHelper.bic,
+                                              width: 20,
+                                              fit: BoxFit.fitWidth,
+                                            ),
+                                            const SizedBox(width: 10),
+                                            Text(
+                                              historyList[index]
+                                                  .amount
+                                                  .toString(),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleMedium,
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ],
             ),
           ),
