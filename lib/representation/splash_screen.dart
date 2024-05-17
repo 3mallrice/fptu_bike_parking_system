@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
 import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
+import 'package:fptu_bike_parking_system/representation/login.dart';
 import 'package:fptu_bike_parking_system/representation/navigation_bar.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -37,7 +38,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (ignoreIntroScreen != null && ignoreIntroScreen) {
       //redirectTo(Login.routeName);
-      redirectTo(MyNavigationBar.routeName);
+      redirectTo(LoginScreen.routeName);
     } else {
       LocalStorageHelper.setValue('ignoreIntroScreen', true);
       redirectTo(MyNavigationBar.routeName);
