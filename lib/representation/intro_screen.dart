@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
-import 'package:fptu_bike_parking_system/representation/navigation_bar.dart';
+import 'package:fptu_bike_parking_system/representation/login.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class IntroScreen extends StatefulWidget {
@@ -137,7 +137,7 @@ class _IntroScreenState extends State<IntroScreen> {
               ),
               onPressed: () async {
                 Navigator.of(context)
-                    .pushReplacementNamed(MyNavigationBar.routeName);
+                    .pushReplacementNamed(LoginScreen.routeName);
               },
               child: Text(
                 'Get Started',

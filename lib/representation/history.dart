@@ -128,7 +128,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           border: Border.all(
                             color: Theme.of(context).colorScheme.outline,
                           ),
-                          padding: const EdgeInsets.all(20),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 20,
+                            horizontal: 40,
+                          ),
                           child: Column(
                             children: [
                               Text(
@@ -136,7 +139,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyMedium!
-                                    .copyWith(fontSize: 20),
+                                    .copyWith(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w700,
+                                    ),
                               ),
                               Container(
                                 margin:
@@ -157,93 +163,47 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               ),
                               Row(
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceEvenly,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Expanded(
+                                    flex: 3,
                                     child: Column(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.center,
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Text(
+                                        historyInfo(
                                           'Time in:',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .labelMedium!
-                                              .copyWith(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSecondary,
-                                              ),
-                                        ),
-                                        Text(
                                           DateFormat('dd/MM/yyyy HH:mm').format(
                                               historyList[index].timeIn),
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyMedium,
                                         ),
                                         const SizedBox(height: 10),
-                                        Text(
+                                        historyInfo(
                                           'Time out:',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .labelMedium!
-                                              .copyWith(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSecondary,
-                                              ),
-                                        ),
-                                        Text(
                                           DateFormat('dd/MM/yyyy HH:mm').format(
                                               historyList[index].timeOut),
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyMedium,
                                         ),
                                       ],
                                     ),
                                   ),
                                   Expanded(
+                                    flex: 1,
                                     child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
-                                        Text(
+                                        historyInfo(
                                           'Gate in:',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .labelMedium!
-                                              .copyWith(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSecondary,
-                                              ),
-                                        ),
-                                        Text(
                                           historyList[index].gateIn.toString(),
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyMedium,
                                         ),
                                         const SizedBox(height: 10),
-                                        Text(
+                                        historyInfo(
                                           'Gate out:',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .labelMedium!
-                                              .copyWith(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSecondary,
-                                              ),
-                                        ),
-                                        Text(
                                           historyList[index].gateOut.toString(),
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyMedium,
                                         ),
                                       ],
                                     ),
@@ -301,17 +261,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                           children: [
                                             Image.asset(
                                               AssetHelper.bic,
-                                              width: 20,
+                                              width: 25,
                                               fit: BoxFit.fitWidth,
                                             ),
-                                            const SizedBox(width: 10),
+                                            const SizedBox(width: 5),
                                             Text(
-                                              historyList[index]
-                                                  .amount
-                                                  .toString(),
+                                              '${historyList[index].amount.toString()} bic',
                                               style: Theme.of(context)
                                                   .textTheme
-                                                  .titleMedium,
+                                                  .displayMedium,
                                             ),
                                           ],
                                         )
@@ -332,6 +290,27 @@ class _HistoryScreenState extends State<HistoryScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget historyInfo(String title, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          title,
+          style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                color: Theme.of(context).colorScheme.onSecondary,
+              ),
+        ),
+        Text(
+          value,
+          style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                color: Theme.of(context).colorScheme.outline,
+              ),
+        ),
+      ],
     );
   }
 }
