@@ -481,7 +481,6 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 60),
           ],
         ),
       ),
