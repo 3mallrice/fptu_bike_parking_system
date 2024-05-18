@@ -37,20 +37,9 @@ class AppBarCom extends StatelessWidget implements PreferredSizeWidget {
                         : Navigator.of(context)
                             .pushReplacementNamed(routeName!);
                   },
-                  icon: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.secondary,
-                      border: Border.all(
-                        color: Theme.of(context).colorScheme.secondary,
-                        width: 1.5,
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(
-                      Icons.arrow_back_ios_new_rounded,
-                      size: 16,
-                    ),
+                  icon: const Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    size: 16,
                   ),
                 )
             : null,
