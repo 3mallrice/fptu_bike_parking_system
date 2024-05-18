@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -246,24 +247,23 @@ class _PayOsScreenState extends State<PayOsScreen> {
                 ),
 
                 // Save and Share
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    button(
-                      () {},
-                      const Icon(
-                        Icons.save_alt_rounded,
-                        size: 15,
-                      ),
-                      'Save',
-                    ),
-                    button(
-                      () {},
-                      const Icon(Icons.share_rounded),
-                      'Share',
-                    )
-                  ],
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: MediaQuery.of(context).size.width * 0.1,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      button(() {
+                        print('clicked Save');
+                      }, Icons.save_alt_rounded),
+                      button(() {
+                        print('clicked Share');
+                      }, Icons.share_rounded)
+                    ],
+                  ),
                 )
               ],
             ),
@@ -273,25 +273,18 @@ class _PayOsScreenState extends State<PayOsScreen> {
     );
   }
 
-  Widget button(void Function()? onTap, Icon icon, String label) {
+  Widget button(void Function()? onTap, IconData icon) {
     return GestureDetector(
       onTap: onTap,
       child: ShadowContainer(
-        borderRadius: 20,
-        height: MediaQuery.of(context).size.height * 0.01,
-        width: MediaQuery.of(context).size.height * 0.01,
+        borderRadius: 50,
+        height: MediaQuery.of(context).size.height * 0.07,
+        width: MediaQuery.of(context).size.height * 0.07,
         color: Theme.of(context).colorScheme.outline,
-        child: Column(
-          children: [
-            icon,
-            const SizedBox(
-              height: 5,
-            ),
-            Text(
-              label,
-              style: Theme.of(context).textTheme.labelMedium,
-            )
-          ],
+        child: Icon(
+          icon,
+          color: Theme.of(context).colorScheme.background,
+          size: 30,
         ),
       ),
     );
