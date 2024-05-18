@@ -245,12 +245,53 @@ class _PayOsScreenState extends State<PayOsScreen> {
                   ),
                 ),
 
+                // Save and Share
                 Row(
-                  
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    button(
+                      () {},
+                      const Icon(
+                        Icons.save_alt_rounded,
+                        size: 15,
+                      ),
+                      'Save',
+                    ),
+                    button(
+                      () {},
+                      const Icon(Icons.share_rounded),
+                      'Share',
+                    )
+                  ],
                 )
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget button(void Function()? onTap, Icon icon, String label) {
+    return GestureDetector(
+      onTap: onTap,
+      child: ShadowContainer(
+        borderRadius: 20,
+        height: MediaQuery.of(context).size.height * 0.01,
+        width: MediaQuery.of(context).size.height * 0.01,
+        color: Theme.of(context).colorScheme.outline,
+        child: Column(
+          children: [
+            icon,
+            const SizedBox(
+              height: 5,
+            ),
+            Text(
+              label,
+              style: Theme.of(context).textTheme.labelMedium,
+            )
+          ],
         ),
       ),
     );
