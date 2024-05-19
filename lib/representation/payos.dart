@@ -1,8 +1,9 @@
-import 'package:flutter/cupertino.dart';
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
+import 'package:fptu_bike_parking_system/component/shadow_button.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
@@ -257,14 +258,43 @@ class _PayOsScreenState extends State<PayOsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       button(() {
-                        print('clicked Save');
+                        //TODO
                       }, Icons.save_alt_rounded),
                       button(() {
-                        print('clicked Share');
+                        //TODO
                       }, Icons.share_rounded)
                     ],
                   ),
-                )
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.lightbulb_circle,
+                      color: Theme.of(context).colorScheme.outline,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      'Service is provided by PayOS',
+                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                            color: Theme.of(context).colorScheme.onSecondary,
+                          ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                GestureDetector(
+                  onTap: () {
+                    //TODO
+                  },
+                  child: const ShadowButton(
+                    buttonTitle: 'CONFIRM',
+                    margin: EdgeInsets.symmetric(vertical: 20),
+                  ),
+                ),
               ],
             ),
           ),
