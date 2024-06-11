@@ -125,19 +125,54 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                             Navigator.of(context).pushNamed(MyWallet.routeName),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Image(
-                              image: AssetImage(AssetHelper.bic),
-                              fit: BoxFit.fitWidth,
-                              width: 30,
+                            Expanded(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  const Image(
+                                    image: AssetImage(AssetHelper.bic),
+                                    fit: BoxFit.fitWidth,
+                                    width: 30,
+                                  ),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text(
+                                    _hideBalance ? '******' : '45.000 BIC',
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
+                                  ),
+                                ],
+                              ),
                             ),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            Text(
-                              _hideBalance ? '******' : '45.000 BIC',
-                              style: Theme.of(context).textTheme.titleMedium,
+                            Expanded(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    'Extra: ',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium!
+                                        .copyWith(
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                  ),
+                                  Text(
+                                    '5.000',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium!
+                                        .copyWith(
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                  )
+                                ],
+                              ),
                             ),
                           ],
                         ),
