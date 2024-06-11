@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:fptu_bike_parking_system/representation/wallet_extra_screen.dart';
+import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
+import 'package:fptu_bike_parking_system/component/shadow_container.dart';
+import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
+import 'package:fptu_bike_parking_system/representation/fundin_screen.dart';
+import 'package:fptu_bike_parking_system/representation/wallet_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 
-import '../component/app_bar_component.dart';
-import '../component/shadow_container.dart';
-import '../core/helper/local_storage_helper.dart';
-import 'fundin_screen.dart';
+class WalletExtraScreen extends StatefulWidget {
+  const WalletExtraScreen({super.key});
 
-class MyWallet extends StatefulWidget {
-  static String routeName = '/my_wallet';
-
-  const MyWallet({super.key});
+  static String routeName = '/my_extra_wallet';
 
   @override
-  State<MyWallet> createState() => _MyWalletState();
+  State<WalletExtraScreen> createState() => _WalletExtraScreenState();
 }
 
-class _MyWalletState extends State<MyWallet> {
+class _WalletExtraScreenState extends State<WalletExtraScreen> {
   bool _hideBalance = false;
   var log = Logger();
 
@@ -63,6 +62,12 @@ class _MyWalletState extends State<MyWallet> {
     } else {
       return DateFormat('dd/MM/yyyy').format(date);
     }
+  }
+
+  @override
+  initState() {
+    super.initState();
+    _loadHideBalance();
   }
 
   //init transaction list
@@ -122,12 +127,6 @@ class _MyWalletState extends State<MyWallet> {
   ];
 
   @override
-  initState() {
-    super.initState();
-    _loadHideBalance();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBarCom(
@@ -162,11 +161,23 @@ class _MyWalletState extends State<MyWallet> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    GestureDetector(
+                      onTap: () =>
+                          {Navigator.of(context).pushNamed(MyWallet.routeName)},
+                      child: ShadowContainer(
+                        width: MediaQuery.of(context).size.width * 0.43,
+                        child: Text(
+                          'Main',
+                          style: Theme.of(context).textTheme.titleMedium,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
                     ShadowContainer(
                       width: MediaQuery.of(context).size.width * 0.43,
                       color: Theme.of(context).colorScheme.outline,
                       child: Text(
-                        'Main',
+                        'Extra',
                         style: Theme.of(context)
                             .textTheme
                             .titleMedium!
@@ -174,20 +185,6 @@ class _MyWalletState extends State<MyWallet> {
                               color: Theme.of(context).colorScheme.background,
                             ),
                         textAlign: TextAlign.center,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () => {
-                        Navigator.of(context)
-                            .pushNamed(WalletExtraScreen.routeName)
-                      },
-                      child: ShadowContainer(
-                        width: MediaQuery.of(context).size.width * 0.43,
-                        child: Text(
-                          'Extra',
-                          style: Theme.of(context).textTheme.titleMedium,
-                          textAlign: TextAlign.center,
-                        ),
                       ),
                     )
                   ],
@@ -204,20 +201,37 @@ class _MyWalletState extends State<MyWallet> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          'Current balance',
+                          'Extra coin',
                           style: Theme.of(context).textTheme.bodyLarge,
                         ),
                         const SizedBox(
-                          height: 8,
+                          height: 5,
                         ),
                         Text(
-                          _hideBalance ? '******' : '45.000 bic',
+                          _hideBalance ? '******' : '5.000 bic',
                           style: Theme.of(context)
                               .textTheme
                               .displayMedium!
                               .copyWith(
                                 color: Theme.of(context).colorScheme.primary,
                               ),
+                        ),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        Text(
+                          '5.000 bic will expire on 20/06/2024',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall!
+                              .copyWith(
+                                color:
+                                    Theme.of(context).colorScheme.onSecondary,
+                                fontSize: 10,
+                              ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                          textAlign: TextAlign.left,
                         ),
                       ],
                     ),
