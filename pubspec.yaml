@@ -54,6 +54,7 @@ dependencies:
   hive_flutter: ^1.1.0
   dotted_line: ^3.2.2
   transition: ^2.0.2
+  modal_bottom_sheet: ^3.0.0
 
 dev_dependencies:
   flutter_test:
