@@ -50,7 +50,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
     await Geolocator.requestPermission();
 
     Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+        desiredAccuracy: LocationAccuracy.medium);
 
     if (mounted) {
       setState(() {

@@ -4,6 +4,7 @@ class ShadowButton extends StatelessWidget {
   final String buttonTitle;
   final Color? backgroundColor;
   final Color? titleColor;
+  final TextStyle? textStyle;
   final double? width;
   final double? height;
   final EdgeInsetsGeometry? margin;
@@ -20,6 +21,7 @@ class ShadowButton extends StatelessWidget {
 
     ///color for title
     this.titleColor,
+    this.textStyle,
 
     ///background color for button
     this.backgroundColor,
@@ -53,7 +55,7 @@ class ShadowButton extends StatelessWidget {
       ),
       child: Text(
         buttonTitle,
-        style: Theme.of(context).textTheme.displayLarge,
+        style: textStyle ?? Theme.of(context).textTheme.displayLarge,
         textAlign: TextAlign.center,
       ),
     );
