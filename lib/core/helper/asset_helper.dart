@@ -15,4 +15,5 @@ class AssetHelper {
   static const String intro2_1 = 'assets/imgs/Parking.png';
   static const String intro2_2 = 'assets/imgs/Intro_bike.png';
   static const String googleLogo = 'assets/imgs/Google.png';
+  static const String zaloLogo = 'assets/imgs/zalopay.png';
 }

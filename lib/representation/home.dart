@@ -4,6 +4,7 @@ import 'package:flutter_image_slideshow/flutter_image_slideshow.dart'
 import 'package:font_awesome_flutter/font_awesome_flutter.dart'
     show FontAwesomeIcons;
 import 'package:fptu_bike_parking_system/representation/navigation_bar.dart';
+import 'package:fptu_bike_parking_system/representation/payment.dart';
 import 'package:fptu_bike_parking_system/representation/wallet_screen.dart';
 import 'package:geolocator/geolocator.dart'
     show Geolocator, LocationAccuracy, Position;
@@ -181,19 +182,26 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           homeMainItem(
-                              context,
-                              () => Navigator.of(context)
-                                  .pushNamed(FundinScreen.routeName),
-                              Icons.input_rounded,
-                              'Fund-in'),
+                            context,
+                            () => Navigator.of(context)
+                                .pushNamed(FundinScreen.routeName),
+                            Icons.input_rounded,
+                            'Fund-in',
+                          ),
                           homeMainItem(
-                              context,
-                              () => Navigator.of(context)
-                                  .pushNamed(MyWallet.routeName),
-                              Icons.wallet,
-                              'Wallet'),
-                          homeMainItem(context, () {},
-                              Icons.insert_chart_outlined_rounded, 'Insights'),
+                            context,
+                            () => Navigator.of(context)
+                                .pushNamed(MyWallet.routeName),
+                            Icons.wallet,
+                            'Wallet',
+                          ),
+                          homeMainItem(
+                            context,
+                            () => Navigator.of(context)
+                                .pushNamed(PaymentScreen.routeName),
+                            Icons.insert_chart_outlined_rounded,
+                            'Insights',
+                          ),
                           homeMainItem(
                             context,
                             () => Navigator.of(context).pushNamed(
