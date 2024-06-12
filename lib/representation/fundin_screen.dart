@@ -53,14 +53,14 @@ class _FundinScreenState extends State<FundinScreen> {
       amount: 200000,
       price: 200000,
       extraCoin: 20000,
-      extraEXP: 200,
+      extraEXP: null,
     ),
     CoinPackage(
       packageName: 'Diamond Package',
       amount: 500000,
       price: 500000,
       extraCoin: 50000,
-      extraEXP: 500,
+      extraEXP: null,
     ),
   ];
 
@@ -82,7 +82,7 @@ class _FundinScreenState extends State<FundinScreen> {
         ),
       ),
       builder: (context) {
-        final maxHeight = MediaQuery.of(context).size.height * 0.45;
+        final maxHeight = MediaQuery.of(context).size.height * 0.5;
         final minHeight = MediaQuery.of(context).size.height * 0.2;
 
         return ConstrainedBox(
@@ -164,6 +164,26 @@ class _FundinScreenState extends State<FundinScreen> {
                             smallText(context,
                                 'Each purchase extends the expiration of all your extra coins by the specified days, giving you more flexibility to use them.'),
                           ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.6,
+                          child: Text(
+                            'By tapping BUY NOW you agree to deposit bai coins into your wallet.',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall!
+                                .copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.onSecondary,
+                                ),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ),
                     ),
@@ -355,38 +375,28 @@ class _FundinScreenState extends State<FundinScreen> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  packages[index].extraCoin != null
-                                      ? Text(
-                                          '${packages[index].amount + packages[index].extraCoin!} bic',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleMedium!
-                                              .copyWith(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                        )
-                                      : Text(
-                                          '${packages[index].amount} bic',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleMedium!
-                                              .copyWith(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                              ),
+                                  Text(
+                                    '${packages[index].amount + (packages[index].extraCoin ?? 0)} bic',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium!
+                                        .copyWith(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
                                         ),
+                                  ),
                                   const SizedBox(
                                     height: 3,
                                   ),
-                                  Text(
-                                    '+${packages[index].extraEXP} days',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge!
-                                        .copyWith(fontSize: 12),
-                                    textAlign: TextAlign.left,
-                                  ),
+                                  if (packages[index].extraEXP != null)
+                                    Text(
+                                      '+${packages[index].extraEXP} days',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge!
+                                          .copyWith(fontSize: 12),
+                                      textAlign: TextAlign.left,
+                                    ),
                                 ],
                               ),
                             ),
