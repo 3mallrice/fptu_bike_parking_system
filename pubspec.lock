@@ -685,14 +685,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.1"
-  transition:
-    dependency: "direct main"
-    description:
-      name: transition
-      sha256: "6765ff4c9d6058eaa703022a6490d7cb134a5109d888bb5eb01b3adf0d88eb6b"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.2"
   typed_data:
     dependency: transitive
     description:
