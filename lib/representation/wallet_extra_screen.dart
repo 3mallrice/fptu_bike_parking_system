@@ -3,9 +3,11 @@ import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
 import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
 import 'package:fptu_bike_parking_system/representation/fundin_screen.dart';
+import 'package:fptu_bike_parking_system/representation/home.dart';
 import 'package:fptu_bike_parking_system/representation/wallet_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
+import 'package:transition/transition.dart';
 
 class WalletExtraScreen extends StatefulWidget {
   const WalletExtraScreen({super.key});
@@ -131,6 +133,7 @@ class _WalletExtraScreenState extends State<WalletExtraScreen> {
     return Scaffold(
       appBar: AppBarCom(
         leading: true,
+        routeName: HomeAppScreen.routeName,
         appBarText: 'Wallet',
         action: [
           Padding(
@@ -162,8 +165,14 @@ class _WalletExtraScreenState extends State<WalletExtraScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     GestureDetector(
-                      onTap: () =>
-                          {Navigator.of(context).pushNamed(MyWallet.routeName)},
+                      onTap: () => Navigator.push(
+                        context,
+                        Transition(
+                          child: const MyWallet(),
+                          transitionEffect: TransitionEffect.LEFT_TO_RIGHT,
+                          curve: Curves.easeInOut,
+                        ),
+                      ),
                       child: ShadowContainer(
                         width: MediaQuery.of(context).size.width * 0.43,
                         child: Text(

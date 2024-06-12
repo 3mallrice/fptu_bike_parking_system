@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:fptu_bike_parking_system/representation/home.dart';
 import 'package:fptu_bike_parking_system/representation/wallet_extra_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
+import 'package:transition/transition.dart';
 
 import '../component/app_bar_component.dart';
 import '../component/shadow_container.dart';
@@ -132,6 +134,7 @@ class _MyWalletState extends State<MyWallet> {
     return Scaffold(
       appBar: AppBarCom(
         leading: true,
+        routeName: HomeAppScreen.routeName,
         appBarText: 'Wallet',
         action: [
           Padding(
@@ -177,10 +180,14 @@ class _MyWalletState extends State<MyWallet> {
                       ),
                     ),
                     GestureDetector(
-                      onTap: () => {
-                        Navigator.of(context)
-                            .pushNamed(WalletExtraScreen.routeName)
-                      },
+                      onTap: () => Navigator.push(
+                        context,
+                        Transition(
+                          child: const WalletExtraScreen(),
+                          transitionEffect: TransitionEffect.RIGHT_TO_LEFT,
+                          curve: Curves.easeInOut,
+                        ),
+                      ),
                       child: ShadowContainer(
                         width: MediaQuery.of(context).size.width * 0.43,
                         child: Text(
