@@ -13,6 +13,8 @@ class LabelMessage {
   static String yes = "Yes";
   static String no = "No";
   static String close = "Close";
+  static String done = "Done";
+  static String checkout = "Check out";
 }
 
 class ErrorMessage {
