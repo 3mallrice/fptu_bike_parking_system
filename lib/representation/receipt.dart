@@ -2,7 +2,9 @@ import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
+import 'package:fptu_bike_parking_system/core/const/frondend/message.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
+import 'package:logger/logger.dart';
 
 class ReceiptScreen extends StatefulWidget {
   const ReceiptScreen({super.key});
@@ -14,13 +16,15 @@ class ReceiptScreen extends StatefulWidget {
 }
 
 class _ReceiptScreenState extends State<ReceiptScreen> {
+  String status = "pending";
+  Color? statusColor;
+  String? statusText;
+  IconData? statusIcon;
+
+  var log = Logger();
+
   @override
   Widget build(BuildContext context) {
-    String status = "pending";
-    Color statusColor;
-    String statusText;
-    IconData statusIcon;
-
     switch (status) {
       case "fail":
         statusColor = Theme.of(context).colorScheme.error;
@@ -96,7 +100,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                           ),
                           const SizedBox(width: 10),
                           Text(
-                            statusText,
+                            statusText ?? "N/A",
                             style: Theme.of(context)
                                 .textTheme
                                 .titleMedium!
@@ -269,6 +273,22 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Container(
+        alignment: Alignment.bottomCenter,
+        child: GestureDetector(
+          onTap: () {
+            log.e("Clicked!!");
+          },
+          child: Text(
+            LabelMessage.close,
+            style: Theme.of(context).textTheme.displayMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontSize: 20,
+                ),
           ),
         ),
       ),
