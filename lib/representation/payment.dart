@@ -1,7 +1,9 @@
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
+import 'package:fptu_bike_parking_system/component/my_radio_button.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
+import 'package:fptu_bike_parking_system/core/const/frondend/message.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
 
 class PaymentScreen extends StatefulWidget {
@@ -14,6 +16,9 @@ class PaymentScreen extends StatefulWidget {
 }
 
 class _PaymentScreenState extends State<PaymentScreen> {
+  // State variable to track the selected payment option
+  int selectedPaymentOption = 1; // Default selection = ZaloPay
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -167,7 +172,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 const EdgeInsets.symmetric(horizontal: 20.0),
                             child: Table(
                               columnWidths: const {
-                                0: FractionColumnWidth(0.25) // Cột đầu tiên
+                                0: FractionColumnWidth(0.25)
                               },
                               children: [
                                 TableRow(
@@ -230,34 +235,101 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       ),
                 ),
               ),
-              ShadowContainer(
-                width: MediaQuery.of(context).size.width * 0.8,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Image(
-                      image: AssetImage(AssetHelper.zaloLogo),
-                      height: 20,
-                      fit: BoxFit.fitHeight,
-                    ),
-                  ],
+              const SizedBox(height: 5),
+
+              // ZaloPay
+              RadioButtonCustom(
+                //bank icon
+                prefixWidget: Image.asset(
+                  AssetHelper.zaloLogo,
+                  height: 19,
                 ),
+                contentWidget: Text(
+                  'ZaloPay',
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        fontSize: 17,
+                      ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+                isSelected: selectedPaymentOption == 1,
+                onTap: () {
+                  setState(() {
+                    selectedPaymentOption = 1;
+                  });
+                },
               ),
-              const SizedBox(height: 20),
-              ShadowContainer(
-                width: MediaQuery.of(context).size.width * 0.8,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Icon(
-                      Icons.qr_code,
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
-                  ],
+
+              // Internet Banking
+              const SizedBox(height: 15),
+              RadioButtonCustom(
+                //bank icon
+                prefixWidget: Icon(
+                  Icons.account_balance,
+                  size: 30,
+                  color: Theme.of(context).colorScheme.outline,
                 ),
-              )
+                contentWidget: Text(
+                  'Internet Banking',
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        fontSize: 17,
+                      ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+                isSelected: selectedPaymentOption == 2,
+                onTap: () {
+                  setState(() {
+                    selectedPaymentOption = 2;
+                  });
+                },
+              ),
             ],
           ),
+        ),
+      ),
+
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      // close button and check-out button
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            FloatingActionButton.extended(
+              onPressed: () {
+                //TODO: Implement close logic
+              },
+              label: Text(
+                LabelMessage.close,
+                style: Theme.of(context).textTheme.displayMedium!.copyWith(
+                      fontSize: 20,
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.w900,
+                    ),
+              ),
+              backgroundColor: Theme.of(context).colorScheme.background,
+              elevation: 0,
+            ),
+            SizedBox(width: MediaQuery.of(context).size.width * 0.12),
+            FloatingActionButton.extended(
+              onPressed: () {
+                //TODO: Implement check-out logic
+              },
+              label: Text(
+                LabelMessage.checkout.toUpperCase(),
+                style: Theme.of(context).textTheme.displayMedium!.copyWith(
+                      fontSize: 20,
+                      color: Theme.of(context).colorScheme.background,
+                      fontWeight: FontWeight.w900,
+                    ),
+              ),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          ],
         ),
       ),
     );
