@@ -5,11 +5,11 @@ import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
 import 'package:fptu_bike_parking_system/component/dialog.dart';
 import 'package:fptu_bike_parking_system/component/shadow_button.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
-import 'package:fptu_bike_parking_system/representation/receipt.dart';
 import 'package:fptu_bike_parking_system/component/snackbar.dart';
-import 'package:fptu_bike_parking_system/core/helper/widget_to_image.dart';
-import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
+import 'package:fptu_bike_parking_system/core/helper/widget_to_image.dart';
+import 'package:fptu_bike_parking_system/representation/receipt.dart';
+import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:widgets_to_image/widgets_to_image.dart';
 
 import '../component/widget_to_image_template.dart';
@@ -128,18 +128,18 @@ class _PayOsScreenState extends State<PayOsScreen> {
                                               child: Column(
                                                 children: [
                                                   FieldTransferInfo(
-                                                    text:
-                                                        "ABC123456789", // addPaymentResponse!.accountNumber,
+                                                    text: "ABC123456789",
+                                                    // addPaymentResponse!.accountNumber,
                                                     label: "Account Number",
                                                   ),
                                                   FieldTransferInfo(
-                                                    text:
-                                                        "45.000 vnd", // addPaymentResponse!.amount,
+                                                    text: "45.000 vnd",
+                                                    // addPaymentResponse!.amount,
                                                     label: "Amount",
                                                   ),
                                                   FieldTransferInfo(
-                                                    text:
-                                                        "ABCDEF BUI HUU PHUC", // addPaymentResponse!.message,
+                                                    text: "ABCDEF BUI HUU PHUC",
+                                                    // addPaymentResponse!.message,
                                                     label: "Message",
                                                   ),
                                                 ],
@@ -275,6 +275,7 @@ class _PayOsScreenState extends State<PayOsScreen> {
                     ],
                   ),
                 ),
+                const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -294,7 +295,6 @@ class _PayOsScreenState extends State<PayOsScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
                 GestureDetector(
                   onTap: () =>
                       Navigator.of(context).pushNamed(ReceiptScreen.routeName),
@@ -314,11 +314,13 @@ class _PayOsScreenState extends State<PayOsScreen> {
   Widget button(void Function()? onTap, IconData icon) {
     return GestureDetector(
       onTap: onTap,
-      child: ShadowContainer(
-        borderRadius: 50,
-        height: MediaQuery.of(context).size.height * 0.07,
-        width: MediaQuery.of(context).size.height * 0.07,
-        color: Theme.of(context).colorScheme.outline,
+      child: Container(
+        padding: const EdgeInsets.all(15),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.outline,
+          borderRadius: const BorderRadius.all(Radius.circular(50)),
+        ),
         child: Icon(
           icon,
           color: Theme.of(context).colorScheme.background,

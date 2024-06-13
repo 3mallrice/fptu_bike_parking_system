@@ -242,8 +242,53 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                   ],
                 ),
               ),
+              const SizedBox(height: 20),
+              // Save and Share
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: MediaQuery.of(context).size.width * 0.1,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    button(
+                      () {
+                        //TODO
+                      },
+                      Icons.save_alt_rounded,
+                    ),
+                    button(
+                      () {
+                        //TODO
+                      },
+                      Icons.share_rounded,
+                    )
+                  ],
+                ),
+              ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget button(void Function()? onTap, IconData icon) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(15),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.outline,
+          borderRadius: const BorderRadius.all(Radius.circular(50)),
+        ),
+        child: Icon(
+          icon,
+          color: Theme.of(context).colorScheme.background,
+          size: 30,
         ),
       ),
     );
