@@ -4,11 +4,13 @@ class MySnackBar extends StatelessWidget {
   final Widget? prefix;
   final String message;
   final Color? backgroundColor;
+  final Color? textColor;
   const MySnackBar({
     super.key,
     this.prefix,
     required this.message,
     this.backgroundColor,
+    this.textColor,
   });
 
   @override
@@ -34,7 +36,9 @@ class MySnackBar extends StatelessWidget {
           // message
           Text(
             message,
-            style: Theme.of(context).textTheme.bodyMedium,
+            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: textColor ?? Theme.of(context).colorScheme.background,
+                ),
           ),
         ],
       ),

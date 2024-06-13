@@ -6,10 +6,10 @@ import 'package:fptu_bike_parking_system/component/dialog.dart';
 import 'package:fptu_bike_parking_system/component/shadow_button.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
 import 'package:fptu_bike_parking_system/component/snackbar.dart';
-import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
-import 'package:fptu_bike_parking_system/core/helper/widget_to_image.dart';
-import 'package:fptu_bike_parking_system/representation/receipt.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
+import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
+import 'package:fptu_bike_parking_system/core/helper/save_image.dart';
+import 'package:fptu_bike_parking_system/representation/receipt.dart';
 import 'package:widgets_to_image/widgets_to_image.dart';
 
 import '../component/widget_to_image_template.dart';
@@ -359,7 +359,7 @@ class _PayOsScreenState extends State<PayOsScreen> {
           content: dialogWidget(controller, context),
           onConfirm: () async {
             var image = await controller.capture();
-            await widgetToImage("abc", image)
+            await saveImage(ImageName.imageName(prefix: "BankingInfo"), image)
                 ? showCustomSnackBar(MySnackBar(
                     prefix: Icon(
                       Icons.check_circle_rounded,
