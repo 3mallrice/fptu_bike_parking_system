@@ -37,6 +37,8 @@ ThemeData lightMode = ThemeData(
     outlineVariant: ColorLightMode.dividerColor,
     outline: ColorLightMode.primaryText,
     onSecondary: ColorLightMode.secondaryText,
+    error: ColorLightMode.fail,
+    onError: ColorLightMode.success,
   ),
   dividerColor: ColorLightMode.primaryText,
   useMaterial3: true,

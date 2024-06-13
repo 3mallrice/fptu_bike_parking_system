@@ -13,6 +13,7 @@ import 'package:fptu_bike_parking_system/representation/navigation_bar.dart';
 import 'package:fptu_bike_parking_system/representation/payment.dart';
 import 'package:fptu_bike_parking_system/representation/payos.dart';
 import 'package:fptu_bike_parking_system/representation/profile.dart';
+import 'package:fptu_bike_parking_system/representation/receipt.dart';
 import 'package:fptu_bike_parking_system/representation/splash_screen.dart';
 import 'package:fptu_bike_parking_system/representation/wallet_extra_screen.dart';
 import 'package:fptu_bike_parking_system/representation/wallet_screen.dart';
@@ -44,4 +45,5 @@ final Map<String, WidgetBuilder> routes = {
   HistoryScreen.routeName: (context) => const HistoryScreen(),
   WalletExtraScreen.routeName: (context) => const WalletExtraScreen(),
   PaymentScreen.routeName: (context) => const PaymentScreen(),
+  ReceiptScreen.routeName: (context) => const ReceiptScreen(),
 };

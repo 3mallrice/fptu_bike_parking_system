@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
 import 'package:fptu_bike_parking_system/component/shadow_button.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
+import 'package:fptu_bike_parking_system/representation/receipt.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
 
@@ -287,9 +288,8 @@ class _PayOsScreenState extends State<PayOsScreen> {
                 ),
                 const SizedBox(height: 20),
                 GestureDetector(
-                  onTap: () {
-                    //TODO
-                  },
+                  onTap: () =>
+                      Navigator.of(context).pushNamed(ReceiptScreen.routeName),
                   child: const ShadowButton(
                     buttonTitle: 'CONFIRM',
                     margin: EdgeInsets.symmetric(vertical: 20),

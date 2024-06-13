@@ -8,6 +8,8 @@ class ColorLightMode {
   static const Color dividerColor = Color(0xFFD9D9D9);
   static Color secondaryText = const Color(0xFF0E1030).withOpacity(0.5);
   static const Color primaryGray = Color(0xFFE5E5E5);
+  static const Color success = Color(0xFF00A676);
+  static const Color fail = Color(0xFFF42B03);
 }
 
 class ColorDarkMode {
