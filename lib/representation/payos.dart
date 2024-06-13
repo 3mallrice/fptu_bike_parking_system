@@ -1,13 +1,19 @@
-// ignore_for_file: avoid_print
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
+import 'package:fptu_bike_parking_system/component/dialog.dart';
 import 'package:fptu_bike_parking_system/component/shadow_button.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
 import 'package:fptu_bike_parking_system/representation/receipt.dart';
+import 'package:fptu_bike_parking_system/component/snackbar.dart';
+import 'package:fptu_bike_parking_system/core/helper/widget_to_image.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
+import 'package:widgets_to_image/widgets_to_image.dart';
+
+import '../component/widget_to_image_template.dart';
+import '../core/const/frondend/message.dart';
 
 class PayOsScreen extends StatefulWidget {
   const PayOsScreen({super.key});
@@ -22,11 +28,14 @@ class _PayOsScreenState extends State<PayOsScreen> {
   late int selectedPage;
   late final PageController _pageController;
 
+  late final WidgetsToImageController _controller;
+  Uint8List? image;
+
   @override
   void initState() {
-    // TODO: implement initState
     selectedPage = 0;
     _pageController = PageController(initialPage: selectedPage);
+    _controller = WidgetsToImageController();
 
     super.initState();
   }
@@ -258,9 +267,8 @@ class _PayOsScreenState extends State<PayOsScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      button(() {
-                        //TODO
-                      }, Icons.save_alt_rounded),
+                      button(() => _showSaveImageDialog(_controller),
+                          Icons.save_alt_rounded),
                       button(() {
                         //TODO
                       }, Icons.share_rounded)
@@ -334,6 +342,170 @@ class _PayOsScreenState extends State<PayOsScreen> {
       ),
     );
   }
+
+  // save image dialog to preview image
+  void _showSaveImageDialog(WidgetsToImageController controller) {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        Color backgroundColor = Theme.of(context).colorScheme.background;
+        Color onSuccessful = Theme.of(context).colorScheme.onError;
+        Color onUnsuccessful = Theme.of(context).colorScheme.error;
+
+        return ConfirmDialog(
+          title: 'Save Payment Information',
+          content: dialogWidget(controller, context),
+          onConfirm: () async {
+            var image = await controller.capture();
+            await widgetToImage("abc", image)
+                ? showCustomSnackBar(MySnackBar(
+                    prefix: Icon(
+                      Icons.check_circle_rounded,
+                      color: backgroundColor,
+                    ),
+                    message: Message.saveImageSuccessfully,
+                    backgroundColor: onSuccessful,
+                  ))
+                : showCustomSnackBar(
+                    MySnackBar(
+                      prefix: Icon(
+                        Icons.cancel_rounded,
+                        color: backgroundColor,
+                      ),
+                      message: Message.saveImageUnSuccessfully,
+                      backgroundColor: onUnsuccessful,
+                    ),
+                  );
+            backToPage();
+          },
+          onCancel: () => backToPage(),
+          positiveLabel: LabelMessage.save,
+        );
+      },
+    );
+  }
+
+  // show custom snackbar
+  void showCustomSnackBar(MySnackBar snackBar) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: snackBar,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+    );
+  }
+
+  // dialog widget to preview image
+  Column dialogWidget(
+      WidgetsToImageController controller, BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        WidgetsToImage(
+          controller: controller,
+          child: WidgetToImageTemplate(
+            widget: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(22),
+                    child: PrettyQrView.data(
+                      data: 'lorem ipsum dolor sit amet',
+                      decoration: const PrettyQrDecoration(
+                        image: PrettyQrDecorationImage(
+                          image: AssetImage(AssetHelper.imgLogo),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.only(bottom: 2),
+                  child: const Text('- OR -'),
+                ),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      alignment: Alignment.topLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            bankingInfo(
+                              "ABC123456789",
+                              "Account Number",
+                            ),
+                            bankingInfo(
+                              "45.000 vnd",
+                              "Amount",
+                            ),
+                            bankingInfo(
+                              "ABCDEF BUI HUU PHUC",
+                              "Message",
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Flexible(
+                      fit: FlexFit.loose,
+                      child: Text(
+                        'Remember to accurately input 45.000 vnd',
+                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                              color: Theme.of(context).colorScheme.onSecondary,
+                            ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // banking information
+  Widget bankingInfo(String text, String label) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                color: Theme.of(context).colorScheme.onSecondary,
+              ),
+        ),
+        const SizedBox(height: 4),
+        // ignore: unnecessary_string_interpolations
+        Text(
+          text,
+          style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                color: Theme.of(context).colorScheme.outline,
+              ),
+        ),
+      ],
+    );
+  }
+
+  // back to previous page
+  void backToPage({String? routeName}) => routeName != null
+      ? Navigator.of(context).pop(routeName)
+      : Navigator.of(context).pop();
 }
 
 class FieldTransferInfo extends StatefulWidget {

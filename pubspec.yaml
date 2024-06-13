@@ -55,6 +55,9 @@ dependencies:
   dotted_line: ^3.2.2
   transition: ^2.0.2
   modal_bottom_sheet: ^3.0.0
+  widgets_to_image: ^1.0.0
+  permission_handler:
+  path_provider: ^2.1.3
 
 dev_dependencies:
   flutter_test:
