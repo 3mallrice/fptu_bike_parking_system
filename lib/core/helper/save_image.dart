@@ -5,7 +5,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 var log = Logger();
 
-Future<bool> widgetToImage(String imageName, Uint8List? image) async {
+Future<bool> saveImage(String imageName, Uint8List? image) async {
   try {
     var status = await Permission.storage.request();
 
