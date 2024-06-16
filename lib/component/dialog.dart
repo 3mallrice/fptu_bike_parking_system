@@ -16,28 +16,21 @@ class OKDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoAlertDialog(
+    return AlertDialog(
       title: Text(
         title,
-        style: Theme.of(context).textTheme.titleMedium,
+        style: Theme.of(context).textTheme.titleLarge!.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+        textAlign: TextAlign.center,
       ),
-      content: Container(
-        margin: const EdgeInsets.only(top: 10),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.background,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: content,
-      ),
-      actions: [
-        CupertinoDialogAction(
-          onPressed: () {
-            if (onClick != null) onClick!();
-          },
-          child: Text(
-            LabelMessage.ok,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
+      backgroundColor: Theme.of(context).colorScheme.background,
+      surfaceTintColor: Theme.of(context).colorScheme.background,
+      content: content,
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => onClick,
+          child: Text(LabelMessage.ok),
         ),
       ],
     );
@@ -62,37 +55,25 @@ class ConfirmDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoAlertDialog(
+    return AlertDialog(
       title: Text(
         title,
-        style: Theme.of(context).textTheme.titleMedium,
+        style: Theme.of(context).textTheme.titleLarge!.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+        textAlign: TextAlign.center,
       ),
-      content: Container(
-        margin: const EdgeInsets.only(top: 10),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.background,
-          borderRadius: BorderRadius.circular(10),
+      backgroundColor: Theme.of(context).colorScheme.background,
+      surfaceTintColor: Theme.of(context).colorScheme.background,
+      content: content,
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => onCancel,
+          child: Text(LabelMessage.cancel),
         ),
-        child: content,
-      ),
-      actions: [
-        CupertinoDialogAction(
-          onPressed: () {
-            if (onCancel != null) onCancel!();
-          },
-          child: Text(
-            LabelMessage.cancel,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-        ),
-        CupertinoDialogAction(
-          onPressed: () {
-            if (onConfirm != null) onConfirm!();
-          },
-          child: Text(
-            positiveLabel ?? LabelMessage.ok,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
+        TextButton(
+          onPressed: () => onConfirm,
+          child: Text(positiveLabel ?? LabelMessage.save),
         ),
       ],
     );

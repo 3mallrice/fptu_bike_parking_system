@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
@@ -350,7 +349,7 @@ class _PayOsScreenState extends State<PayOsScreen> {
 
   // save image dialog to preview image
   void _showImageDialog(WidgetsToImageController controller, int action) {
-    showCupertinoDialog(
+    showDialog(
       context: context,
       builder: (BuildContext context) {
         Color backgroundColor = Theme.of(context).colorScheme.background;
@@ -358,7 +357,7 @@ class _PayOsScreenState extends State<PayOsScreen> {
         Color onUnsuccessful = Theme.of(context).colorScheme.error;
 
         return ConfirmDialog(
-          title: 'Save Payment Information',
+          title: "Preview",
           content: toImageWidget(controller, context),
           onConfirm: () async {
             var image = await controller.capture();
@@ -384,7 +383,6 @@ class _PayOsScreenState extends State<PayOsScreen> {
             backToPage();
           },
           onCancel: () => backToPage(),
-          positiveLabel: LabelMessage.save,
         );
       },
     );
@@ -411,72 +409,18 @@ class _PayOsScreenState extends State<PayOsScreen> {
         WidgetsToImage(
           controller: controller,
           child: WidgetToImageTemplate(
-            widget: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Center(
-                  child: Container(
-                    padding: const EdgeInsets.all(22),
-                    child: PrettyQrView.data(
-                      data: 'lorem ipsum dolor sit amet',
-                      decoration: const PrettyQrDecoration(
-                        image: PrettyQrDecorationImage(
-                          image: AssetImage(AssetHelper.imgLogo),
-                        ),
-                      ),
+            widget: Center(
+              child: Container(
+                padding: const EdgeInsets.all(22),
+                child: PrettyQrView.data(
+                  data: 'lorem ipsum dolor sit amet',
+                  decoration: const PrettyQrDecoration(
+                    image: PrettyQrDecorationImage(
+                      image: AssetImage(AssetHelper.imgLogo),
                     ),
                   ),
                 ),
-                Container(
-                  margin: const EdgeInsets.only(bottom: 2),
-                  child: const Text('- OR -'),
-                ),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      alignment: Alignment.topLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            bankingInfo(
-                              "ABC123456789",
-                              "Account Number",
-                            ),
-                            bankingInfo(
-                              "45.000 vnd",
-                              "Amount",
-                            ),
-                            bankingInfo(
-                              "ABCDEF BUI HUU PHUC",
-                              "Message",
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Flexible(
-                      fit: FlexFit.loose,
-                      child: Text(
-                        'Remember to accurately input 45.000 vnd',
-                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                              color: Theme.of(context).colorScheme.onSecondary,
-                            ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+              ),
             ),
           ),
         ),
