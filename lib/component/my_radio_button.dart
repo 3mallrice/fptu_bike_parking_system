@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'shadow_container.dart';
@@ -23,7 +22,6 @@ class RadioButtonCustom extends StatelessWidget {
       onTap: onTap,
       child: ShadowContainer(
         width: MediaQuery.of(context).size.width * 0.8,
-        height: MediaQuery.of(context).size.height * 0.067,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
