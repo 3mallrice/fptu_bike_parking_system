@@ -28,6 +28,9 @@ class _PayOsScreenState extends State<PayOsScreen> {
   late int selectedPage;
   late final PageController _pageController;
 
+  final int save = 1;
+  final int share = 2;
+
   late final WidgetsToImageController _controller;
   Uint8List? image;
 
@@ -267,7 +270,7 @@ class _PayOsScreenState extends State<PayOsScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      button(() => _showSaveImageDialog(_controller),
+                      button(() => _showImageDialog(_controller, save),
                           Icons.save_alt_rounded),
                       button(() {
                         //TODO
@@ -346,7 +349,7 @@ class _PayOsScreenState extends State<PayOsScreen> {
   }
 
   // save image dialog to preview image
-  void _showSaveImageDialog(WidgetsToImageController controller) {
+  void _showImageDialog(WidgetsToImageController controller, int action) {
     showCupertinoDialog(
       context: context,
       builder: (BuildContext context) {
@@ -356,7 +359,7 @@ class _PayOsScreenState extends State<PayOsScreen> {
 
         return ConfirmDialog(
           title: 'Save Payment Information',
-          content: dialogWidget(controller, context),
+          content: toImageWidget(controller, context),
           onConfirm: () async {
             var image = await controller.capture();
             await saveImage(ImageName.imageName(prefix: "BankingInfo"), image)
@@ -400,7 +403,7 @@ class _PayOsScreenState extends State<PayOsScreen> {
   }
 
   // dialog widget to preview image
-  Column dialogWidget(
+  Column toImageWidget(
       WidgetsToImageController controller, BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,

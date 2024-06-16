@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:fptu_bike_parking_system/component/shadow_button.dart';
 import 'package:fptu_bike_parking_system/representation/payos.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -82,141 +83,176 @@ class _FundinScreenState extends State<FundinScreen> {
         ),
       ),
       builder: (context) {
-        final maxHeight = MediaQuery.of(context).size.height * 0.5;
-        final minHeight = MediaQuery.of(context).size.height * 0.2;
-
         return ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: minHeight,
-            maxHeight: maxHeight,
+          constraints: const BoxConstraints(
+            minHeight: 400,
           ),
-          child: CupertinoPageScaffold(
-            navigationBar: CupertinoNavigationBar(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              middle: Text(
-                'Package Detail',
-                style: Theme.of(context).textTheme.displayMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.background,
-                    ),
-              ),
-              automaticallyImplyLeading: false,
-              border: const Border(
-                bottom: BorderSide(
-                  color: Colors.transparent,
-                  width: 0,
-                ),
-              ),
-            ),
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    Container(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 15),
-                        child: Text(
-                          package.packageName,
-                          style: Theme.of(context)
-                              .textTheme
-                              .displayLarge!
-                              .copyWith(
-                                color: Theme.of(context).colorScheme.outline,
-                              ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.left,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            smallText(context,
-                                'If you purchase the ${package.packageName}, you will get:'),
-                            smallText(context,
-                                '  • ${package.amount} bic (Main Wallet).'),
-                            if (package.extraCoin != null)
-                              smallText(context,
-                                  '  • ${package.extraCoin} Extra bic (Extra Wallet).'),
-                            if (package.extraEXP != null)
-                              smallText(context,
-                                  '  • Your Extra Wallet’s expiration period will increase by ${package.extraEXP} days.'),
-                            smallText(context,
-                                'Total Coins to Spend: ${package.amount + (package.extraCoin ?? 0)} bic.'),
-                            if (package.extraEXP != null)
-                              smallText(context,
-                                  'Expiration Extension: +${package.extraEXP} days added to the current expiration date of your Extra Wallet coins.'),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 10),
-                              child: Text(
-                                'Keep in mind:',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium!
-                                    .copyWith(fontWeight: FontWeight.w800),
-                              ),
-                            ),
-                            smallText(context,
-                                'Each purchase extends the expiration of all your extra coins by the specified days, giving you more flexibility to use them.'),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.6,
-                          child: Text(
-                            'By tapping BUY NOW you agree to deposit bai coins into your wallet.',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall!
-                                .copyWith(
-                                  color:
-                                      Theme.of(context).colorScheme.onSecondary,
-                                ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.of(context)
-                              .pushNamed(PayOsScreen.routeName);
-                        },
-                        child: ShadowButton(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.outline,
-                          height: MediaQuery.of(context).size.height * 0.07,
-                          buttonTitle: '${package.price} VND - BUY NOW',
-                          textStyle: Theme.of(context)
-                              .textTheme
-                              .titleLarge!
-                              .copyWith(
-                                fontSize: 20,
-                                color: Theme.of(context).colorScheme.background,
-                                fontWeight: FontWeight.w600,
-                              ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.45,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: bottomSheet(package),
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget bottomSheet(CoinPackage package) {
+    return SafeArea(
+      child: Column(
+        children: [
+          AppBar(
+            // backgroundColor: Theme.of(context).colorScheme.primary,
+            title: Text('Package Detail',
+                style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                      fontSize: 20,
+                    )),
+            automaticallyImplyLeading: false,
+            elevation: 0,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    'Package Name:',
+                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                          fontWeight: FontWeight.normal,
+                        ),
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    package.packageName,
+                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                          color: Theme.of(context).colorScheme.outline,
+                          fontSize: 19,
+                        ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.right,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    'Price:',
+                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                          fontWeight: FontWeight.normal,
+                        ),
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    '${package.price}đ',
+                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                          color: Theme.of(context).colorScheme.outline,
+                          fontSize: 19,
+                        ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.right,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 10, bottom: 5),
+            child: Divider(
+              color:
+                  Theme.of(context).colorScheme.onSecondary.withOpacity(0.12),
+              thickness: 1,
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  smallText(context,
+                      'If you purchase the ${package.packageName}, you will get:'),
+                  smallText(
+                      context, '  • ${package.amount} bic (Main Wallet).'),
+                  if (package.extraCoin != null)
+                    smallText(context,
+                        '  • ${package.extraCoin} Extra bic (Extra Wallet).'),
+                  if (package.extraEXP != null)
+                    smallText(context,
+                        '  • Your Extra Wallet’s expiration period will increase by ${package.extraEXP} days.'),
+                  smallText(context,
+                      'Total Coins to Spend: ${package.amount + (package.extraCoin ?? 0)} bic.'),
+                  if (package.extraEXP != null)
+                    smallText(context,
+                        'Expiration Extension: +${package.extraEXP} days added to the current expiration date of your Extra Wallet coins.'),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Text(
+                      'Keep in mind:',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium!
+                          .copyWith(fontWeight: FontWeight.w800),
+                    ),
+                  ),
+                  smallText(context,
+                      'Each purchase extends the expiration of all your extra coins by the specified days, giving you more flexibility to use them.'),
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Align(
+              alignment: Alignment.center,
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.6,
+                child: Text(
+                  'By tapping BUY NOW you agree to deposit bai coins into your wallet.',
+                  style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                        color: Theme.of(context).colorScheme.onSecondary,
+                      ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+            child: GestureDetector(
+              onTap: () =>
+                  Navigator.of(context).pushNamed(PayOsScreen.routeName),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  minHeight: 60,
+                ),
+                child: ShadowButton(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  height: MediaQuery.of(context).size.height * 0.07,
+                  buttonTitle: '${package.price} VND - BUY NOW',
+                  textStyle: Theme.of(context).textTheme.titleLarge!.copyWith(
+                        fontSize: 20,
+                        color: Theme.of(context).colorScheme.background,
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

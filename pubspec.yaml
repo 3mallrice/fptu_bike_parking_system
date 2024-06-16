@@ -58,6 +58,7 @@ dependencies:
   widgets_to_image: ^1.0.0
   permission_handler:
   path_provider: ^2.1.3
+  share_plus: ^9.0.0
 
 dev_dependencies:
   flutter_test:
