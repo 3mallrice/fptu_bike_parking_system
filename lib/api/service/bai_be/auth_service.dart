@@ -8,19 +8,19 @@ import '../../model/bai_model/api_response.dart';
 import '../../model/bai_model/login_model.dart';
 
 class CallAuthApi {
-  static const String baseUrl = 'https://localhost:7041/api';
+  static const String baseUrl = 'https://10.0.2.2:7041/api';
   static const apiName = '/auth';
   final String api = baseUrl + apiName;
 
   String token = "";
   var log = Logger();
-  
+
   //Login with google
-  Future<void> loginWithGoogle() async {
+  Future<void> loginWithGoogle(String idToken) async {
     try {
       final response = await http.post(
-        Uri.parse('$api/login/login-google'),
-        headers: {'Content-Type': 'application/json'},
+        Uri.parse('$api/google?idToken=$idToken'),
+        headers: {'Content-Type': 'application/text'},
       );
 
       if (response.statusCode == 200) {
