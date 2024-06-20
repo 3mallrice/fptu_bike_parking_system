@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
-import 'package:fptu_bike_parking_system/representation/navigation_bar.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:logger/logger.dart';
+
+import '../core/helper/google_signin.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,6 +16,23 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final Logger log = Logger();
+
+  Future signIn() async {
+    final currentUser = await GoogleSignInApi.currentUser();
+    GoogleSignInAuthentication? authen = await currentUser?.authentication;
+    log.i("currentUser: $currentUser" "\nidToken: ${authen?.idToken}");
+
+    if (currentUser == null) {
+      final googleUser = await GoogleSignInApi.login();
+      log.i(googleUser);
+    }
+
+    GoogleSignInAuthentication? auth =
+        await GoogleSignInApi().getGoogleSignInAuthentication();
+    log.i(auth?.idToken);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,11 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   //Continue with Google
                   GestureDetector(
-                    onTap: () {
-                      //TODO: Implement Google Sign In
-                      Navigator.of(context)
-                          .pushNamed(MyNavigationBar.routeName);
-                    },
+                    onTap: signIn,
                     child: ShadowContainer(
                       width: MediaQuery.of(context).size.width * 0.8,
                       height: MediaQuery.of(context).size.height * 0.08,
@@ -147,5 +163,11 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  void goToPageHelper({String? routeName}) {
+    routeName == null
+        ? Navigator.of(context).pop()
+        : Navigator.of(context).pushNamed(routeName);
   }
 }
