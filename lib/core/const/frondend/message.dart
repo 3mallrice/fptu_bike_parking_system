@@ -20,7 +20,9 @@ class LabelMessage {
 class ErrorMessage {
   static String error = "Error";
   static String somethingWentWrong =
-      "Something went wrong, please try again later";
+      "Something went wrong, please try again later!";
+  static String errorWhileLoading =
+      "Error while loading, please try again later!";
 }
 
 class ImageName {

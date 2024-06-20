@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+
+import '../component/in_app_web_view.dart';
 
 class AboutUs extends StatefulWidget {
   const AboutUs({super.key});
@@ -12,6 +16,35 @@ class AboutUs extends StatefulWidget {
 }
 
 class _AboutUsState extends State<AboutUs> {
+  // Show in-app web view
+  void showInAppWebView(String? title, String? url) {
+    showBarModalBottomSheet(
+      context: context,
+      animationCurve: Curves.easeInCirc,
+      barrierColor: Theme.of(context).colorScheme.outline.withOpacity(0.35),
+      expand: false,
+      backgroundColor: Theme.of(context).colorScheme.background,
+      closeProgressThreshold: 0.3,
+      enableDrag: true,
+      elevation: 4,
+      useRootNavigator: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(10),
+          topRight: Radius.circular(10),
+        ),
+      ),
+      builder: (context) {
+        return SizedBox(
+          child: InAppWebView(
+            url: url ?? 'https://www.google.com',
+            title: title ?? "Google",
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,11 +75,17 @@ class _AboutUsState extends State<AboutUs> {
                   color: Theme.of(context).colorScheme.outlineVariant,
                   thickness: 1,
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Text(
+                GestureDetector(
+                  onTap: () => showInAppWebView(
                     'Bai.com.vn',
-                    style: Theme.of(context).textTheme.titleMedium,
+                    'https://google.com',
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Text(
+                      'Bai.com.vn',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
                   ),
                 ),
                 Divider(

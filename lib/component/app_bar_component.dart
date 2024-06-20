@@ -6,7 +6,7 @@ class AppBarCom extends StatelessWidget implements PreferredSizeWidget {
   final Widget? leftIcon;
   final String? routeName;
   final Color? backgroundColor;
-  final Color? textColor;
+  final TextStyle? titleTextStyle;
   final List<Widget>? action;
 
   const AppBarCom({
@@ -15,7 +15,7 @@ class AppBarCom extends StatelessWidget implements PreferredSizeWidget {
     required this.leading,
     this.leftIcon,
     this.backgroundColor,
-    this.textColor,
+    this.titleTextStyle,
     this.action,
     this.routeName,
   });
@@ -43,11 +43,13 @@ class AppBarCom extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 )
             : null,
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        backgroundColor:
+            backgroundColor ?? Theme.of(context).appBarTheme.backgroundColor,
         title: Text(appBarText ?? ""),
-        titleTextStyle: Theme.of(context).textTheme.displayMedium!.copyWith(
-              fontWeight: FontWeight.normal,
-            ),
+        titleTextStyle: titleTextStyle ??
+            Theme.of(context).textTheme.displayMedium!.copyWith(
+                  fontWeight: FontWeight.normal,
+                ),
         actions: action,
       ),
     );

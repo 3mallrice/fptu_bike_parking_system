@@ -1,10 +1,12 @@
+// ignore_for_file: unused_field
+
 import 'package:flutter/material.dart';
+import 'package:fptu_bike_parking_system/api/service/bai_be/auth_service.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:logger/logger.dart';
 
-import '../core/helper/google_signin.dart';
+import 'navigation_bar.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,21 +18,18 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final Logger log = Logger();
+  static final log = Logger();
+  final _authApi = CallAuthApi();
 
   Future signIn() async {
-    final currentUser = await GoogleSignInApi.currentUser();
-    GoogleSignInAuthentication? authen = await currentUser?.authentication;
-    log.i("currentUser: $currentUser" "\nidToken: ${authen?.idToken}");
+    // var currentUser = await GoogleSignInApi.currentUser();
 
-    if (currentUser == null) {
-      final googleUser = await GoogleSignInApi.login();
-      log.i(googleUser);
-    }
+    // currentUser ??= await GoogleSignInApi.login();
+    // GoogleSignInAuthentication? authen = await currentUser?.authentication;
 
-    GoogleSignInAuthentication? auth =
-        await GoogleSignInApi().getGoogleSignInAuthentication();
-    log.i(auth?.idToken);
+    // log.i("currentUser: $currentUser" "\nidToken: ${authen?.idToken}");
+    // await _authApi.loginWithGoogle(authen?.idToken ?? "");
+    Navigator.of(context).pushNamed(MyNavigationBar.routeName);
   }
 
   @override
@@ -113,7 +112,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   //Continue with Google
                   GestureDetector(
-                    onTap: signIn,
+                    onTap: () async {
+                      await signIn();
+                      // _showPackageDetail();
+                    },
                     child: ShadowContainer(
                       width: MediaQuery.of(context).size.width * 0.8,
                       height: MediaQuery.of(context).size.height * 0.08,
