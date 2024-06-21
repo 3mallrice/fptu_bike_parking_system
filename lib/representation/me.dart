@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
+import 'package:fptu_bike_parking_system/core/helper/google_auth.dart';
 import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
 import 'package:fptu_bike_parking_system/representation/about_screen.dart';
+import 'package:fptu_bike_parking_system/representation/login.dart';
 import 'package:fptu_bike_parking_system/representation/profile.dart';
 import 'package:logger/logger.dart';
 
@@ -32,6 +34,20 @@ class _MeScreenState extends State<MeScreen> {
       _hideBalance = !_hideBalance;
     });
     await LocalStorageHelper.setValue('hide_balance', _hideBalance);
+  }
+
+  //log out
+  Future<void> _logout() async {
+    await LocalStorageHelper.setValue('userData', null);
+    await GoogleAuthApi.signOut();
+    log.i('Logout success');
+    goToPageHelper(routeName: LoginScreen.routeName);
+  }
+
+  void goToPageHelper({String? routeName}) {
+    routeName != null
+        ? Navigator.of(context).pushNamed(routeName)
+        : Navigator.of(context).pop();
   }
 
   @override
@@ -205,7 +221,9 @@ class _MeScreenState extends State<MeScreen> {
               ShadowContainer(
                 width: MediaQuery.of(context).size.width * 0.9,
                 child: GestureDetector(
-                  onTap: () => {},
+                  onTap: () => {
+                    _logout(),
+                  },
                   child: Container(
                     padding: const EdgeInsets.all(10.0),
                     child: Row(

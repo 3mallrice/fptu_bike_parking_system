@@ -1,9 +1,8 @@
+import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
-import 'package:dotted_line/dotted_line.dart';
 
 import '../component/shadow_container.dart';
 

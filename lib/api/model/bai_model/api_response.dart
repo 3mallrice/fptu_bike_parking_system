@@ -17,4 +17,9 @@ class APIResponse<T> {
       totalRecord: json['totalRecord'],
     );
   }
+
+  @override
+  String toString() {
+    return 'APIResponse{data: $data, message: $message, totalRecord: $totalRecord}';
+  }
 }

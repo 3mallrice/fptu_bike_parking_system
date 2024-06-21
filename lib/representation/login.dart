@@ -4,9 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/api/service/bai_be/auth_service.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
+import 'package:fptu_bike_parking_system/representation/navigation_bar.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:logger/logger.dart';
 
-import 'navigation_bar.dart';
+import '../api/model/bai_model/login_model.dart';
+import '../component/snackbar.dart';
+import '../core/const/frondend/message.dart';
+import '../core/helper/google_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -21,19 +26,33 @@ class _LoginScreenState extends State<LoginScreen> {
   static final log = Logger();
   final _authApi = CallAuthApi();
 
-  Future signIn() async {
-    // var currentUser = await GoogleSignInApi.currentUser();
+  Future<bool> signIn() async {
+    var currentUser = await GoogleAuthApi.currentUser();
 
-    // currentUser ??= await GoogleSignInApi.login();
-    // GoogleSignInAuthentication? authen = await currentUser?.authentication;
+    currentUser ??= await GoogleAuthApi.login();
+    GoogleSignInAuthentication? auth = await currentUser?.authentication;
 
-    // log.i("currentUser: $currentUser" "\nidToken: ${authen?.idToken}");
-    // await _authApi.loginWithGoogle(authen?.idToken ?? "");
-    Navigator.of(context).pushNamed(MyNavigationBar.routeName);
+    log.i("currentUser: $currentUser" "\nidToken: ${auth?.idToken}");
+
+    if (currentUser != null && auth != null && auth.idToken != null) {
+      UserData? userData = await _authApi.loginWithGoogle(auth.idToken!);
+      if (userData != null) {
+        // log.i('Login success. Token: ${userData.bearerToken}');
+
+        goToPageHelper(routeName: MyNavigationBar.routeName);
+        return true;
+      }
+      GoogleAuthApi.signOut();
+    }
+    return false;
   }
 
   @override
   Widget build(BuildContext context) {
+    Color backgroundColor = Theme.of(context).colorScheme.background;
+    Color onSuccessful = Theme.of(context).colorScheme.onError;
+    Color onUnsuccessful = Theme.of(context).colorScheme.error;
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Align(
@@ -113,8 +132,31 @@ class _LoginScreenState extends State<LoginScreen> {
                   //Continue with Google
                   GestureDetector(
                     onTap: () async {
-                      await signIn();
-                      // _showPackageDetail();
+                      bool isLogin = await signIn();
+
+                      isLogin
+                          ? showCustomSnackBar(
+                              // login successfully
+                              MySnackBar(
+                                prefix: Icon(
+                                  Icons.check_circle_rounded,
+                                  color: backgroundColor,
+                                ),
+                                message: Message.loginSuccess,
+                                backgroundColor: onSuccessful,
+                              ),
+                            )
+                          : showCustomSnackBar(
+                              // login failed
+                              MySnackBar(
+                                prefix: Icon(
+                                  Icons.cancel_rounded,
+                                  color: backgroundColor,
+                                ),
+                                message: ErrorMessage.loginFailed,
+                                backgroundColor: onUnsuccessful,
+                              ),
+                            );
                     },
                     child: ShadowContainer(
                       width: MediaQuery.of(context).size.width * 0.8,
@@ -163,6 +205,18 @@ class _LoginScreenState extends State<LoginScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  // show custom snackbar
+  void showCustomSnackBar(MySnackBar snackBar) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: snackBar,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
     );
   }

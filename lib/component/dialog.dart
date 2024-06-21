@@ -28,7 +28,11 @@ class OKDialog extends StatelessWidget {
       content: content,
       actions: <Widget>[
         TextButton(
-          onPressed: () => onClick,
+          onPressed: () {
+            if (onClick != null) {
+              onClick!();
+            }
+          },
           child: Text(LabelMessage.ok),
         ),
       ],
@@ -43,6 +47,7 @@ class ConfirmDialog extends StatelessWidget {
   final Function? onConfirm;
   final Function? onCancel;
   final String? positiveLabel;
+  final String? negativeLabel;
   const ConfirmDialog({
     super.key,
     required this.title,
@@ -50,6 +55,7 @@ class ConfirmDialog extends StatelessWidget {
     this.onConfirm,
     this.onCancel,
     this.positiveLabel,
+    this.negativeLabel,
   });
 
   @override
@@ -67,11 +73,19 @@ class ConfirmDialog extends StatelessWidget {
       content: content,
       actions: <Widget>[
         TextButton(
-          onPressed: () => onCancel,
-          child: Text(LabelMessage.cancel),
+          onPressed: () {
+            if (onCancel != null) {
+              onCancel!();
+            }
+          },
+          child: Text(negativeLabel ?? LabelMessage.cancel),
         ),
         TextButton(
-          onPressed: () => onConfirm,
+          onPressed: () {
+            if (onConfirm != null) {
+              onConfirm!();
+            }
+          },
           child: Text(positiveLabel ?? LabelMessage.save),
         ),
       ],
