@@ -74,11 +74,9 @@ class _AboutUsState extends State<AboutUs> {
                   color: Theme.of(context).colorScheme.outlineVariant,
                   thickness: 1,
                 ),
-                GestureDetector(
-                  onTap: () => showInAppWebView(
-                    'Bai.com.vn',
-                    'https://google.com',
-                  ),
+                InkWell(
+                  onTap: () =>
+                      showInAppWebView('Bai.com.vn', 'https://google.com'),
                   child: Padding(
                     padding: const EdgeInsets.all(10.0),
                     child: Text(
@@ -91,24 +89,29 @@ class _AboutUsState extends State<AboutUs> {
                   color: Theme.of(context).colorScheme.outlineVariant,
                   thickness: 1,
                 ),
-                Container(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Connect to ',
-                        style:
-                            Theme.of(context).textTheme.titleMedium!.copyWith(
-                                  fontWeight: FontWeight.normal,
-                                ),
-                      ),
-                      Text(
-                        'Bai',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      )
-                    ],
+                InkWell(
+                  onTap: () {
+                    // TODO
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Connect to ',
+                          style:
+                              Theme.of(context).textTheme.titleMedium!.copyWith(
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                        ),
+                        Text(
+                          'Bai',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ],

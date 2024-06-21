@@ -104,12 +104,12 @@ class _MeScreenState extends State<MeScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    GestureDetector(
-                      onTap: () => {
+                    InkWell(
+                      onTap: () {
                         Navigator.of(context)
-                            .pushNamed(ProfileScreen.routeName),
+                            .pushNamed(ProfileScreen.routeName);
                       },
-                      child: Container(
+                      child: Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -127,7 +127,7 @@ class _MeScreenState extends State<MeScreen> {
                                   .textTheme
                                   .titleMedium!
                                   .copyWith(fontSize: 18),
-                            )
+                            ),
                           ],
                         ),
                       ),
@@ -136,7 +136,7 @@ class _MeScreenState extends State<MeScreen> {
                       color: Theme.of(context).colorScheme.outlineVariant,
                       thickness: 1,
                     ),
-                    GestureDetector(
+                    InkWell(
                       onTap: _toggleHideBalance,
                       child: Container(
                         padding: const EdgeInsets.all(10.0),
@@ -188,10 +188,11 @@ class _MeScreenState extends State<MeScreen> {
                       color: Theme.of(context).colorScheme.outlineVariant,
                       thickness: 1,
                     ),
-                    GestureDetector(
-                      onTap: () =>
-                          Navigator.of(context).pushNamed(AboutUs.routeName),
-                      child: Container(
+                    InkWell(
+                      onTap: () {
+                        Navigator.of(context).pushNamed(AboutUs.routeName);
+                      },
+                      child: Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -209,7 +210,7 @@ class _MeScreenState extends State<MeScreen> {
                                   .textTheme
                                   .titleMedium!
                                   .copyWith(fontSize: 18),
-                            )
+                            ),
                           ],
                         ),
                       ),
