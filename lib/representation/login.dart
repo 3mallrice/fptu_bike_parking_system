@@ -12,6 +12,7 @@ import '../api/model/bai_model/login_model.dart';
 import '../component/snackbar.dart';
 import '../core/const/frondend/message.dart';
 import '../core/helper/google_auth.dart';
+import '../core/helper/loading_overlay_helper.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -27,9 +28,13 @@ class _LoginScreenState extends State<LoginScreen> {
   final _authApi = CallAuthApi();
 
   Future<bool> signIn() async {
-    var currentUser = await GoogleAuthApi.currentUser();
+    // show loading
+    LoadingOverlayHelper.show(context);
 
-    currentUser ??= await GoogleAuthApi.login();
+    // logout before login
+    GoogleAuthApi.signOut();
+
+    var currentUser = await GoogleAuthApi.login();
     GoogleSignInAuthentication? auth = await currentUser?.authentication;
 
     log.i("currentUser: $currentUser" "\nidToken: ${auth?.idToken}");
@@ -37,13 +42,17 @@ class _LoginScreenState extends State<LoginScreen> {
     if (currentUser != null && auth != null && auth.idToken != null) {
       UserData? userData = await _authApi.loginWithGoogle(auth.idToken!);
       if (userData != null) {
-        // log.i('Login success. Token: ${userData.bearerToken}');
+        // hide loading
+        LoadingOverlayHelper.hide();
 
         goToPageHelper(routeName: MyNavigationBar.routeName);
         return true;
       }
       GoogleAuthApi.signOut();
     }
+
+    // hide loading
+    LoadingOverlayHelper.hide();
     return false;
   }
 
@@ -133,7 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   GestureDetector(
                     onTap: () async {
                       bool isLogin = await signIn();
-
+                      // check login successfully or not
                       isLogin
                           ? showCustomSnackBar(
                               // login successfully

@@ -31,3 +31,9 @@ class LocalStorageHelper {
     _shared.hiveBox?.put(key, val);
   }
 }
+
+class LocalStorageKey {
+  static const String userData = 'userData';
+  static const String ignoreIntroScreen = 'ignoreIntroScreen';
+  static const String isHiddenBalance = 'isHiddenBalance';
+}

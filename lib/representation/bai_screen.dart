@@ -1,7 +1,10 @@
+import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
 import 'package:fptu_bike_parking_system/representation/add_bai_screen.dart';
+
+import '../component/image_not_found_component.dart';
 
 class BaiScreen extends StatefulWidget {
   const BaiScreen({super.key});
@@ -23,7 +26,7 @@ class _BaiScreenState extends State<BaiScreen> {
   List<Bike> bikes = [
     Bike(
       bikeId: '1',
-      bikeImageURL: 'https://vnn-imgs-f.vgcloud.vn/2018/04/14/09/xe-ga-3.jpg',
+      bikeImageURL: '',
       plateNumber: '29A-12345',
       bikeType: 'Automatic',
       status: 'Accepted',
@@ -124,11 +127,17 @@ class _BaiScreenState extends State<BaiScreen> {
                                     topLeft: Radius.circular(10),
                                     topRight: Radius.circular(10),
                                   ),
-                                  child: Image.network(
-                                    bikes[index].bikeImageURL,
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.9,
-                                    fit: BoxFit.fitWidth,
+                                  child: FancyShimmerImage(
+                                    width: double.infinity,
+                                    imageUrl: bikes[index].bikeImageURL,
+                                    boxFit: BoxFit.cover,
+                                    errorWidget: const ImageNotFound(),
+                                    shimmerBaseColor: Theme.of(context)
+                                        .colorScheme
+                                        .background,
+                                    shimmerHighlightColor: Theme.of(context)
+                                        .colorScheme
+                                        .outlineVariant,
                                   ),
                                 ),
                               ),
@@ -218,11 +227,11 @@ class _BaiScreenState extends State<BaiScreen> {
 }
 
 class Bike {
-  String bikeId;
-  String bikeImageURL;
-  String plateNumber;
-  String bikeType;
-  String status;
+  final String bikeId;
+  final String bikeImageURL;
+  final String plateNumber;
+  final String bikeType;
+  final String status;
 
   Bike({
     required this.bikeId,

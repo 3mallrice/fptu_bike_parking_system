@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
+import 'package:fptu_bike_parking_system/api/model/bai_model/login_model.dart';
+import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
 import 'package:fptu_bike_parking_system/representation/feedback.dart';
+import 'package:logger/logger.dart';
+
+import '../core/helper/asset_helper.dart';
 
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   const MainAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
+    var log = Logger();
+    late UserData? userData = UserData.fromJson(
+        LocalStorageHelper.getValue(LocalStorageKey.userData));
+    log.i('$userData');
     return SafeArea(
       child: AppBar(
         automaticallyImplyLeading: false,
@@ -27,10 +35,17 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                     CircleAvatar(
                       radius: 20,
                       backgroundColor: Theme.of(context).colorScheme.background,
-                      child: Image.asset(
-                        AssetHelper.imgLogo,
-                        fit: BoxFit.fill,
-                      ),
+                      child: userData.avatar == null
+                          ? Image.asset(
+                              AssetHelper.imgLogo,
+                              fit: BoxFit.fill,
+                            )
+                          : ClipOval(
+                              child: Image.network(
+                                userData.avatar ?? '',
+                                fit: BoxFit.fill,
+                              ),
+                            ),
                     ),
                     const SizedBox(width: 10),
                     Column(
@@ -42,7 +57,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                         Text(
-                          'PHUC BUI',
+                          userData.name?.toUpperCase() ?? 'Anonymous',
                           style:
                               Theme.of(context).textTheme.bodyMedium!.copyWith(
                                     fontWeight: FontWeight.bold,

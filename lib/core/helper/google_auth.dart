@@ -30,11 +30,4 @@ class GoogleAuthApi {
   static Future<void> signOut() async {
     await _googleSignIn.signOut();
   }
-
-  // get google token
-  Future<GoogleSignInAuthentication?> getGoogleSignInAuthentication() async {
-    final user = _googleSignIn.currentUser;
-    final auth = await user?.authentication;
-    return auth;
-  }
 }

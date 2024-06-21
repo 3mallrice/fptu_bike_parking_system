@@ -33,14 +33,15 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void redirectIntro() async {
     final ignoreIntroScreen =
-        await LocalStorageHelper.getValue('ignoreIntroScreen') as bool?;
+        await LocalStorageHelper.getValue(LocalStorageKey.ignoreIntroScreen)
+            as bool?;
     await Future.delayed(const Duration(milliseconds: 2000));
 
     if (ignoreIntroScreen != null && ignoreIntroScreen) {
       //redirectTo(Login.routeName);
       redirectTo(LoginScreen.routeName);
     } else {
-      LocalStorageHelper.setValue('ignoreIntroScreen', true);
+      LocalStorageHelper.setValue(LocalStorageKey.ignoreIntroScreen, true);
       redirectTo(IntroScreen.routeName);
     }
   }
