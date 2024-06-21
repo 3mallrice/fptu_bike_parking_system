@@ -32,8 +32,9 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
   var log = Logger();
 
   Future<void> _loadHideBalance() async {
-    bool? hideBalance = await LocalStorageHelper.getValue('hide_balance');
-    log.i('Hide balance: $hideBalance');
+    bool? hideBalance =
+        await LocalStorageHelper.getValue(LocalStorageKey.isHiddenBalance);
+    // log.i('Hide balance: $hideBalance');
     setState(() {
       _hideBalance = hideBalance ?? false;
     });

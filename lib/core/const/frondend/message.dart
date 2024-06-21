@@ -2,7 +2,7 @@ class Message {
   static String saveImageSuccessfully = "Image saved successfully";
   static String saveImageUnSuccessfully = "Saved unsuccessfully";
   static String permissionDeny = "Permission denied";
-  static String loginSuccess = "Login success";
+  static String loginSuccess = "Login success, welcome back!";
 }
 
 class LabelMessage {
@@ -24,7 +24,8 @@ class ErrorMessage {
       "Something went wrong, please try again later!";
   static String errorWhileLoading =
       "Error while loading, please try again later!";
-  static String loginFailed = "Login failed";
+  static String loginFailed = "Login failed, please try again!";
+  static String imageNotFound = "Image not found";
 }
 
 class ImageName {

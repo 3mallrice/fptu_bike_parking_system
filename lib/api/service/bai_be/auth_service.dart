@@ -32,7 +32,8 @@ class CallAuthApi {
         );
         if (apiResponse.data != null) {
           // Save userDate{token, ...} to shared preferences
-          LocalStorageHelper.setValue("userData", apiResponseJson['data']);
+          LocalStorageHelper.setValue(
+              LocalStorageKey.userData, apiResponseJson['data']);
           log.i('Login success');
         } else {
           log.e('Login failed. ${apiResponse.message}');

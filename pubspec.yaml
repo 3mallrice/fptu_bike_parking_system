@@ -63,6 +63,8 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   webview_flutter: ^4.8.0
   flutter_lints: ^4.0.0
+  loading_animation_widget: ^1.2.1
+  fancy_shimmer_image: ^2.0.3
 
 dev_dependencies:
   flutter_test:
