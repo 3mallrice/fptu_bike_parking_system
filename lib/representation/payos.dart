@@ -9,6 +9,7 @@ import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
 import 'package:fptu_bike_parking_system/core/helper/save_image.dart';
 import 'package:fptu_bike_parking_system/representation/receipt.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:widgets_to_image/widgets_to_image.dart';
 
 import '../component/widget_to_image_template.dart';
@@ -259,24 +260,26 @@ class _PayOsScreenState extends State<PayOsScreen> {
                   ),
                 ),
 
-                // Save and Share
+                // Save and Share bottom sheet
                 Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: MediaQuery.of(context).size.width * 0.1,
+                    // horizontal: 20,
+                    vertical: MediaQuery.of(context).size.width * 0.09,
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      button(() => _showImageDialog(_controller, save),
-                          Icons.save_alt_rounded),
-                      button(() {
-                        //TODO
-                      }, Icons.share_rounded)
-                    ],
-                  ),
+                  child: GestureDetector(
+                      onTap: () {
+                        _showImageDialog(_controller);
+                      },
+                      child: CircleAvatar(
+                        backgroundColor: Theme.of(context).colorScheme.outline,
+                        child: Icon(
+                          Icons.more_horiz_rounded,
+                          color: Theme.of(context).colorScheme.background,
+                          size: 20,
+                        ),
+                      )),
                 ),
+
                 const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -313,25 +316,6 @@ class _PayOsScreenState extends State<PayOsScreen> {
     );
   }
 
-  Widget button(void Function()? onTap, IconData icon) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(15),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.outline,
-          borderRadius: const BorderRadius.all(Radius.circular(50)),
-        ),
-        child: Icon(
-          icon,
-          color: Theme.of(context).colorScheme.background,
-          size: 30,
-        ),
-      ),
-    );
-  }
-
   Widget dotIndicator(int selectedPage) {
     return Container(
       width: selectedPage == 0 ? 15 : 8,
@@ -347,8 +331,7 @@ class _PayOsScreenState extends State<PayOsScreen> {
     );
   }
 
-  // save image dialog to preview image
-  void _showImageDialog(WidgetsToImageController controller, int action) {
+  void _showImageDialog(WidgetsToImageController controller) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -357,11 +340,13 @@ class _PayOsScreenState extends State<PayOsScreen> {
         Color onUnsuccessful = Theme.of(context).colorScheme.error;
 
         return ConfirmDialog(
-          title: "Preview",
+          title: 'Save or Share',
           content: toImageWidget(controller, context),
+          positiveLabel: "Save",
+          negativeLabel: "Share",
           onConfirm: () async {
             var image = await controller.capture();
-            await saveImage(ImageName.imageName(prefix: "BankingInfo"), image)
+            await saveImage(ImageName.imageName(prefix: "BankingQrCode"), image)
                 ? showCustomSnackBar(MySnackBar(
                     prefix: Icon(
                       Icons.check_circle_rounded,
@@ -382,7 +367,28 @@ class _PayOsScreenState extends State<PayOsScreen> {
                   );
             backToPage();
           },
-          onCancel: () => backToPage(),
+          onCancel: () async {
+            var image = await controller.capture();
+
+            if (image != null) {
+              //convert Uint8List to XFile
+              XFile xFile = XFile.fromData(
+                image,
+                mimeType: 'image/png',
+                name: ImageName.imageName(prefix: "BankingQrCode"),
+                lastModified: DateTime.now(),
+              );
+
+              //TODO: Share image
+              await Share.shareXFiles(
+                [xFile],
+                text:
+                    'Banking Qr Code from Bike Parking System provided by PayOS',
+                subject: 'Banking Qr Code',
+              );
+            }
+            backToPage();
+          },
         );
       },
     );
@@ -423,29 +429,6 @@ class _PayOsScreenState extends State<PayOsScreen> {
               ),
             ),
           ),
-        ),
-      ],
-    );
-  }
-
-  // banking information
-  Widget bankingInfo(String text, String label) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                color: Theme.of(context).colorScheme.onSecondary,
-              ),
-        ),
-        const SizedBox(height: 4),
-        // ignore: unnecessary_string_interpolations
-        Text(
-          text,
-          style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                color: Theme.of(context).colorScheme.outline,
-              ),
         ),
       ],
     );

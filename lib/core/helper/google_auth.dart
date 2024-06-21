@@ -1,6 +1,6 @@
 import 'package:google_sign_in/google_sign_in.dart';
 
-class GoogleSignInApi {
+class GoogleAuthApi {
   static const String webClientId =
       "602350701185-o7eo5nohpanetqev16aia11s84htg8v6.apps.googleusercontent.com";
 

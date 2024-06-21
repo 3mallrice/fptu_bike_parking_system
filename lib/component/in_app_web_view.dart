@@ -55,6 +55,7 @@ class InAppWebView extends StatelessWidget {
               onTap: () => Share.shareUri(Uri.parse(url)),
               child: Icon(
                 Icons.share,
+                size: 20,
                 color: Theme.of(context).colorScheme.background,
               ),
             ),
