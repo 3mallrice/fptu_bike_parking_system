@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:fptu_bike_parking_system/api/model/bai_model/login_model.dart';
 import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
+import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
+import 'package:logger/logger.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -12,6 +15,17 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  var log = Logger();
+  late final UserData? userData;
+
+  @override
+  void initState() {
+    super.initState();
+    userData = UserData.fromJson(
+      LocalStorageHelper.getValue(LocalStorageKey.userData),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,8 +40,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             margin: const EdgeInsets.only(top: 10),
             child: Column(
               children: [
+                const SizedBox(height: 20),
                 Container(
-                  padding: const EdgeInsets.all(30),
+                  // padding: const EdgeInsets.all(1),
+                  height: MediaQuery.of(context).size.width * 0.36,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
@@ -36,14 +52,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     color: Theme.of(context).colorScheme.outline,
                   ),
-                  child: Text(
-                    'PB',
-                    style: Theme.of(context).textTheme.displayLarge!.copyWith(
-                          fontSize: 64,
-                          fontWeight: FontWeight.w900,
-                          color: Theme.of(context).colorScheme.surface,
+                  child: userData == null
+                      ? Text(
+                          getInitials(userData?.name ?? 'Anonymous User'),
+                          style: Theme.of(context)
+                              .textTheme
+                              .displayLarge!
+                              .copyWith(
+                                fontSize: 64,
+                                fontWeight: FontWeight.w900,
+                                color: Theme.of(context).colorScheme.background,
+                              ),
+                        )
+                      : ClipOval(
+                          child: Image.network(
+                            userData!.avatar!,
+                            fit: BoxFit.fill,
+                          ),
                         ),
-                  ),
                 ),
                 const SizedBox(height: 15),
                 Container(
@@ -54,51 +80,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       Text(
                         'Fullname',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium!
-                            .copyWith(
+                        style: Theme.of(context).textTheme.titleSmall!.copyWith(
                               color: Theme.of(context).colorScheme.onSecondary,
                             ),
                       ),
                       const SizedBox(height: 5),
                       ShadowContainer(
                         child: Text(
-                          'Phuc Bui',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      Text(
-                        'Phone',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium!
-                            .copyWith(
-                              color: Theme.of(context).colorScheme.onSecondary,
-                            ),
-                      ),
-                      const SizedBox(height: 5),
-                      ShadowContainer(
-                        child: Text(
-                          '0971226789',
+                          userData?.name ?? 'Anonymous',
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                       ),
                       const SizedBox(height: 15),
                       Text(
                         'Email',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium!
-                            .copyWith(
+                        style: Theme.of(context).textTheme.titleSmall!.copyWith(
                               color: Theme.of(context).colorScheme.onSecondary,
                             ),
                       ),
                       const SizedBox(height: 5),
                       ShadowContainer(
                         child: Text(
-                          'phucbhse160537@fpt.edu.vn',
+                          userData?.email ?? 'anonymous@fpt.edu.vn',
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                       )
@@ -111,5 +114,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
+  }
+
+  // split name into many parts by space and get the first letter of each part
+  String getInitials(String name) {
+    List<String> parts = name.split(' ');
+    String initials = '';
+    for (var part in parts) {
+      initials += part[0];
+    }
+    return initials.toUpperCase();
   }
 }
