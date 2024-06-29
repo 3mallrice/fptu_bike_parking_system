@@ -58,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Color backgroundColor = Theme.of(context).colorScheme.background;
+    Color backgroundColor = Theme.of(context).colorScheme.surface;
     Color onSuccessful = Theme.of(context).colorScheme.onError;
     Color onUnsuccessful = Theme.of(context).colorScheme.error;
 
@@ -188,8 +188,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 .textTheme
                                 .displayMedium!
                                 .copyWith(
-                                  color:
-                                      Theme.of(context).colorScheme.background,
+                                  color: Theme.of(context).colorScheme.surface,
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                 ),

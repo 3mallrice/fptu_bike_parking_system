@@ -41,7 +41,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     style: Theme.of(context).textTheme.displayLarge!.copyWith(
                           fontSize: 64,
                           fontWeight: FontWeight.w900,
-                          color: Theme.of(context).colorScheme.background,
+                          color: Theme.of(context).colorScheme.surface,
                         ),
                   ),
                 ),
@@ -96,7 +96,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                       ),
                       const SizedBox(height: 5),
-                      ShadowContainer(  
+                      ShadowContainer(
                         child: Text(
                           'phucbhse160537@fpt.edu.vn',
                           style: Theme.of(context).textTheme.titleMedium,

@@ -30,7 +30,7 @@ ThemeData lightMode = ThemeData(
   ),
 
   colorScheme: ColorScheme.light(
-    background: ColorLightMode.background,
+    surface: ColorLightMode.background,
     primary: ColorLightMode.primaryOrange,
     secondary: ColorLightMode.secondaryOrange,
     inversePrimary: ColorLightMode.background,

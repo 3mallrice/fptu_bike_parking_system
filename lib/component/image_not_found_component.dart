@@ -16,7 +16,7 @@ class ImageNotFound extends StatelessWidget {
             Icon(
               Icons.image_not_supported_rounded,
               size: 60,
-              color: Theme.of(context).colorScheme.background,
+              color: Theme.of(context).colorScheme.surface,
             ),
             const SizedBox(
               height: 10,
@@ -24,7 +24,7 @@ class ImageNotFound extends StatelessWidget {
             Text(
               ErrorMessage.imageNotFound,
               style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.background,
+                    color: Theme.of(context).colorScheme.surface,
                   ),
             ),
           ],

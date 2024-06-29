@@ -3,7 +3,7 @@ import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
 import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
 import 'package:fptu_bike_parking_system/representation/fundin_screen.dart';
-import 'package:fptu_bike_parking_system/representation/home.dart';
+import 'package:fptu_bike_parking_system/representation/navigation_bar.dart';
 import 'package:fptu_bike_parking_system/representation/wallet_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
@@ -133,7 +133,7 @@ class _WalletExtraScreenState extends State<WalletExtraScreen> {
     return Scaffold(
       appBar: AppBarCom(
         leading: true,
-        routeName: HomeAppScreen.routeName,
+        routeName: MyNavigationBar.routeName,
         appBarText: 'Wallet',
         action: [
           Padding(
@@ -187,12 +187,10 @@ class _WalletExtraScreenState extends State<WalletExtraScreen> {
                       color: Theme.of(context).colorScheme.outline,
                       child: Text(
                         'Extra',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium!
-                            .copyWith(
-                              color: Theme.of(context).colorScheme.background,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium!.copyWith(
+                                  color: Theme.of(context).colorScheme.surface,
+                                ),
                         textAlign: TextAlign.center,
                       ),
                     )

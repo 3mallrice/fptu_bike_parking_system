@@ -551,7 +551,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.background,
+          color: Theme.of(context).colorScheme.surface,
           shape: BoxShape.rectangle,
           borderRadius: BorderRadius.circular(10),
         ),

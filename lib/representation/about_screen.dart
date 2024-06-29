@@ -22,7 +22,7 @@ class _AboutUsState extends State<AboutUs> {
       animationCurve: Curves.easeInCirc,
       barrierColor: Theme.of(context).colorScheme.outline.withOpacity(0.35),
       expand: false,
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       closeProgressThreshold: 0.3,
       enableDrag: true,
       elevation: 4,

@@ -274,7 +274,7 @@ class _PayOsScreenState extends State<PayOsScreen> {
                         backgroundColor: Theme.of(context).colorScheme.outline,
                         child: Icon(
                           Icons.more_horiz_rounded,
-                          color: Theme.of(context).colorScheme.background,
+                          color: Theme.of(context).colorScheme.surface,
                           size: 20,
                         ),
                       )),
@@ -335,7 +335,7 @@ class _PayOsScreenState extends State<PayOsScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        Color backgroundColor = Theme.of(context).colorScheme.background;
+        Color backgroundColor = Theme.of(context).colorScheme.surface;
         Color onSuccessful = Theme.of(context).colorScheme.onError;
         Color onUnsuccessful = Theme.of(context).colorScheme.error;
 

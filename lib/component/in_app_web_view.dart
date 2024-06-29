@@ -21,7 +21,7 @@ class InAppWebView extends StatelessWidget {
     // initialize the webview controller
     late final controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.disabled)
-      ..setBackgroundColor(Theme.of(context).colorScheme.background)
+      ..setBackgroundColor(Theme.of(context).colorScheme.surface)
       ..setNavigationDelegate(NavigationDelegate(
         //handle error
         onHttpError: (error) {
@@ -44,7 +44,7 @@ class InAppWebView extends StatelessWidget {
         appBarText: title,
         titleTextStyle: Theme.of(context).textTheme.displayMedium!.copyWith(
               fontWeight: FontWeight.w900,
-              color: Theme.of(context).colorScheme.background,
+              color: Theme.of(context).colorScheme.surface,
             ),
         backgroundColor: Theme.of(context).colorScheme.outline,
         action: [
@@ -56,7 +56,7 @@ class InAppWebView extends StatelessWidget {
               child: Icon(
                 Icons.share,
                 size: 20,
-                color: Theme.of(context).colorScheme.background,
+                color: Theme.of(context).colorScheme.surface,
               ),
             ),
           ),

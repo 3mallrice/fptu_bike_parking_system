@@ -23,7 +23,7 @@ class MyNavigationBar extends StatefulWidget {
 
 class _MyNavigationBarState extends State<MyNavigationBar> {
   late int _selectedIndex;
-  
+
   @override
   void initState() {
     super.initState();
@@ -62,7 +62,7 @@ class _MyNavigationBarState extends State<MyNavigationBar> {
           opacity: 0.5,
         ),
         elevation: 5,
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         currentIndex: _selectedIndex,
         iconSpace: 10,
         items: [

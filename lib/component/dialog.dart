@@ -23,8 +23,8 @@ class OKDialog extends StatelessWidget {
             ),
         textAlign: TextAlign.center,
       ),
-      backgroundColor: Theme.of(context).colorScheme.background,
-      surfaceTintColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      surfaceTintColor: Theme.of(context).colorScheme.surface,
       content: content,
       actions: <Widget>[
         TextButton(
@@ -68,8 +68,8 @@ class ConfirmDialog extends StatelessWidget {
             ),
         textAlign: TextAlign.center,
       ),
-      backgroundColor: Theme.of(context).colorScheme.background,
-      surfaceTintColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      surfaceTintColor: Theme.of(context).colorScheme.surface,
       content: content,
       actions: <Widget>[
         TextButton(

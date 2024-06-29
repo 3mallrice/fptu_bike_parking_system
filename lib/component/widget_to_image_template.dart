@@ -17,7 +17,7 @@ class WidgetToImageTemplate extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-      color: Theme.of(context).colorScheme.background,
+      color: Theme.of(context).colorScheme.surface,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,

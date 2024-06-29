@@ -69,7 +69,7 @@ class _FundinScreenState extends State<FundinScreen> {
       animationCurve: Curves.easeInCirc,
       barrierColor: Theme.of(context).colorScheme.outline.withOpacity(0.35),
       expand: false,
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       closeProgressThreshold: 0.3,
       enableDrag: true,
       elevation: 4,
@@ -242,7 +242,7 @@ class _FundinScreenState extends State<FundinScreen> {
                   buttonTitle: '${package.price} VND - BUY NOW',
                   textStyle: Theme.of(context).textTheme.titleLarge!.copyWith(
                         fontSize: 20,
-                        color: Theme.of(context).colorScheme.background,
+                        color: Theme.of(context).colorScheme.surface,
                         fontWeight: FontWeight.w600,
                       ),
                 ),

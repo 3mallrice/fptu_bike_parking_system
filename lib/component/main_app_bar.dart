@@ -20,7 +20,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
         automaticallyImplyLeading: false,
         elevation: 5,
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        // shadowColor: Theme.of(context).colorScheme.background,
+        // shadowColor: Theme.of(context).colorScheme.surface,
         flexibleSpace: FractionallySizedBox(
           widthFactor: 0.9,
           child: Container(
@@ -34,7 +34,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                   children: [
                     CircleAvatar(
                       radius: 20,
-                      backgroundColor: Theme.of(context).colorScheme.background,
+                      backgroundColor: Theme.of(context).colorScheme.surface,
                       child: userData.avatar == null
                           ? Image.asset(
                               AssetHelper.imgLogo,

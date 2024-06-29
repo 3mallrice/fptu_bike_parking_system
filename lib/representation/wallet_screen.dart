@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fptu_bike_parking_system/representation/home.dart';
 import 'package:fptu_bike_parking_system/representation/wallet_extra_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
@@ -9,6 +8,7 @@ import '../component/app_bar_component.dart';
 import '../component/shadow_container.dart';
 import '../core/helper/local_storage_helper.dart';
 import 'fundin_screen.dart';
+import 'navigation_bar.dart';
 
 class MyWallet extends StatefulWidget {
   static String routeName = '/my_wallet';
@@ -134,7 +134,7 @@ class _MyWalletState extends State<MyWallet> {
     return Scaffold(
       appBar: AppBarCom(
         leading: true,
-        routeName: HomeAppScreen.routeName,
+        routeName: MyNavigationBar.routeName,
         appBarText: 'Wallet',
         action: [
           Padding(
@@ -170,12 +170,10 @@ class _MyWalletState extends State<MyWallet> {
                       color: Theme.of(context).colorScheme.outline,
                       child: Text(
                         'Main',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium!
-                            .copyWith(
-                              color: Theme.of(context).colorScheme.background,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium!.copyWith(
+                                  color: Theme.of(context).colorScheme.surface,
+                                ),
                         textAlign: TextAlign.center,
                       ),
                     ),
