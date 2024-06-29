@@ -79,8 +79,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                               children: [
                                 Icon(
                                   Icons.pending,
-                                  color:
-                                      Theme.of(context).colorScheme.background,
+                                  color: Theme.of(context).colorScheme.surface,
                                 ),
                                 const SizedBox(width: 10),
                                 Text(
@@ -341,7 +340,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       style:
                           Theme.of(context).textTheme.displayMedium!.copyWith(
                                 fontSize: 20,
-                                color: Theme.of(context).colorScheme.background,
+                                color: Theme.of(context).colorScheme.surface,
                                 fontWeight: FontWeight.w900,
                               ),
                     ),

@@ -101,8 +101,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                               children: [
                                 Icon(
                                   statusIcon,
-                                  color:
-                                      Theme.of(context).colorScheme.background,
+                                  color: Theme.of(context).colorScheme.surface,
                                 ),
                                 const SizedBox(width: 10),
                                 Text(
@@ -326,7 +325,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
         ),
         child: Icon(
           icon,
-          color: Theme.of(context).colorScheme.background,
+          color: Theme.of(context).colorScheme.surface,
           size: 30,
         ),
       ),

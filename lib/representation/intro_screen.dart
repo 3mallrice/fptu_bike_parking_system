@@ -142,12 +142,12 @@ class _IntroScreenState extends State<IntroScreen> {
               child: Text(
                 'Get Started',
                 style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.background,
+                      color: Theme.of(context).colorScheme.surface,
                     ),
               ),
             )
           : Container(
-              color: Theme.of(context).colorScheme.background,
+              color: Theme.of(context).colorScheme.surface,
               padding: const EdgeInsets.symmetric(horizontal: 20),
               height: 80,
               child: Row(

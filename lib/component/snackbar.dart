@@ -19,7 +19,7 @@ class MySnackBar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: backgroundColor ?? Theme.of(context).colorScheme.background,
+        color: backgroundColor ?? Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -37,7 +37,7 @@ class MySnackBar extends StatelessWidget {
           Text(
             message,
             style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                  color: textColor ?? Theme.of(context).colorScheme.background,
+                  color: textColor ?? Theme.of(context).colorScheme.surface,
                 ),
           ),
         ],

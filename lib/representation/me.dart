@@ -87,14 +87,12 @@ class _MeScreenState extends State<MeScreen> {
                 child: userData == null
                     ? Text(
                         getInitials(userData?.name ?? 'Anonymous User'),
-                        style: Theme.of(context)
-                            .textTheme
-                            .displayLarge!
-                            .copyWith(
-                              fontSize: 64,
-                              fontWeight: FontWeight.w900,
-                              color: Theme.of(context).colorScheme.background,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.displayLarge!.copyWith(
+                                  fontSize: 64,
+                                  fontWeight: FontWeight.w900,
+                                  color: Theme.of(context).colorScheme.surface,
+                                ),
                       )
                     : ClipOval(
                         child: Image.network(
