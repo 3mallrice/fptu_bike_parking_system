@@ -26,7 +26,8 @@ class _BaiScreenState extends State<BaiScreen> {
   List<Bike> bikes = [
     Bike(
       bikeId: '1',
-      bikeImageURL: '',
+      bikeImageURL:
+          'https://xedien.com.vn/upimages/articles/xemay50cc/WaveVictoria/xe-wave-1.jpg',
       plateNumber: '29A-12345',
       bikeType: 'Automatic',
       status: 'Accepted',
