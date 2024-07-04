@@ -1,6 +1,8 @@
+import 'dart:io';
+
 class BaiModel {
   final String? plateNumber;
-  final String? plateImage;
+  final File? plateImage;
   final String? vehicleTypeId;
   final int? totalBike;
 
@@ -14,7 +16,7 @@ class BaiModel {
   factory BaiModel.fromJson(Map<String, dynamic> json) {
     return BaiModel(
       plateNumber: json['plateNumber'],
-      plateImage: json['plateImage'],
+      plateImage: json['plateImage'] != null ? File(json['plateImage']) : null,
       vehicleTypeId: json['vehicleTypeId'],
       totalBike: json['totalBike'],
     );
@@ -24,20 +26,19 @@ class BaiModel {
     return {
       'plateNumber': plateNumber,
       'plateImage': plateImage,
-      'vehicleTypeId': vehicleTypeId,
-      'totalBike': totalBike,
+      'vehicleTypeId': vehicleTypeId
     };
   }
 }
 
 class VehicleTypeModel {
   final String? id;
-  final String? name;
+  final String name;
   final String? description;
 
   VehicleTypeModel({
     this.id,
-    this.name,
+    required this.name,
     this.description,
   });
 

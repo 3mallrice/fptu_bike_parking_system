@@ -65,6 +65,8 @@ dependencies:
   flutter_lints: ^4.0.0
   loading_animation_widget: ^1.2.1
   fancy_shimmer_image: ^2.0.3
+  animated_custom_dropdown: ^3.1.1
+  http_parser: ^4.0.2
 
 dev_dependencies:
   flutter_test:
