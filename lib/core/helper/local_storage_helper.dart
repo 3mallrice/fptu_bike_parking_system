@@ -1,3 +1,4 @@
+import 'package:fptu_bike_parking_system/api/model/bai_model/login_model.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:logger/logger.dart';
@@ -36,4 +37,16 @@ class LocalStorageKey {
   static const String userData = 'userData';
   static const String ignoreIntroScreen = 'ignoreIntroScreen';
   static const String isHiddenBalance = 'isHiddenBalance';
+}
+
+class GetLocalHelper {
+  static UserData getUserData() {
+    return UserData.fromJson(
+        LocalStorageHelper.getValue(LocalStorageKey.userData));
+  }
+
+  static String getBearerToken() {
+    UserData userData = getUserData();
+    return 'Bearer ${userData.bearerToken ?? ""}';
+  }
 }
