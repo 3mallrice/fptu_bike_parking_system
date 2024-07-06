@@ -2,32 +2,28 @@ import 'dart:io';
 
 class BaiModel {
   final String? plateNumber;
-  final File? plateImage;
+  final File? plateImageFile;
+  final String? plateImage;
   final String? vehicleTypeId;
-  final int? totalBike;
+  final String? status;
+  final String? vehicleType;
 
   BaiModel({
+    this.status,
+    this.vehicleType,
     this.plateNumber,
-    this.plateImage,
+    this.plateImageFile,
     this.vehicleTypeId,
-    this.totalBike,
+    this.plateImage, 
   });
 
   factory BaiModel.fromJson(Map<String, dynamic> json) {
     return BaiModel(
       plateNumber: json['plateNumber'],
-      plateImage: json['plateImage'] != null ? File(json['plateImage']) : null,
-      vehicleTypeId: json['vehicleTypeId'],
-      totalBike: json['totalBike'],
+      plateImage: json['plateImage'],
+      status: json['statusVehicle'],
+      vehicleType: json['vehicleTypeName'],
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'plateNumber': plateNumber,
-      'plateImage': plateImage,
-      'vehicleTypeId': vehicleTypeId
-    };
   }
 }
 
@@ -48,13 +44,5 @@ class VehicleTypeModel {
       name: json['name'],
       description: json['description'],
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'description': description,
-    };
   }
 }

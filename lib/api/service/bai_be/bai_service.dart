@@ -1,14 +1,14 @@
 import 'dart:convert';
 
+import 'package:fptu_bike_parking_system/api/model/bai_model/api_response.dart';
 import 'package:fptu_bike_parking_system/api/model/bai_model/bai_model.dart';
-import 'package:fptu_bike_parking_system/api/model/bai_model/login_model.dart';
 import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:logger/web.dart';
 
 class CallBikeApi {
-  static const String baseUrl = 'https://10.0.2.2:7041/api';
+  static const String baseUrl = 'https://backend.khangbpa.com/api';
   static const apiName = '/vehicles';
   final String api = baseUrl + apiName;
 
@@ -23,9 +23,7 @@ class CallBikeApi {
         return null;
       }
 
-      UserData userData = UserData.fromJson(
-          LocalStorageHelper.getValue(LocalStorageKey.userData));
-      token = 'Bearer ${userData.bearerToken ?? ""}';
+      token = GetLocalHelper.getBearerToken();
 
       // Tạo multipart request
       var request = http.MultipartRequest('POST', Uri.parse('$api/customer'));
@@ -38,8 +36,9 @@ class CallBikeApi {
 
       // Thêm file ảnh vào request
       String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-      var fileStream = http.ByteStream(baiModel.plateImage!.openRead().cast());
-      var length = await baiModel.plateImage!.length();
+      var fileStream =
+          http.ByteStream(baiModel.plateImageFile!.openRead().cast());
+      var length = await baiModel.plateImageFile!.length();
       var multipartFile = http.MultipartFile(
         'PlateImage',
         fileStream,
@@ -68,12 +67,9 @@ class CallBikeApi {
     try {
       final response = await http.get(
         Uri.parse('$api/type'),
-        headers: {'Authorization': 'Bearer $token'},
       );
-
       if (response.statusCode == 200) {
         var jsonResponse = jsonDecode(response.body);
-
         if (jsonResponse is List) {
           return jsonResponse
               .map((json) => VehicleTypeModel.fromJson(json))
@@ -97,5 +93,42 @@ class CallBikeApi {
       log.e('Error during get vehicle type: $e');
     }
     return null;
+  }
+
+  Future<List<BaiModel>?> getBai() async {
+    try {
+      String? token =
+          GetLocalHelper.getBearerToken(); // Sử dụng await để lấy token
+
+      if (token.isEmpty) {
+        log.e('Token is empty');
+        return null;
+      }
+
+      final response = await http.get(
+        Uri.parse('$api/customer'),
+        headers: {
+          'Authorization': token,
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final responseJson = jsonDecode(response.body);
+        APIResponse<List<BaiModel>> apiResponse = APIResponse.fromJson(
+          responseJson,
+          (json) => (json as List)
+              .map((item) => BaiModel.fromJson(item as Map<String, dynamic>))
+              .toList(),
+        );
+        return apiResponse.data;
+      } else {
+        log.e('Failed to get vehicle: ${response.statusCode} ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      log.e('Error during get bai: $e');
+      return null;
+    }
   }
 }

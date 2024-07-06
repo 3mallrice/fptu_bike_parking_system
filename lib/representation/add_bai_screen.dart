@@ -81,7 +81,7 @@ class _AddBaiState extends State<AddBai> {
         _plateNumber != null) {
       BaiModel baiModel = BaiModel(
         plateNumber: _plateNumber,
-        plateImage: File(imageUrl!),
+        plateImageFile: File(imageUrl!),
         vehicleTypeId: _selectedVehicleTypeId!,
       );
 

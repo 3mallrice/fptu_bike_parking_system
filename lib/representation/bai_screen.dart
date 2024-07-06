@@ -1,8 +1,11 @@
 import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:flutter/material.dart';
+import 'package:fptu_bike_parking_system/api/model/bai_model/bai_model.dart';
+import 'package:fptu_bike_parking_system/api/service/bai_be/bai_service.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
 import 'package:fptu_bike_parking_system/representation/add_bai_screen.dart';
+import 'package:logger/web.dart';
 
 import '../component/image_not_found_component.dart';
 
@@ -16,31 +19,28 @@ class BaiScreen extends StatefulWidget {
 }
 
 class _BaiScreenState extends State<BaiScreen> {
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
+  var log = Logger();
+  CallBikeApi api = CallBikeApi();
+  bool isLoaded = false;
+  List<BaiModel>? bikes;
+
+  Future<void> fetchBikes() async {
+    try {
+      List<BaiModel>? bikeList = await api.getBai();
+      setState(() {
+        bikes = bikeList;
+        isLoaded = true;
+      });
+    } catch (e) {
+      log.e('Error fetching bikes: $e');
+    }
   }
 
-  // Bike List
-  List<Bike> bikes = [
-    Bike(
-      bikeId: '1',
-      bikeImageURL:
-          'https://xedien.com.vn/upimages/articles/xemay50cc/WaveVictoria/xe-wave-1.jpg',
-      plateNumber: '29A-12345',
-      bikeType: 'Automatic',
-      status: 'Accepted',
-    ),
-    Bike(
-      bikeId: '2',
-      bikeImageURL:
-          'https://xedien.com.vn/upimages/articles/xemay50cc/WaveVictoria/xe-wave-1.jpg',
-      plateNumber: '29A-12345',
-      bikeType: 'Manual',
-      status: 'Pending',
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    fetchBikes();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,11 +68,9 @@ class _BaiScreenState extends State<BaiScreen> {
                               'Total bike',
                               style: Theme.of(context).textTheme.bodyLarge,
                             ),
-                            const SizedBox(
-                              height: 8,
-                            ),
+                            const SizedBox(height: 8),
                             Text(
-                              '2',
+                              '${bikes?.length}',
                               style: Theme.of(context).textTheme.displayMedium,
                             ),
                           ],
@@ -103,121 +101,124 @@ class _BaiScreenState extends State<BaiScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(
-                  height: 30,
-                ),
+                const SizedBox(height: 30),
                 //Bike Information
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: bikes.length,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        child: ShadowContainer(
-                          padding: const EdgeInsets.all(0),
-                          child: Column(
-                            children: [
-                              SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.25,
-                                child: ClipRRect(
-                                  borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(10),
-                                    topRight: Radius.circular(10),
-                                  ),
-                                  child: FancyShimmerImage(
-                                    width: double.infinity,
-                                    imageUrl: bikes[index].bikeImageURL,
-                                    boxFit: BoxFit.cover,
-                                    errorWidget: const ImageNotFound(),
-                                    shimmerBaseColor: Theme.of(context)
-                                        .colorScheme
-                                        .background,
-                                    shimmerHighlightColor: Theme.of(context)
-                                        .colorScheme
-                                        .outlineVariant,
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  top: 10,
-                                  left: 10,
-                                  right: 10,
-                                  bottom: 0,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
+
+                bikes == null
+                    ? Text('Empty List!')
+                    : SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: bikes?.length,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 20),
+                              child: ShadowContainer(
+                                padding: const EdgeInsets.all(0),
+                                child: Column(
                                   children: [
-                                    const SizedBox(width: 10),
-                                    Image.asset(
-                                      AssetHelper.plateNumber,
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Text(
-                                      bikes[index].plateNumber,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    const SizedBox(width: 10),
-                                    Text(
-                                      bikes[index].bikeType,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium,
-                                    ),
-                                    const SizedBox(width: 10),
-                                    const Icon(Icons.circle, size: 4),
-                                    const SizedBox(width: 10),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.rectangle,
-                                        borderRadius: BorderRadius.circular(16),
-                                        color: bikes[index].status == 'Accepted'
-                                            ? Theme.of(context)
-                                                .colorScheme
-                                                .primary
-                                            : Theme.of(context)
-                                                .colorScheme
-                                                .outline,
-                                      ),
-                                      child: Text(
-                                        bikes[index].status,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyMedium!
-                                            .copyWith(
-                                              color: Theme.of(context)
+                                    SizedBox(
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.25,
+                                      child: ClipRRect(
+                                        borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(10),
+                                          topRight: Radius.circular(10),
+                                        ),
+                                        child: FancyShimmerImage(
+                                          width: double.infinity,
+                                          imageUrl: bikes![index].plateImage!,
+                                          boxFit: BoxFit.cover,
+                                          errorWidget: const ImageNotFound(),
+                                          shimmerBaseColor: Theme.of(context)
+                                              .colorScheme
+                                              .background,
+                                          shimmerHighlightColor:
+                                              Theme.of(context)
                                                   .colorScheme
-                                                  .background,
-                                            ),
+                                                  .outlineVariant,
+                                        ),
                                       ),
-                                    )
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        top: 10,
+                                        left: 10,
+                                        right: 10,
+                                        bottom: 0,
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          const SizedBox(width: 10),
+                                          Image.asset(
+                                            AssetHelper.plateNumber,
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Text(
+                                            bikes![index].plateNumber!,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(10.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          const SizedBox(width: 10),
+                                          Text(
+                                            bikes![index].vehicleType!,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium,
+                                          ),
+                                          const SizedBox(width: 10),
+                                          const Icon(Icons.circle, size: 4),
+                                          const SizedBox(width: 10),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.rectangle,
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              color: _getStatusColor(
+                                                  bikes![index].status!,
+                                                  context),
+                                            ),
+                                            child: Text(
+                                              bikes![index].status!,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium!
+                                                  .copyWith(
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .background,
+                                                  ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
-                            ],
-                          ),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
-                ),
+                      ),
               ],
             ),
           ),
@@ -225,20 +226,17 @@ class _BaiScreenState extends State<BaiScreen> {
       ),
     );
   }
-}
 
-class Bike {
-  final String bikeId;
-  final String bikeImageURL;
-  final String plateNumber;
-  final String bikeType;
-  final String status;
-
-  Bike({
-    required this.bikeId,
-    required this.bikeImageURL,
-    required this.plateNumber,
-    required this.bikeType,
-    required this.status,
-  });
+  Color _getStatusColor(String status, BuildContext context) {
+    switch (status) {
+      case 'ACTIVE':
+        return Theme.of(context).colorScheme.primary;
+      case 'INACTIVE':
+        return Theme.of(context).colorScheme.outline;
+      case 'PENDING':
+        return Theme.of(context).colorScheme.onSecondary;
+      default:
+        return Theme.of(context).colorScheme.outline;
+    }
+  }
 }

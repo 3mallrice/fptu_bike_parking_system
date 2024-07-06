@@ -8,7 +8,7 @@ import '../../model/bai_model/api_response.dart';
 import '../../model/bai_model/login_model.dart';
 
 class CallAuthApi {
-  static const String baseUrl = 'https://10.0.2.2:7041/api';
+  static const String baseUrl = 'https://backend.khangbpa.com/api';
   static const apiName = '/auth';
   final String api = baseUrl + apiName;
 
