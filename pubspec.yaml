@@ -67,6 +67,7 @@ dependencies:
   fancy_shimmer_image: ^2.0.3
   animated_custom_dropdown: ^3.1.1
   http_parser: ^4.0.2
+  google_mlkit_text_recognition: ^0.13.0
 
 dev_dependencies:
   flutter_test:

@@ -9,6 +9,9 @@ import 'package:logger/logger.dart';
 
 import '../component/app_bar_component.dart';
 import '../component/shadow_button.dart';
+import '../component/snackbar.dart';
+import '../core/const/frondend/message.dart';
+import '../core/helper/loading_overlay_helper.dart';
 
 class AddBai extends StatefulWidget {
   static String routeName = '/addBai';
@@ -31,11 +34,9 @@ class _AddBaiState extends State<AddBai> {
     super.initState();
     log.i('AddBai widget initialized');
     _fetchVehicleType();
-    _saveVehicleRegistration();
   }
 
   List<VehicleTypeModel> _vehicleType = [];
-  bool _isEmptyList = true;
   bool isLoaded = false;
 
   Future<void> selectImage(BuildContext context) async {
@@ -45,8 +46,13 @@ class _AddBaiState extends State<AddBai> {
 
       // Pick image
       ImagePicker imagePicker = ImagePicker();
-      XFile? imageFile =
-          await imagePicker.pickImage(source: source ?? ImageSource.gallery);
+
+      // Check if user cancels picking image
+      if (source == null) {
+        return;
+      }
+
+      XFile? imageFile = await imagePicker.pickImage(source: source);
 
       // Check if user cancels picking image
       if (imageFile == null) {
@@ -76,6 +82,10 @@ class _AddBaiState extends State<AddBai> {
   }
 
   Future<void> _saveVehicleRegistration() async {
+    Color backgroundColor = Theme.of(context).colorScheme.surface;
+    Color onSuccessful = Theme.of(context).colorScheme.onError;
+    Color onUnsuccessful = Theme.of(context).colorScheme.error;
+
     if (imageUrl != null &&
         _selectedVehicleTypeId != null &&
         _plateNumber != null) {
@@ -89,11 +99,43 @@ class _AddBaiState extends State<AddBai> {
 
       if (result != null) {
         log.i('Vehicle registration saved successfully');
+        // add successfully
+        MySnackBar(
+          prefix: Icon(
+            Icons.check_circle_rounded,
+            color: backgroundColor,
+          ),
+          message: Message.actionSuccessfully(
+              action: LabelMessage.add(message: ListName.bai)),
+          backgroundColor: onSuccessful,
+        );
       } else {
         log.e('Failed to save vehicle registration');
+        showCustomSnackBar(
+          // add failed
+          MySnackBar(
+            prefix: Icon(
+              Icons.cancel_rounded,
+              color: backgroundColor,
+            ),
+            message: ErrorMessage.inputRequired,
+            backgroundColor: onUnsuccessful,
+          ),
+        );
       }
     } else {
       log.e('Vehicle type, image URL, or plate number is null');
+      showCustomSnackBar(
+        // add failed
+        MySnackBar(
+          prefix: Icon(
+            Icons.cancel_rounded,
+            color: backgroundColor,
+          ),
+          message: ErrorMessage.somethingWentWrong,
+          backgroundColor: onUnsuccessful,
+        ),
+      );
     }
   }
 
@@ -103,13 +145,11 @@ class _AddBaiState extends State<AddBai> {
 
       if (vehicleType!.isEmpty) {
         setState(() {
-          _isEmptyList = true;
           isLoaded = true;
         });
       } else {
         setState(() {
           _vehicleType = vehicleType;
-          _isEmptyList = false;
         });
       }
     } catch (e) {
@@ -274,7 +314,13 @@ class _AddBaiState extends State<AddBai> {
                 ),
                 GestureDetector(
                   onTap: () async {
+                    // show loading
+                    LoadingOverlayHelper.show(context);
+
                     await _saveVehicleRegistration();
+
+                    // hide loading
+                    LoadingOverlayHelper.hide();
                   },
                   child: const ShadowButton(
                     buttonTitle: 'ADD',
@@ -313,6 +359,18 @@ class _AddBaiState extends State<AddBai> {
           ],
         );
       },
+    );
+  }
+
+  // show custom snackbar
+  void showCustomSnackBar(MySnackBar snackBar) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: snackBar,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
     );
   }
 }
