@@ -231,8 +231,126 @@ class _BaiScreenState extends State<BaiScreen> {
                       ],
                     ),
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 30),
+                //Bike Information
+
+                bikes == null
+                    ? const Text('Empty List!')
+                    : SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: bikes?.length,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 20),
+                              child: ShadowContainer(
+                                padding: const EdgeInsets.all(0),
+                                child: Column(
+                                  children: [
+                                    SizedBox(
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.25,
+                                      child: ClipRRect(
+                                        borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(10),
+                                          topRight: Radius.circular(10),
+                                        ),
+                                        child: FancyShimmerImage(
+                                          width: double.infinity,
+                                          imageUrl: bikes![index].plateImage!,
+                                          boxFit: BoxFit.cover,
+                                          errorWidget: const ImageNotFound(),
+                                          shimmerBaseColor: Theme.of(context)
+                                              .colorScheme
+                                              .background,
+                                          shimmerHighlightColor:
+                                              Theme.of(context)
+                                                  .colorScheme
+                                                  .outlineVariant,
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        top: 10,
+                                        left: 10,
+                                        right: 10,
+                                        bottom: 0,
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          const SizedBox(width: 10),
+                                          Image.asset(
+                                            AssetHelper.plateNumber,
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Text(
+                                            bikes![index].plateNumber!,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(10.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          const SizedBox(width: 10),
+                                          Text(
+                                            bikes![index].vehicleType!,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium,
+                                          ),
+                                          const SizedBox(width: 10),
+                                          const Icon(Icons.circle, size: 4),
+                                          const SizedBox(width: 10),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.rectangle,
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              color: _getStatusColor(
+                                                  bikes![index].status!,
+                                                  context),
+                                            ),
+                                            child: Text(
+                                              bikes![index].status!,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium!
+                                                  .copyWith(
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .background,
+                                                  ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+              ],
             ),
           );
         },
