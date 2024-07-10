@@ -25,6 +25,11 @@ class CallBikeApi {
 
       token = GetLocalHelper.getBearerToken();
 
+      if (token.isEmpty) {
+        log.e('Token is empty');
+        return null;
+      }
+
       // Tạo multipart request
       var request = http.MultipartRequest('POST', Uri.parse('$api/customer'));
       request.headers['Authorization'] = token;
@@ -97,8 +102,7 @@ class CallBikeApi {
 
   Future<List<BaiModel>?> getBai() async {
     try {
-      String? token =
-          GetLocalHelper.getBearerToken(); // Sử dụng await để lấy token
+      token = GetLocalHelper.getBearerToken();
 
       if (token.isEmpty) {
         log.e('Token is empty');

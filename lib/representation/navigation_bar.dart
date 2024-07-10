@@ -50,8 +50,11 @@ class _MyNavigationBarState extends State<MyNavigationBar> {
       resizeToAvoidBottomInset: false,
       extendBody: true,
       appBar: const MainAppBar(),
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
+      body: PopScope(
+        canPop: false,
+        child: Center(
+          child: _widgetOptions.elementAt(_selectedIndex),
+        ),
       ),
       bottomNavigationBar: StylishBottomBar(
         option: AnimatedBarOptions(
@@ -61,7 +64,8 @@ class _MyNavigationBarState extends State<MyNavigationBar> {
           inkColor: Theme.of(context).colorScheme.primary,
           opacity: 0.5,
         ),
-        elevation: 5,
+
+        // elevation: 5,
         backgroundColor: Theme.of(context).colorScheme.surface,
         currentIndex: _selectedIndex,
         iconSpace: 10,
