@@ -105,7 +105,7 @@ class _BaiScreenState extends State<BaiScreen> {
                 //Bike Information
 
                 bikes == null
-                    ? Text('Empty List!')
+                    ? const Text('Empty List!')
                     : SizedBox(
                         width: MediaQuery.of(context).size.width * 0.9,
                         child: ListView.builder(

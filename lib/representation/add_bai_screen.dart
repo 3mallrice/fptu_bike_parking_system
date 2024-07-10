@@ -31,10 +31,12 @@ class _AddBaiState extends State<AddBai> {
     super.initState();
     log.i('AddBai widget initialized');
     _fetchVehicleType();
-    _saveVehicleRegistration();
+    //_saveVehicleRegistration();
   }
 
   List<VehicleTypeModel> _vehicleType = [];
+
+  // ignore: unused_field
   bool _isEmptyList = true;
   bool isLoaded = false;
 
