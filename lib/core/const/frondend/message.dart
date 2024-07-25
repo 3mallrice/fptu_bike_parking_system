@@ -3,16 +3,20 @@ class Message {
   static String saveImageUnSuccessfully = "Saved unsuccessfully!";
   static String permissionDeny = "Permission denied!";
   static String loginSuccess = "Login success, welcome back!";
+
   static String actionSuccessfully({String? action}) => "$action successfully!";
 }
 
 class ListName {
   static String bai = "Bai";
   static String vehicleType = "Vehicle Type";
+  static String plateNumber = "Plate Number";
+  static String vehicle = "Vehicle";
 }
 
 class LabelMessage {
   static String ok = "OK";
+
   static String add({String? message}) => "Add ${message ?? ""}";
   static String save = "Save";
   static String cancel = "Cancel";
@@ -33,7 +37,12 @@ class ErrorMessage {
       "Error while loading, please try again later!";
   static String loginFailed = "Login failed, please try again!";
   static String imageNotFound = "Image not found";
-  static String inputRequired = "Action Failed! Please input all fields";
+
+  static String inputRequired({String? message}) =>
+      "Action Failed! Please input all fields for $message";
+
+  static String inputInvalid({String? message}) =>
+      "Action Failed! Please input valid fields for $message";
 }
 
 class ImageName {
