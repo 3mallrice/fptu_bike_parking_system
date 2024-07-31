@@ -1,6 +1,7 @@
 import 'dart:convert';
 
-import 'package:fptu_bike_parking_system/api/model/bai_model/package_model.dart';
+import 'package:fptu_bike_parking_system/api/model/bai_model/api_response.dart';
+import 'package:fptu_bike_parking_system/api/model/bai_model/coin_package_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
@@ -12,24 +13,23 @@ class CallPackageApi {
   String token = "";
   var log = Logger();
 
-  Future<List<PackageModel>?> getPackages() async {
+  // GET: /packages/active
+  // Get all active packages
+  Future<List<CoinPackage>?> getPackages() async {
     try {
       final response = await http.get(
-        Uri.parse(api),
+        Uri.parse('$api/active'),
       );
       if (response.statusCode == 200) {
         var jsonResponse = jsonDecode(response.body);
-        if (jsonResponse is List) {
-          return jsonResponse
-              .map((json) => PackageModel.fromJson(json))
-              .toList();
-        } else if (jsonResponse is Map) {
-          var jsonList = jsonResponse['data'] as List;
-          return jsonList.map((json) => PackageModel.fromJson(json)).toList();
-        } else {
-          log.e('Unexpected JSON format: $jsonResponse');
-          return null;
-        }
+        log.i('Get package: $jsonResponse');
+        APIResponse<List<CoinPackage>> apiResponse = APIResponse.fromJson(
+          jsonResponse,
+          (json) => (json as List)
+              .map((item) => CoinPackage.fromJson(item as Map<String, dynamic>))
+              .toList(),
+        );
+        return apiResponse.data;
       } else {
         log.e('Failed to get package: ${response.statusCode}');
         return null;
