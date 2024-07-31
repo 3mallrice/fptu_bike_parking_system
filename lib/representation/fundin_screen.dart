@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:fptu_bike_parking_system/api/service/bai_be/package_service.dart';
 import 'package:fptu_bike_parking_system/component/shadow_button.dart';
 import 'package:fptu_bike_parking_system/representation/payos.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
+import '../api/model/bai_model/coin_package_model.dart';
 import '../component/app_bar_component.dart';
 import '../component/shadow_container.dart';
 import '../core/helper/asset_helper.dart';
@@ -18,50 +20,17 @@ class FundinScreen extends StatefulWidget {
 }
 
 class _FundinScreenState extends State<FundinScreen> {
-  final List<CoinPackage> packages = [
-    CoinPackage(
-      packageName: 'Basic Package',
-      amount: 10000,
-      price: 10000,
-      extraCoin: 1000,
-      extraEXP: 10,
-    ),
-    CoinPackage(
-      packageName: 'Standard Package',
-      amount: 20000,
-      price: 20000,
-      extraCoin: 2000,
-      extraEXP: 20,
-    ),
-    CoinPackage(
-      packageName: 'Premium Package',
-      amount: 50000,
-      price: 50000,
-      extraCoin: 5000,
-      extraEXP: 50,
-    ),
-    CoinPackage(
-      packageName: 'VIP Package',
-      amount: 100000,
-      price: 100000,
-      extraCoin: 10000,
-      extraEXP: 100,
-    ),
-    CoinPackage(
-      packageName: 'Platinum Package',
-      amount: 200000,
-      price: 200000,
-      extraCoin: 20000,
-      extraEXP: null,
-    ),
-    CoinPackage(
-      packageName: 'Diamond Package',
-      amount: 500000,
-      price: 500000,
-      extraCoin: 50000,
-      extraEXP: null,
-    ),
-  ];
+  final CallPackageApi _packageApi = CallPackageApi();
+
+  // Get all active packages
+  Future<List<CoinPackage>> _getPackages() async {
+    final List<CoinPackage>? packages = await _packageApi.getPackages();
+    if (packages != null) {
+      return packages;
+    } else {
+      return [];
+    }
+  }
 
   void _showPackageDetail(CoinPackage package) {
     showBarModalBottomSheet(
@@ -86,7 +55,7 @@ class _FundinScreenState extends State<FundinScreen> {
             minHeight: 400,
           ),
           child: SizedBox(
-            height: MediaQuery.of(context).size.height * 0.45,
+            height: MediaQuery.of(context).size.height * 0.6,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: bottomSheet(package),
@@ -190,8 +159,10 @@ class _FundinScreenState extends State<FundinScreen> {
                   if (package.extraEXP != null)
                     smallText(context,
                         '  • Your Extra Wallet’s expiration period will increase by ${package.extraEXP} days.'),
-                  smallText(context,
-                      'Total Coins to Spend: ${package.amount + (package.extraCoin ?? 0)} bic.'),
+                  smallText(
+                    context,
+                    'Total Coins to Spend: ${int.parse(package.amount) + (package.extraCoin ?? 0)} bic.',
+                  ),
                   if (package.extraEXP != null)
                     smallText(context,
                         'Expiration Extension: +${package.extraEXP} days added to the current expiration date of your Extra Wallet coins.'),
@@ -384,89 +355,25 @@ class _FundinScreenState extends State<FundinScreen> {
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                 ),
-                GridView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 2.5,
-                    crossAxisSpacing: 15,
-                    mainAxisSpacing: 11,
-                  ),
-                  itemCount: packages.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return GestureDetector(
-                      onTap: () => _showPackageDetail(packages[index]),
-                      child: ShadowContainer(
-                        width: MediaQuery.of(context).size.width * 0.9,
-                        height: MediaQuery.of(context).size.height * 0.1,
-                        padding: const EdgeInsets.all(0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              flex: 5,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    '${packages[index].amount + (packages[index].extraCoin ?? 0)} bic',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium!
-                                        .copyWith(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                  ),
-                                  const SizedBox(
-                                    height: 3,
-                                  ),
-                                  if (packages[index].extraEXP != null)
-                                    Text(
-                                      '+${packages[index].extraEXP} days',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyLarge!
-                                          .copyWith(fontSize: 12),
-                                      textAlign: TextAlign.left,
-                                    ),
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              flex: 3,
-                              child: Container(
-                                height: double.infinity,
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  borderRadius: const BorderRadius.only(
-                                    topRight: Radius.circular(10),
-                                    bottomRight: Radius.circular(10),
-                                  ),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    '${packages[index].price ~/ 1000}K\nVND',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium!
-                                        .copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .background,
-                                        ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    );
+                FutureBuilder<List<CoinPackage>>(
+                  future: _getPackages(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      // TODO: Add loading spinner
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      // TODO: Add error message
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      //TODO: Add no packages available message
+                      return Center(child: Text('No packages available'));
+                    } else {
+                      // get packages
+                      final packages = snapshot.data as List<CoinPackage>;
+                      return coinPackageGridView(packages);
+                    }
                   },
-                ),
+                )
               ],
             ),
           ),
@@ -474,20 +381,86 @@ class _FundinScreenState extends State<FundinScreen> {
       ),
     );
   }
-}
 
-class CoinPackage {
-  final String packageName;
-  final int amount;
-  final int price;
-  final int? extraCoin;
-  final int? extraEXP;
-
-  CoinPackage({
-    required this.packageName,
-    required this.amount,
-    required this.price,
-    this.extraCoin,
-    this.extraEXP,
-  });
+  Widget coinPackageGridView(List<CoinPackage> packages) {
+    return GridView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 2.5,
+        crossAxisSpacing: 15,
+        mainAxisSpacing: 11,
+      ),
+      itemCount: packages.length,
+      itemBuilder: (BuildContext context, int index) {
+        return GestureDetector(
+          onTap: () => _showPackageDetail(packages[index]),
+          child: ShadowContainer(
+            width: MediaQuery.of(context).size.width * 0.9,
+            height: MediaQuery.of(context).size.height * 0.1,
+            padding: const EdgeInsets.all(0),
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 5,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        '${int.parse(packages[index].amount) + (packages[index].extraCoin ?? 0)} bic',
+                        style:
+                            Theme.of(context).textTheme.titleMedium!.copyWith(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                      ),
+                      const SizedBox(
+                        height: 3,
+                      ),
+                      if (packages[index].extraEXP != null)
+                        Text(
+                          '+${packages[index].extraEXP} days',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge!
+                              .copyWith(fontSize: 12),
+                          textAlign: TextAlign.left,
+                        ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Container(
+                    height: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
+                      borderRadius: const BorderRadius.only(
+                        topRight: Radius.circular(10),
+                        bottomRight: Radius.circular(10),
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${packages[index].price ~/ 1000}K\nVND',
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium!
+                            .copyWith(
+                              color: Theme.of(context).colorScheme.background,
+                            ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
