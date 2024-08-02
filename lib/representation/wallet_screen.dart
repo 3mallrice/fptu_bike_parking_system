@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:fptu_bike_parking_system/api/model/bai_model/wallet_model.dart';
+import 'package:fptu_bike_parking_system/api/service/bai_be/wallet_service.dart';
 import 'package:fptu_bike_parking_system/representation/wallet_extra_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
@@ -22,9 +24,15 @@ class MyWallet extends StatefulWidget {
 class _MyWalletState extends State<MyWallet> {
   bool _hideBalance = false;
   var log = Logger();
+  CallWalletApi callWalletApi = CallWalletApi();
+  late int balance = 0;
+  List<WalletModel> transactions = [];
+  bool isLoading = true;
+  String? errorMessage;
 
   Future<void> _loadHideBalance() async {
-    bool? hideBalance = await LocalStorageHelper.getValue('hide_balance');
+    bool? hideBalance =
+        await LocalStorageHelper.getValue(LocalStorageKey.isHiddenBalance);
     log.i('Hide balance: $hideBalance');
     setState(() {
       _hideBalance = hideBalance ?? false;
@@ -39,94 +47,59 @@ class _MyWalletState extends State<MyWallet> {
     // await LocalStorageHelper.setValue('hide_balance', _hideBalance);
   }
 
-  // Function to check if a date is today
-  bool isToday(DateTime date) {
-    final now = DateTime.now();
-    return date.year == now.year &&
-        date.month == now.month &&
-        date.day == now.day;
-  }
-
-  // Function to check if a date is yesterday
-  bool isYesterday(DateTime date) {
-    final now = DateTime.now();
-    final yesterday = DateTime(now.year, now.month, now.day - 1);
-    return date.year == yesterday.year &&
-        date.month == yesterday.month &&
-        date.day == yesterday.day;
-  }
-
   // Function to format date
   String formatDate(DateTime date) {
-    if (isToday(date)) {
-      return 'Today';
-    } else if (isYesterday(date)) {
-      return 'Yesterday';
-    } else {
-      return DateFormat('dd/MM/yyyy').format(date);
+    return DateFormat('HH:mm dd/MM/yyyy').format(date);
+  }
+
+  // Function to format number
+  // eg: 100000 -> 100.000
+  String formatNumber(int number) {
+    return NumberFormat.decimalPattern('vi_VN').format(number);
+  }
+
+  Future<void> getBalance() async {
+    try {
+      final int? result = await callWalletApi.getMainWalletBalance();
+      setState(() {
+        balance = result ?? 0;
+        log.i('Main wallet balance: $balance');
+      });
+    } catch (e) {
+      log.e('Error during get main wallet balance: $e');
     }
   }
 
-  //init transaction list
-  List<TransactionList> transactionList = [
-    TransactionList(
-      date: DateTime.now(),
-      transactionList: [
-        TransactionItem(
-            title: 'Deposit',
-            amount: '100.000',
-            transactionType: true,
-            description: 'Deposit from bank',
-            total: '100.000'),
-        TransactionItem(
-            title: 'Parking Fee',
-            amount: '50.000',
-            transactionType: false,
-            description: 'Deposit from bank',
-            total: '500.000'),
-      ],
-    ),
-    TransactionList(
-      //date in format dd/mm/yyyy
-      date: DateTime(2024, 6, 10),
-      transactionList: [
-        TransactionItem(
-            title: 'Deposit',
-            amount: '100.000',
-            transactionType: true,
-            description: 'Deposit from bank',
-            total: '100.000'),
-        TransactionItem(
-            title: 'Parking Fee',
-            amount: '50.000',
-            transactionType: false,
-            description: 'Deposit from bank',
-            total: '500.000'),
-      ],
-    ),
-    TransactionList(
-      date: DateTime(2024, 5, 12),
-      transactionList: [
-        TransactionItem(
-            title: 'Deposit',
-            amount: '100.000',
-            transactionType: true,
-            description: 'Deposit from bank',
-            total: '100.000'),
-        TransactionItem(
-            title: 'Parking Fee',
-            amount: '50.000',
-            transactionType: false,
-            description: 'Deposit from bank',
-            total: '500.000'),
-      ],
-    ),
-  ];
+  Future<void> getMainTransactions() async {
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+    });
+
+    try {
+      final List<WalletModel>? result =
+          await callWalletApi.getMainWalletTransactions();
+      setState(() {
+        transactions = result ?? [];
+      });
+    } catch (e) {
+      log.e('Error during get main wallet transactions: $e');
+      setState(() {
+        errorMessage = 'Error loading data: $e';
+      });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
-  initState() {
+  void initState() {
     super.initState();
     _loadHideBalance();
+    getBalance();
+    getMainTransactions();
   }
 
   @override
@@ -216,7 +189,9 @@ class _MyWalletState extends State<MyWallet> {
                           height: 8,
                         ),
                         Text(
-                          _hideBalance ? '******' : '45.000 bic',
+                          _hideBalance
+                              ? '******'
+                              : '${formatNumber(balance)} bic',
                           style: Theme.of(context)
                               .textTheme
                               .displayMedium!
@@ -230,8 +205,10 @@ class _MyWalletState extends State<MyWallet> {
                 ),
               ),
 
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.9,
+              Container(
+                color: Theme.of(context).colorScheme.secondary,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 17),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -245,9 +222,7 @@ class _MyWalletState extends State<MyWallet> {
                           'FILTER',
                           style: Theme.of(context).textTheme.bodyLarge,
                         ),
-                        const SizedBox(
-                          width: 5,
-                        ),
+                        const SizedBox(width: 5),
                         GestureDetector(
                           onTap: () {
                             //TODO: Open filter dialog
@@ -265,213 +240,109 @@ class _MyWalletState extends State<MyWallet> {
               ),
 
               // List of transaction
-              Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: transactionList.length,
-                  itemBuilder: (context, index) {
-                    return Column(
-                      children: [
-                        Container(
-                          color: Theme.of(context).colorScheme.secondary,
-                          child: SizedBox(
-                            width: double.infinity,
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                vertical: 1,
-                                horizontal:
-                                    MediaQuery.of(context).size.width * 0.05,
-                              ),
-                              child: Text(
-                                formatDate(transactionList[index].date),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall!
-                                    .copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSecondary,
-                                    ),
-                              ),
-                            ),
+              isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : errorMessage != null
+                      ? Center(
+                          child: Text(
+                            errorMessage!,
+                            style: Theme.of(context).textTheme.bodyMedium,
                           ),
-                        ),
-                        const SizedBox(
-                          height: 2,
-                        ),
-                        SizedBox(
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount:
-                                transactionList[index].transactionList.length,
-                            itemBuilder: (context, i) {
-                              bool transactionType = transactionList[index]
-                                  .transactionList[i]
-                                  .transactionType;
-
-                              String title = transactionList[index]
-                                  .transactionList[i]
-                                  .title;
-
-                              String amount = transactionList[index]
-                                  .transactionList[i]
-                                  .amount;
-
-                              String description = transactionList[index]
-                                  .transactionList[i]
-                                  .description;
-
-                              String extra = transactionList[index]
-                                  .transactionList[i]
-                                  .total;
-
-                              return Container(
-                                decoration: BoxDecoration(
-                                  border: Border(
-                                    bottom: BorderSide(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .secondary,
-                                    ),
-                                  ),
-                                ),
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal:
-                                        MediaQuery.of(context).size.width *
-                                            0.05,
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                        )
+                      : transactions.isEmpty
+                          ? Center(
+                              child: Text(
+                                'No transaction found',
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                            )
+                          : ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: transactions.length,
+                              itemBuilder: (context, index) {
+                                Color itemBackgroundColor = index % 2 == 0
+                                    ? Colors.white
+                                    : Theme.of(context).colorScheme.secondary;
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 10),
+                                  child: Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.9,
+                                    color: itemBackgroundColor,
+                                    child: ListTile(
+                                      leading: CircleAvatar(
+                                        backgroundColor: transactions[index]
+                                                    .transactionType ==
+                                                'IN'
+                                            ? Theme.of(context)
+                                                .colorScheme
+                                                .primary
+                                            : Theme.of(context)
+                                                .colorScheme
+                                                .outline,
+                                        child: Icon(
+                                          transactions[index].transactionType ==
+                                                  'IN'
+                                              ? Icons.attach_money_rounded
+                                              : Icons.local_parking_rounded,
+                                        ),
+                                      ),
+                                      title: Text(
+                                        transactions[index].transactionType ==
+                                                'IN'
+                                            ? 'Deposit'
+                                            : 'Parking Fee',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleSmall,
+                                      ),
+                                      subtitle: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Text(
-                                                title,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .titleMedium!
-                                                    .copyWith(
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: transactionType
-                                                          ? Theme.of(context)
-                                                              .colorScheme
-                                                              .primary
-                                                          : Theme.of(context)
-                                                              .colorScheme
-                                                              .outline,
-                                                    ),
-                                              ),
-                                              Text(
-                                                description,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .bodySmall!
-                                                    .copyWith(
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .onSecondary,
-                                                    ),
-                                              )
-                                            ],
+                                          Text(
+                                            transactions[index]
+                                                    .transactionDescription ??
+                                                '',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge,
                                           ),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Text(
-                                                '${transactionType ? '' : '-'} bic $amount',
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .titleMedium!
-                                                    .copyWith(
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: transactionType
-                                                          ? Theme.of(context)
-                                                              .colorScheme
-                                                              .primary
-                                                          : Theme.of(context)
-                                                              .colorScheme
-                                                              .outline,
-                                                    ),
-                                              ),
-                                              Text(
-                                                extra,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .titleMedium!
-                                                    .copyWith(
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: transactionType
-                                                          ? Theme.of(context)
-                                                              .colorScheme
-                                                              .primary
-                                                          : Theme.of(context)
-                                                              .colorScheme
-                                                              .outline,
-                                                    ),
-                                              )
-                                            ],
-                                          ),
+                                          Text(
+                                            formatDate(
+                                                transactions[index].date),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall!
+                                                .copyWith(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSecondary,
+                                                ),
+                                          )
                                         ],
                                       ),
-                                    ],
+                                      trailing: Text(
+                                        (transactions[index].transactionType ==
+                                                    'IN'
+                                                ? '+'
+                                                : '-') +
+                                            formatNumber(
+                                                transactions[index].amount),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              ),
+                                );
+                              },
+                            ),
             ],
           ),
         ),
       ),
     );
   }
-}
-
-class TransactionItem {
-  final String title;
-  final String amount;
-  final bool transactionType;
-  final String description;
-  final String total;
-
-  TransactionItem({
-    required this.description,
-    required this.total,
-    required this.title,
-    required this.amount,
-    this.transactionType = true,
-  });
-}
-
-class TransactionList {
-  final DateTime date;
-  final List<TransactionItem> transactionList;
-
-  TransactionList({
-    required this.date,
-    required this.transactionList,
-  });
 }
