@@ -102,61 +102,6 @@ class _AddFeedbackScreenState extends State<AddFeedbackScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Parking Area',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyLarge!
-                                .copyWith(
-                                  color: Theme.of(context).colorScheme.outline,
-                                ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              //TODO: show parking area dialog
-                            },
-                            child: ShadowContainer(
-                              padding: const EdgeInsets.all(10),
-                              height:
-                                  MediaQuery.of(context).size.height * 0.065,
-                              // parking area dropdown
-                              child: TextField(
-                                decoration: InputDecoration(
-                                  suffixIcon: Icon(
-                                    Icons.edit_rounded,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSecondary,
-                                  ),
-                                  enabledBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSecondary,
-                                    ),
-                                  ),
-                                  focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color:
-                                          Theme.of(context).colorScheme.outline,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.03,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
                             'Description',
                             style: Theme.of(context)
                                 .textTheme
@@ -264,5 +209,6 @@ class _AddFeedbackScreenState extends State<AddFeedbackScreen> {
 class ParkingArea {
   String name;
   String id;
+
   ParkingArea({required this.name, required this.id});
 }

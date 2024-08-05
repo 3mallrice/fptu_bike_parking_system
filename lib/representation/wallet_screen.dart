@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/api/model/bai_model/wallet_model.dart';
 import 'package:fptu_bike_parking_system/api/service/bai_be/wallet_service.dart';
+import 'package:fptu_bike_parking_system/core/helper/util_helper.dart';
 import 'package:fptu_bike_parking_system/representation/wallet_extra_screen.dart';
-import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:transition/transition.dart';
 
@@ -45,17 +45,6 @@ class _MyWalletState extends State<MyWallet> {
       _hideBalance = !_hideBalance;
     });
     // await LocalStorageHelper.setValue('hide_balance', _hideBalance);
-  }
-
-  // Function to format date
-  String formatDate(DateTime date) {
-    return DateFormat('HH:mm dd/MM/yyyy').format(date);
-  }
-
-  // Function to format number
-  // eg: 100000 -> 100.000
-  String formatNumber(int number) {
-    return NumberFormat.decimalPattern('vi_VN').format(number);
   }
 
   Future<void> getBalance() async {
@@ -188,7 +177,7 @@ class _MyWalletState extends State<MyWallet> {
                         Text(
                           _hideBalance
                               ? '******'
-                              : '${formatNumber(balance)} bic',
+                              : '${UltilHelper.formatNumber(balance)} bic',
                           style: Theme.of(context)
                               .textTheme
                               .displayMedium!
@@ -307,7 +296,7 @@ class _MyWalletState extends State<MyWallet> {
                                                 .bodyLarge,
                                           ),
                                           Text(
-                                            formatDate(
+                                            UltilHelper.formatDate(
                                                 transactions[index].date),
                                             style: Theme.of(context)
                                                 .textTheme
@@ -325,7 +314,7 @@ class _MyWalletState extends State<MyWallet> {
                                                     'IN'
                                                 ? '+'
                                                 : '-') +
-                                            formatNumber(
+                                            UltilHelper.formatNumber(
                                                 transactions[index].amount),
                                         style: Theme.of(context)
                                             .textTheme

@@ -3,8 +3,12 @@ import 'package:flutter_image_slideshow/flutter_image_slideshow.dart'
     show ImageSlideshow;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart'
     show FontAwesomeIcons;
+import 'package:fptu_bike_parking_system/api/model/bai_model/wallet_model.dart';
+import 'package:fptu_bike_parking_system/api/service/bai_be/wallet_service.dart';
+import 'package:fptu_bike_parking_system/core/helper/util_helper.dart';
 import 'package:fptu_bike_parking_system/representation/navigation_bar.dart';
 import 'package:fptu_bike_parking_system/representation/payment.dart';
+import 'package:fptu_bike_parking_system/representation/wallet_extra_screen.dart';
 import 'package:fptu_bike_parking_system/representation/wallet_screen.dart';
 import 'package:geolocator/geolocator.dart'
     show Geolocator, LocationAccuracy, Position;
@@ -86,6 +90,38 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
     super.initState();
     getWeather();
     _loadHideBalance();
+    getBalance();
+    getExtraBalance();
+  }
+
+  CallWalletApi callWalletApi = CallWalletApi();
+  late int balance = 0;
+  late int extraBalance = 0;
+
+  Future<void> getBalance() async {
+    try {
+      final int? result = await callWalletApi.getMainWalletBalance();
+      setState(() {
+        balance = result ?? 0;
+        log.i('Main wallet balance: $balance');
+      });
+    } catch (e) {
+      log.e('Error during get main wallet balance: $e');
+    }
+  }
+
+  Future<void> getExtraBalance() async {
+    try {
+      ExtraBalanceModel? extraBalanceModel =
+          await callWalletApi.getExtraWalletBalance();
+      if (extraBalanceModel != null) {
+        setState(() {
+          extraBalance = extraBalanceModel.balance;
+        });
+      }
+    } catch (e) {
+      log.e('Error during get extra balance: $e');
+    }
   }
 
   @override
@@ -453,13 +489,14 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
       width: MediaQuery.of(context).size.width * 0.9,
       child: Column(
         children: [
-          GestureDetector(
-            onTap: () => Navigator.of(context).pushNamed(MyWallet.routeName),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () =>
+                      Navigator.of(context).pushNamed(MyWallet.routeName),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -473,13 +510,19 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                         width: 5,
                       ),
                       Text(
-                        _hideBalance ? '******' : '45.000 BIC',
+                        _hideBalance
+                            ? '******'
+                            : UltilHelper.formatNumber(balance),
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                     ],
                   ),
                 ),
-                Expanded(
+              ),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context)
+                      .pushNamed(WalletExtraScreen.routeName),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -492,17 +535,19 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                                 ),
                       ),
                       Text(
-                        '5.000',
+                        _hideBalance
+                            ? '******'
+                            : UltilHelper.formatNumber(extraBalance),
                         style:
                             Theme.of(context).textTheme.titleMedium!.copyWith(
                                   fontWeight: FontWeight.w500,
                                 ),
-                      )
+                      ),
                     ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
