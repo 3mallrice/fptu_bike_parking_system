@@ -84,9 +84,6 @@ class _MyWalletState extends State<MyWallet> {
       });
     } catch (e) {
       log.e('Error during get main wallet transactions: $e');
-      setState(() {
-        errorMessage = 'Error loading data: $e';
-      });
     } finally {
       setState(() {
         isLoading = false;

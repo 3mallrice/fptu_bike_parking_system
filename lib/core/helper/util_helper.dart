@@ -1,6 +1,6 @@
 import 'package:intl/intl.dart';
 
-class UtilHelper {
+class UltilHelper {
   // Function to check if a date is today
   static bool _isToday(DateTime date) {
     final now = DateTime.now();

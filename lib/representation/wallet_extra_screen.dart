@@ -184,7 +184,7 @@ class _WalletExtraScreenState extends State<WalletExtraScreen> {
                         Text(
                           _hideBalance
                               ? '******'
-                              : '${UtilHelper.formatNumber(extraBalance)} bic',
+                              : '${UltilHelper.formatNumber(extraBalance)} bic',
                           style: Theme.of(context)
                               .textTheme
                               .displayMedium!
@@ -197,8 +197,8 @@ class _WalletExtraScreenState extends State<WalletExtraScreen> {
                         ),
                         Text(
                           expiredDate != null
-                              ? '${UtilHelper.formatNumber(extraBalance)} bic sẽ hết hạn vào ${UtilHelper.formatDate(expiredDate!)}'
-                              : '${UtilHelper.formatNumber(extraBalance)} bic',
+                              ? '${UltilHelper.formatNumber(extraBalance)} bic sẽ hết hạn vào ${UltilHelper.formatDate(expiredDate!)}'
+                              : '${UltilHelper.formatNumber(extraBalance)} bic',
                           style: Theme.of(context)
                               .textTheme
                               .bodySmall!
@@ -322,7 +322,7 @@ class _WalletExtraScreenState extends State<WalletExtraScreen> {
                                                 .bodyLarge,
                                           ),
                                           Text(
-                                            UtilHelper.formatDate(
+                                            UltilHelper.formatDate(
                                                 transactions[index].date),
                                             style: Theme.of(context)
                                                 .textTheme
@@ -340,7 +340,7 @@ class _WalletExtraScreenState extends State<WalletExtraScreen> {
                                                     'IN'
                                                 ? '+'
                                                 : '-') +
-                                            UtilHelper.formatNumber(
+                                            UltilHelper.formatNumber(
                                                 transactions[index].amount),
                                         style: Theme.of(context)
                                             .textTheme
