@@ -16,23 +16,9 @@ class LoadingCircle extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            LoadingAnimationWidget.fourRotatingDots(
-              color: Theme.of(context).colorScheme.primary,
-              size: size ?? 100,
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Loading...',
-              style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                    fontWeight: FontWeight.normal,
-                    color: Theme.of(context).colorScheme.outline,
-                  ),
-            ),
-          ],
+        child: LoadingAnimationWidget.fourRotatingDots(
+          color: Theme.of(context).colorScheme.primary,
+          size: size ?? 100,
         ),
       ),
     );

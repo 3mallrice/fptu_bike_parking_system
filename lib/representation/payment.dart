@@ -1,13 +1,27 @@
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_zalopay_sdk/flutter_zalopay_sdk.dart';
+import 'package:fptu_bike_parking_system/api/model/bai_model/coin_package_model.dart';
+import 'package:fptu_bike_parking_system/api/service/bai_be/payment_service.dart';
 import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
 import 'package:fptu_bike_parking_system/component/my_radio_button.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
 import 'package:fptu_bike_parking_system/core/const/frondend/message.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
+import 'package:logger/logger.dart';
+
+import '../api/model/bai_model/zalopay_model.dart';
+import '../component/snackbar.dart';
+import '../core/helper/loading_overlay_helper.dart';
+import '../core/helper/util_helper.dart';
 
 class PaymentScreen extends StatefulWidget {
-  const PaymentScreen({super.key});
+  final CoinPackage package;
+
+  const PaymentScreen({
+    super.key,
+    required this.package,
+  });
 
   static const String routeName = '/payment_screen';
 
@@ -18,6 +32,77 @@ class PaymentScreen extends StatefulWidget {
 class _PaymentScreenState extends State<PaymentScreen> {
   // State variable to track the selected payment option
   int selectedPaymentOption = 1; // Default selection = ZaloPay
+  late final CoinPackage _package = widget.package;
+  var log = Logger();
+
+  bool isLoading = true;
+  final CallPaymentApi _paymentApi = CallPaymentApi();
+  late ZaloPayModel zaloPayModel;
+  String payResult = "";
+  int type = 0;
+  late Color btnColor = Theme.of(context).colorScheme.primary;
+  late String txtPay = LabelMessage.pay.toUpperCase();
+
+  @override
+  initState() {
+    super.initState();
+  }
+
+  // BUY NOW
+  Future<void> buyNow(String packageId) async {
+    setState(() {
+      isLoading = true; // Đặt isLoading thành true khi bắt đầu
+    });
+
+    try {
+      final ZaloPayModel? zaloPayMd = await _paymentApi.depositCoin(packageId);
+      if (zaloPayMd != null) {
+        setState(() {
+          zaloPayModel = zaloPayMd;
+          isLoading = false; // Đặt isLoading thành false khi hoàn thành
+        });
+      }
+    } catch (e) {
+      log.e('Error during buy now: $e');
+      setState(() {
+        isLoading =
+            false; // Đảm bảo isLoading được đặt thành false ngay cả khi xảy ra lỗi
+      });
+    }
+  }
+
+  Future<void> openZaloPayApp(CoinPackage package) async {
+    await buyNow(package.id);
+
+    await FlutterZaloPaySdk.payOrder(zpToken: zaloPayModel.zpTransToken)
+        .then((event) {
+      setState(() {
+        switch (event) {
+          case FlutterZaloPayStatus.processing:
+            payResult = ZaloPayMessage.processing;
+            type = 0;
+            break;
+          case FlutterZaloPayStatus.cancelled:
+            payResult = ZaloPayMessage.cancelled;
+            type = 0;
+            break;
+          case FlutterZaloPayStatus.success:
+            payResult = ZaloPayMessage.success;
+            type = 1;
+            break;
+          case FlutterZaloPayStatus.failed:
+            payResult = ZaloPayMessage.failed;
+            type = 2;
+            break;
+          default:
+            payResult = ZaloPayMessage.failed;
+            type = 2;
+            break;
+        }
+        log.i('Pay result: $payResult');
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +168,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 ),
                                 const SizedBox(width: 10),
                                 Text(
-                                  'Pending transaction',
+                                  'Transaction Details',
                                   style: Theme.of(context)
                                       .textTheme
                                       .titleMedium!
@@ -122,7 +207,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 ),
                                 const SizedBox(height: 5),
                                 Text(
-                                  '19/05/2024 08:20',
+                                  UltilHelper.formatDateTime(DateTime.now()),
                                   style: Theme.of(context)
                                       .textTheme
                                       .labelSmall!
@@ -138,7 +223,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     Text(
-                                      '80.000',
+                                      UltilHelper.formatNumber(_package.price),
                                       style: Theme.of(context)
                                           .textTheme
                                           .displayMedium!
@@ -152,7 +237,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                     ),
                                     const SizedBox(width: 2),
                                     Text(
-                                      'bic',
+                                      'VND',
                                       style: Theme.of(context)
                                           .textTheme
                                           .bodyMedium!
@@ -196,7 +281,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                                 .bodyLarge,
                                           ),
                                           Text(
-                                            'Fund In',
+                                            'Deposit',
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .bodyLarge!
@@ -217,7 +302,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                                 .bodyLarge,
                                           ),
                                           Text(
-                                            'Fund in via existing package',
+                                            // Message show that buy package name
+                                            'Buy ${_package.packageName} to get ${UltilHelper.formatNumber(int.parse(_package.amount))} bic coins',
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .bodyLarge!
@@ -250,14 +336,16 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 ),
                       ),
                     ),
-                    const SizedBox(height: 5),
+
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.01),
 
                     // ZaloPay
                     RadioButtonCustom(
                       //bank icon
                       prefixWidget: Image.asset(
                         AssetHelper.zaloLogo,
-                        height: 19,
+                        height: 30,
+                        fit: BoxFit.contain,
                       ),
                       contentWidget: Text(
                         'ZaloPay',
@@ -271,6 +359,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       onTap: () {
                         setState(() {
                           selectedPaymentOption = 1;
+                          btnColor =
+                              Theme.of(context).colorScheme.primaryContainer;
+                          txtPay = ZaloPayMessage.openApp;
                         });
                       },
                     ),
@@ -296,6 +387,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       onTap: () {
                         setState(() {
                           selectedPaymentOption = 2;
+                          btnColor = Theme.of(context).colorScheme.primary;
+                          txtPay = LabelMessage.pay.toUpperCase();
                         });
                       },
                     ),
@@ -312,7 +405,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    //TODO
+                    //close payment screen
+                    Navigator.of(context).pop();
                   },
                   child: Text(
                     LabelMessage.close,
@@ -325,31 +419,81 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    //TODO
+                    btnPay(context);
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 20),
+                    width: MediaQuery.of(context).size.width * 0.4,
+                    height: MediaQuery.of(context).size.height * 0.05,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary,
+                      color: btnColor,
                       shape: BoxShape.rectangle,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Text(
-                      LabelMessage.checkout.toUpperCase(),
-                      style:
-                          Theme.of(context).textTheme.displayMedium!.copyWith(
+                    child: Center(
+                      child: Text(
+                        txtPay,
+                        style: Theme.of(context)
+                            .textTheme
+                            .displayMedium!
+                            .copyWith(
                                 fontSize: 20,
                                 color: Theme.of(context).colorScheme.surface,
-                                fontWeight: FontWeight.w900,
-                              ),
+                                fontWeight: FontWeight.w900),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
                 )
               ],
             ),
-          )
+          ),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
         ],
+      ),
+    );
+  }
+
+  void btnPay(BuildContext context) {
+    if (selectedPaymentOption == 1) {
+      LoadingOverlayHelper.show(context);
+      //open ZaloPay app
+      openZaloPayApp(_package).then((_) {
+        LoadingOverlayHelper.hide();
+        showSnackBar(payResult, type: type);
+      });
+    } else {
+      //show snackbar if user select internet banking: development
+      showSnackBar(ErrorMessage.underDevelopment);
+    }
+  }
+
+  // show snackbar
+  void showSnackBar(String message, {int type = 0}) {
+    Color backgroundColor = type == 0
+        ? Theme.of(context).colorScheme.outline
+        : (type == 1
+            ? Theme.of(context).colorScheme.onError
+            : Theme.of(context).colorScheme.error);
+    showCustomSnackBar(
+      MySnackBar(
+        message: message,
+        prefix: Icon(
+          Icons.info,
+          color: Theme.of(context).colorScheme.surface,
+        ),
+        backgroundColor: backgroundColor,
+      ),
+    );
+  }
+
+  // show custom snackbar
+  void showCustomSnackBar(MySnackBar snackBar) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: snackBar,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
     );
   }

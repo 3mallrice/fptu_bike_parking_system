@@ -10,6 +10,7 @@ class ColorLightMode {
   static const Color primaryGray = Color(0xFFE5E5E5);
   static const Color success = Color(0xFF00A676);
   static const Color fail = Color(0xFFF42B03);
+  static const Color zaloPay = Color(0xFF008fe5);
 }
 
 class ColorDarkMode {

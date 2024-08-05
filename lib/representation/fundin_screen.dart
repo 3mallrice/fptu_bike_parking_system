@@ -4,8 +4,9 @@ import 'package:fptu_bike_parking_system/api/service/bai_be/package_service.dart
 import 'package:fptu_bike_parking_system/api/service/bai_be/wallet_service.dart';
 import 'package:fptu_bike_parking_system/component/shadow_button.dart';
 import 'package:fptu_bike_parking_system/core/helper/util_helper.dart';
-import 'package:fptu_bike_parking_system/representation/payos.dart';
 import 'package:logger/web.dart';
+import 'package:fptu_bike_parking_system/representation/payment.dart';
+import 'package:logger/logger.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../api/model/bai_model/coin_package_model.dart';
@@ -25,6 +26,7 @@ class FundinScreen extends StatefulWidget {
 
 class _FundinScreenState extends State<FundinScreen> {
   final CallPackageApi _packageApi = CallPackageApi();
+  var log = Logger();
 
   // Get all active packages
   Future<List<CoinPackage>> _getPackages() async {
@@ -126,7 +128,7 @@ class _FundinScreenState extends State<FundinScreen> {
                 ),
                 Expanded(
                   child: Text(
-                    '${package.price}đ',
+                    '${UltilHelper.formatNumber(package.price)}đ',
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
                           color: Theme.of(context).colorScheme.outline,
                           fontSize: 19,
@@ -205,8 +207,12 @@ class _FundinScreenState extends State<FundinScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
             child: GestureDetector(
-              onTap: () =>
-                  Navigator.of(context).pushNamed(PayOsScreen.routeName),
+              onTap: () {
+                Navigator.of(context).pushNamed(
+                  PaymentScreen.routeName,
+                  arguments: package,
+                );
+              },
               child: ConstrainedBox(
                 constraints: const BoxConstraints(
                   minHeight: 60,
@@ -214,7 +220,8 @@ class _FundinScreenState extends State<FundinScreen> {
                 child: ShadowButton(
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   height: MediaQuery.of(context).size.height * 0.07,
-                  buttonTitle: '${package.price} VND - BUY NOW',
+                  buttonTitle:
+                      '${UltilHelper.formatNumber(package.price)} VND - BUY NOW',
                   textStyle: Theme.of(context).textTheme.titleLarge!.copyWith(
                         fontSize: 20,
                         color: Theme.of(context).colorScheme.surface,
@@ -224,6 +231,11 @@ class _FundinScreenState extends State<FundinScreen> {
               ),
             ),
           ),
+
+          // Padding between button and bottom
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.01,
+          )
         ],
       ),
     );
@@ -244,7 +256,6 @@ class _FundinScreenState extends State<FundinScreen> {
   late int balance = 0;
   late int extraBalance = 0;
   DateTime? expiredDate;
-  var log = Logger();
 
   Future<void> getBalance() async {
     try {
@@ -457,7 +468,7 @@ class _FundinScreenState extends State<FundinScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        '${int.parse(packages[index].amount) + (packages[index].extraCoin ?? 0)} bic',
+                        '${UltilHelper.formatNumber(int.parse(packages[index].amount) + (packages[index].extraCoin ?? 0))} bic',
                         style:
                             Theme.of(context).textTheme.titleMedium!.copyWith(
                                   fontSize: 16,

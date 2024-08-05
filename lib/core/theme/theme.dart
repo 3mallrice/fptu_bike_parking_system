@@ -39,6 +39,7 @@ ThemeData lightMode = ThemeData(
     onSecondary: ColorLightMode.secondaryText,
     error: ColorLightMode.fail,
     onError: ColorLightMode.success,
+    primaryContainer: ColorLightMode.zaloPay,
   ),
   dividerColor: ColorLightMode.primaryText,
   useMaterial3: true,
