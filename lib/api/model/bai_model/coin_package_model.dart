@@ -1,4 +1,5 @@
 class CoinPackage {
+  final String id;
   final String packageName;
   final String amount;
   final int price;
@@ -6,6 +7,7 @@ class CoinPackage {
   final int? extraEXP;
 
   CoinPackage({
+    required this.id,
     required this.packageName,
     required this.amount,
     required this.price,
@@ -15,6 +17,7 @@ class CoinPackage {
 
   factory CoinPackage.fromJson(Map<String, dynamic> json) {
     return CoinPackage(
+      id: json['id'],
       packageName: json['name'],
       amount: json['coinAmount'],
       price: json['price'],

@@ -27,6 +27,7 @@ class LabelMessage {
   static String close = "Close";
   static String done = "Done";
   static String checkout = "Check out";
+  static String pay = "Pay";
 }
 
 class ErrorMessage {
@@ -43,6 +44,8 @@ class ErrorMessage {
 
   static String inputInvalid({String? message}) =>
       "Action Failed! Please input valid fields for $message";
+
+  static String underDevelopment = "This feature is under development!";
 }
 
 class ImageName {
@@ -54,4 +57,12 @@ class StaticMessage {
   static String emptyList = "Empty List!";
   static String emptyBaiList =
       "Oops! Looks like there are no ‘Bai’ items in the list. Please add some!";
+}
+
+class ZaloPayMessage {
+  static const String openApp = "Open ZaloPay";
+  static const String cancelled = "Payment has been cancelled.";
+  static const String success = "Payment was successful!";
+  static const String failed = "Payment failed. Please try again.";
+  static const String processing = "Payment is processing...";
 }

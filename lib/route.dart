@@ -19,6 +19,7 @@ import 'package:fptu_bike_parking_system/representation/wallet_extra_screen.dart
 import 'package:fptu_bike_parking_system/representation/wallet_screen.dart';
 
 import '../representation/bai_screen.dart';
+import 'api/model/bai_model/coin_package_model.dart';
 import 'representation/home.dart';
 
 final Map<String, WidgetBuilder> routes = {
@@ -44,6 +45,11 @@ final Map<String, WidgetBuilder> routes = {
   PayOsScreen.routeName: (context) => const PayOsScreen(),
   HistoryScreen.routeName: (context) => const HistoryScreen(),
   WalletExtraScreen.routeName: (context) => const WalletExtraScreen(),
-  PaymentScreen.routeName: (context) => const PaymentScreen(),
+  PaymentScreen.routeName: (context) {
+    final agrs = ModalRoute.of(context)!.settings.arguments as CoinPackage;
+    return PaymentScreen(
+      package: agrs,
+    );
+  },
   ReceiptScreen.routeName: (context) => const ReceiptScreen(),
 };
