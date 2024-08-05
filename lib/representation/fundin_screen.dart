@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:fptu_bike_parking_system/api/model/bai_model/wallet_model.dart';
 import 'package:fptu_bike_parking_system/api/service/bai_be/package_service.dart';
+import 'package:fptu_bike_parking_system/api/service/bai_be/wallet_service.dart';
 import 'package:fptu_bike_parking_system/component/shadow_button.dart';
+import 'package:fptu_bike_parking_system/core/helper/util_helper.dart';
 import 'package:fptu_bike_parking_system/representation/payos.dart';
+import 'package:logger/web.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../api/model/bai_model/coin_package_model.dart';
@@ -236,6 +240,46 @@ class _FundinScreenState extends State<FundinScreen> {
     );
   }
 
+  CallWalletApi callWalletApi = CallWalletApi();
+  late int balance = 0;
+  late int extraBalance = 0;
+  DateTime? expiredDate;
+  var log = Logger();
+
+  Future<void> getBalance() async {
+    try {
+      final int? result = await callWalletApi.getMainWalletBalance();
+      setState(() {
+        balance = result ?? 0;
+        log.i('Main wallet balance: $balance');
+      });
+    } catch (e) {
+      log.e('Error during get main wallet balance: $e');
+    }
+  }
+
+  Future<void> getExtraBalance() async {
+    try {
+      ExtraBalanceModel? extraBalanceModel =
+          await callWalletApi.getExtraWalletBalance();
+      if (extraBalanceModel != null) {
+        setState(() {
+          extraBalance = extraBalanceModel.balance;
+          expiredDate = extraBalanceModel.expiredDate;
+        });
+      }
+    } catch (e) {
+      log.e('Error during get extra balance: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getBalance();
+    getExtraBalance();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -278,33 +322,24 @@ class _FundinScreenState extends State<FundinScreen> {
                             'TO',
                             style: Theme.of(context).textTheme.bodyLarge,
                           ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
+                          const SizedBox(width: 30),
                           Text(
-                            'BAI Wallet',
+                            'BAi Wallet',
                             style: Theme.of(context).textTheme.displayMedium,
                           ),
                         ],
                       ),
-                      const SizedBox(
-                        height: 5,
-                      ),
+                      const SizedBox(height: 5),
                       Divider(
                         color: Theme.of(context).colorScheme.outlineVariant,
                         thickness: 1,
                       ),
-                      const SizedBox(
-                        height: 5,
-                      ),
+                      const SizedBox(height: 5),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Current balance: ',
+                            'Current balance:',
                             style: Theme.of(context).textTheme.bodyLarge,
                           ),
                           Row(
@@ -318,13 +353,26 @@ class _FundinScreenState extends State<FundinScreen> {
                                 width: 10,
                               ),
                               Text(
-                                '45.000 bic',
+                                UltilHelper.formatNumber(balance),
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                             ],
                           )
                         ],
                       ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Extra balance:',
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                          Text(
+                            UltilHelper.formatNumber(extraBalance),
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        ],
+                      )
                     ],
                   ),
                 ),

@@ -430,10 +430,10 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Image(
-                            image: AssetImage(AssetHelper.imgLogo),
-                            fit: BoxFit.contain,
-                            width: 60,
+                          Image(
+                            image: const AssetImage(AssetHelper.imgLogo),
+                            fit: BoxFit.fitHeight,
+                            height: MediaQuery.of(context).size.height * 0.1,
                           ),
                           Text(
                             'Bai Parking',
@@ -448,7 +448,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                       ),
                       child: const Image(
                         image: AssetImage(AssetHelper.bai),
-                        fit: BoxFit.fitWidth,
+                        fit: BoxFit.fitHeight,
                       ),
                     ),
                   ],
