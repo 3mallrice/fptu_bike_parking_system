@@ -68,6 +68,8 @@ dependencies:
   animated_custom_dropdown: ^3.1.1
   http_parser: ^4.0.2
   flutter_zalopay_sdk: ^0.1.14
+  mime: ^1.0.5
+  # connectivity_plus_widget: ^1.0.5
 
 dev_dependencies:
   flutter_test:

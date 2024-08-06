@@ -1,5 +1,6 @@
 import 'dart:io';
 
+// import 'package:connectivity_plus_widget/connectivity/connectivity_plus_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
@@ -21,6 +22,7 @@ void main() async {
 
   //flutter init
   WidgetsFlutterBinding.ensureInitialized();
+  // ConnectivityPlusService().initConnectivityService();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
