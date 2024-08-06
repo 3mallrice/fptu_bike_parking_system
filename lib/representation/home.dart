@@ -532,6 +532,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                         style:
                             Theme.of(context).textTheme.titleMedium!.copyWith(
                                   fontWeight: FontWeight.w500,
+                                  fontSize: 14,
                                 ),
                       ),
                       Text(
@@ -541,6 +542,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                         style:
                             Theme.of(context).textTheme.titleMedium!.copyWith(
                                   fontWeight: FontWeight.w500,
+                                  fontSize: 14,
                                 ),
                       ),
                     ],
@@ -566,7 +568,9 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
               ),
               homeMainItem(
                 context,
-                () => Navigator.of(context).pushNamed(PaymentScreen.routeName),
+                () {
+                  //TODO: Do something here
+                },
                 Icons.insert_chart_outlined_rounded,
                 'Insights',
               ),

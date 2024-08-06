@@ -47,6 +47,7 @@ class _AddBaiState extends State<AddBai> {
   List<VehicleTypeModel> _vehicleType = [];
   bool isLoaded = false;
 
+  //get image from camera or gallery
   Future<void> selectImage(BuildContext context) async {
     try {
       ImageSource? source = await showSourceDialog(context);
@@ -55,15 +56,8 @@ class _AddBaiState extends State<AddBai> {
       XFile? imageFile = await ImagePicker().pickImage(source: source);
       if (imageFile == null) return;
 
-      String extension = imageFile.path.split('.').last.toLowerCase();
-      if (extension != 'png') {
-        String newPath = imageFile.path.replaceAll(extension, 'png');
-        await File(imageFile.path).rename(newPath);
-        imageFile = XFile(newPath);
-      }
-
       setState(() {
-        imageUrl = imageFile!.path;
+        imageUrl = imageFile.path;
       });
 
       log.i('Image successfully picked: $imageUrl');

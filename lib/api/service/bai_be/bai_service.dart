@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:fptu_bike_parking_system/api/model/bai_model/api_response.dart';
 import 'package:fptu_bike_parking_system/api/model/bai_model/bai_model.dart';
@@ -6,11 +7,15 @@ import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:logger/web.dart';
+import 'package:mime/mime.dart';
 
 class CallBikeApi {
   static const String baseUrl = 'https://backend.khangbpa.com/api';
   static const apiName = '/vehicles';
   final String api = baseUrl + apiName;
+
+  static const String detectUrl =
+      'https://platenumber.khangbpa.com/detect_read';
 
   String token = "";
   var log = Logger();
@@ -132,6 +137,45 @@ class CallBikeApi {
       }
     } catch (e) {
       log.e('Error during get bai: $e');
+      return null;
+    }
+  }
+
+  //POST: platenumber.khangbpa.com/detect_read
+  //'Content-Type: multipart/form-data'
+  // detect plate number
+  Future<PlateNumberResponse?> detectPlateNumber(File imageFile) async {
+    final url = Uri.parse(detectUrl);
+
+    // Xác định MIME type của ảnh
+    final mimeType = lookupMimeType(imageFile.path);
+    final mediaType = mimeType != null
+        ? MediaType.parse(mimeType)
+        : MediaType('application', 'octet-stream');
+
+    final request = http.MultipartRequest('POST', url)
+      ..headers['accept'] = '*/*'
+      ..files.add(await http.MultipartFile.fromPath(
+        'PlateImage',
+        imageFile.path,
+        contentType: mediaType,
+      ));
+
+    try {
+      final response = await request.send();
+      if (response.statusCode == 200) {
+        final responseBody = await response.stream.bytesToString();
+        PlateNumberResponse plateNumberResponse =
+            PlateNumberResponse.fromJson(jsonDecode(responseBody));
+
+        log.i('Success: $plateNumberResponse');
+        return plateNumberResponse;
+      } else {
+        log.e('Failed to detect plate number: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      log.e('Error during POST request: $e');
       return null;
     }
   }
