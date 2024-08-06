@@ -152,7 +152,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Outside weather',
+                          'Weather',
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                         Row(
