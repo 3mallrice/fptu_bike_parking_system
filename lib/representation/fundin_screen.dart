@@ -3,10 +3,11 @@ import 'package:fptu_bike_parking_system/api/model/bai_model/wallet_model.dart';
 import 'package:fptu_bike_parking_system/api/service/bai_be/package_service.dart';
 import 'package:fptu_bike_parking_system/api/service/bai_be/wallet_service.dart';
 import 'package:fptu_bike_parking_system/component/shadow_button.dart';
+import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
 import 'package:fptu_bike_parking_system/core/helper/util_helper.dart';
-import 'package:logger/web.dart';
 import 'package:fptu_bike_parking_system/representation/payment.dart';
 import 'package:logger/logger.dart';
+import 'package:logger/web.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../api/model/bai_model/coin_package_model.dart';
@@ -27,6 +28,7 @@ class FundinScreen extends StatefulWidget {
 class _FundinScreenState extends State<FundinScreen> {
   final CallPackageApi _packageApi = CallPackageApi();
   var log = Logger();
+  List<CoinPackage> _packages = [];
 
   // Get all active packages
   Future<List<CoinPackage>> _getPackages() async {
@@ -256,6 +258,27 @@ class _FundinScreenState extends State<FundinScreen> {
   late int balance = 0;
   late int extraBalance = 0;
   DateTime? expiredDate;
+  bool _hideBalance = false;
+  bool _isLoading = true;
+  String? _error;
+
+  Future<void> _loadHideBalance() async {
+    bool? hideBalance =
+        await LocalStorageHelper.getValue(LocalStorageKey.isHiddenBalance);
+    log.i('Hide balance: $hideBalance');
+    setState(() {
+      _hideBalance = hideBalance ?? false;
+    });
+  }
+
+  void _toggleHideBalance() {
+    setState(() {
+      _hideBalance = !_hideBalance;
+      LocalStorageHelper.setValue(
+          LocalStorageKey.isHiddenBalance, _hideBalance);
+      log.i('Toggle hide balance: $_hideBalance');
+    });
+  }
 
   Future<void> getBalance() async {
     try {
@@ -284,11 +307,28 @@ class _FundinScreenState extends State<FundinScreen> {
     }
   }
 
+  Future<void> _loadPackages() async {
+    try {
+      final packages = await _packageApi.getPackages();
+      setState(() {
+        _packages = packages ?? [];
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    _loadHideBalance();
     getBalance();
     getExtraBalance();
+    _loadPackages();
   }
 
   @override
@@ -321,70 +361,65 @@ class _FundinScreenState extends State<FundinScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ShadowContainer(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                            'TO',
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                          const SizedBox(width: 30),
-                          Text(
-                            'BAi Wallet',
-                            style: Theme.of(context).textTheme.displayMedium,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 5),
-                      Divider(
-                        color: Theme.of(context).colorScheme.outlineVariant,
-                        thickness: 1,
-                      ),
-                      const SizedBox(height: 5),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Current balance:',
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                          Row(
-                            children: [
-                              const Image(
-                                image: AssetImage(AssetHelper.bic),
-                                fit: BoxFit.fitWidth,
-                                width: 25,
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Text(
-                                UltilHelper.formatNumber(balance),
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                            ],
-                          )
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Extra balance:',
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                          Text(
-                            UltilHelper.formatNumber(extraBalance),
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                        ],
-                      )
-                    ],
+                GestureDetector(
+                  onTap: () => _toggleHideBalance(),
+                  child: ShadowContainer(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              'TO',
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                            const SizedBox(width: 30),
+                            Text(
+                              'BAi Wallet',
+                              style: Theme.of(context).textTheme.displayMedium,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 5),
+                        Divider(
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                          thickness: 1,
+                        ),
+                        const SizedBox(height: 5),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Current balance:',
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                            Text(
+                              _hideBalance
+                                  ? '******'
+                                  : 'bic ${UltilHelper.formatNumber(balance)}',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Extra balance:',
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                            Text(
+                              _hideBalance
+                                  ? '******'
+                                  : UltilHelper.formatNumber(extraBalance),
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(
@@ -404,9 +439,7 @@ class _FundinScreenState extends State<FundinScreen> {
                     height: MediaQuery.of(context).size.height * 0.1,
                   ),
                 ),
-                const SizedBox(
-                  height: 35,
-                ),
+                const SizedBox(height: 35),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 5),
                   child: Text(
@@ -414,31 +447,25 @@ class _FundinScreenState extends State<FundinScreen> {
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                 ),
-                FutureBuilder<List<CoinPackage>>(
-                  future: _getPackages(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      // TODO: Add loading spinner
-                      return Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      // TODO: Add error message
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      //TODO: Add no packages available message
-                      return Center(child: Text('No packages available'));
-                    } else {
-                      // get packages
-                      final packages = snapshot.data as List<CoinPackage>;
-                      return coinPackageGridView(packages);
-                    }
-                  },
-                )
+                _buildPackagesSection(),
               ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildPackagesSection() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    } else if (_error != null) {
+      return Center(child: Text('Error: $_error'));
+    } else if (_packages.isEmpty) {
+      return const Center(child: Text('No packages available'));
+    } else {
+      return coinPackageGridView(_packages);
+    }
   }
 
   Widget coinPackageGridView(List<CoinPackage> packages) {

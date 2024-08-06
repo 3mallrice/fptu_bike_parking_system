@@ -72,17 +72,13 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               Column(
                 children: [
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.27,
-                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.27),
                   Image.asset(
                     AssetHelper.imgLogo,
                     width: 200,
                     height: 200,
                   ),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.1,
-                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.1),
 
                   //Welcome
                   Container(
@@ -98,9 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
 
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.005,
-                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.005),
 
                   //to Bai APP
                   Container(
@@ -134,9 +128,19 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
 
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.03,
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.06),
+
+                  Container(
+                    alignment: Alignment.center,
+                    width: MediaQuery.of(context).size.width * 0.6,
+                    child: Text(
+                      'By signing in, you agree to our Terms of Service and Privacy Policy.',
+                      style: Theme.of(context).textTheme.labelSmall,
+                      textAlign: TextAlign.center,
+                    ),
                   ),
+
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
 
                   //Continue with Google
                   GestureDetector(
@@ -180,8 +184,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             height: 30,
                           ),
                           SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.03,
-                          ),
+                              width: MediaQuery.of(context).size.width * 0.03),
                           Text(
                             'Continue with Google',
                             style: Theme.of(context)
