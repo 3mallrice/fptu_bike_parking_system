@@ -1,25 +1,25 @@
 class HistoryModel {
   final String id;
   final DateTime timeIn;
-  final DateTime timeOut;
+  final DateTime? timeOut;
   final String status;
   final String plateNumber;
-  final int amount;
+  final int? amount;
   final String gateIn;
-  final String gateOut;
-  final String paymentMethod;
+  final String? gateOut;
+  final String? paymentMethod;
   final String parkingArea;
 
   HistoryModel({
     required this.id,
     required this.timeIn,
-    required this.timeOut,
+    this.timeOut,
     required this.status,
     required this.plateNumber,
-    required this.amount,
+    this.amount,
     required this.gateIn,
-    required this.gateOut,
-    required this.paymentMethod,
+    this.gateOut,
+    this.paymentMethod,
     required this.parkingArea,
   });
 
@@ -27,7 +27,7 @@ class HistoryModel {
     return HistoryModel(
       id: json['id'],
       timeIn: DateTime.parse(json['timeIn']),
-      timeOut: DateTime.parse(json['timeOut']),
+      timeOut: json['timeOut'] != null ? DateTime.parse(json['timeOut']) : null,
       status: json['status'],
       plateNumber: json['plateNumber'],
       amount: json['amount'],

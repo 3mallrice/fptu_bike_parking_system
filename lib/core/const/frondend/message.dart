@@ -57,6 +57,8 @@ class StaticMessage {
   static String emptyList = "Empty List!";
   static String emptyBaiList =
       "Oops! Looks like there are no ‘Bai’ items in the list. Please add some!";
+  static String emptyHistory =
+      "Oops! Looks like there are no history session in the list.";
 }
 
 class ZaloPayMessage {

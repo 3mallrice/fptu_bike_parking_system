@@ -30,16 +30,6 @@ class _FundinScreenState extends State<FundinScreen> {
   var log = Logger();
   List<CoinPackage> _packages = [];
 
-  // Get all active packages
-  Future<List<CoinPackage>> _getPackages() async {
-    final List<CoinPackage>? packages = await _packageApi.getPackages();
-    if (packages != null) {
-      return packages;
-    } else {
-      return [];
-    }
-  }
-
   void _showPackageDetail(CoinPackage package) {
     showBarModalBottomSheet(
       context: context,

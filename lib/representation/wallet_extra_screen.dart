@@ -197,7 +197,7 @@ class _WalletExtraScreenState extends State<WalletExtraScreen> {
                         ),
                         Text(
                           expiredDate != null
-                              ? '${UltilHelper.formatNumber(extraBalance)} bic sẽ hết hạn vào ${UltilHelper.formatDate(expiredDate!)}'
+                              ? '${UltilHelper.formatNumber(extraBalance)} bic will expire on ${UltilHelper.formatDate(expiredDate!)}'
                               : '${UltilHelper.formatNumber(extraBalance)} bic',
                           style: Theme.of(context)
                               .textTheme

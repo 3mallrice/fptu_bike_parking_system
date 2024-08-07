@@ -38,7 +38,9 @@ class ExtraBalanceModel {
   factory ExtraBalanceModel.fromJson(Map<String, dynamic> json) {
     return ExtraBalanceModel(
       balance: json['balance'],
-      expiredDate: json['expiredDate'],
+      expiredDate: json['expiredDate'] != null
+          ? DateTime.tryParse(json['expiredDate'])
+          : null,
     );
   }
 }

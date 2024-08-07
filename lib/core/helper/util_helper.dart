@@ -21,17 +21,22 @@ class UltilHelper {
   // Function to format date
   static String formatDate(DateTime date) {
     if (_isToday(date)) {
-      return 'Today';
+      return 'Today, ${formatDTS(date)}';
     } else if (_isYesterday(date)) {
-      return 'Yesterday';
+      return 'Yesterday, ${formatDTS(date)}';
     } else {
-      return DateFormat('dd/MM/yyyy').format(date);
+      return formatDTS(date);
     }
+  }
+
+  // Function to format date and time seconds
+  static String formatDTS(DateTime date) {
+    return DateFormat('dd/MM/yyyy HH:mm:ss').format(date);
   }
 
   // Function to format date and time
   static String formatDateTime(DateTime date) {
-    return DateFormat('dd/MM/yyyy HH:mm:ss').format(date);
+    return DateFormat('dd/MM/yyyy HH:mm').format(date);
   }
 
   // Function to format number

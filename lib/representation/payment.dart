@@ -8,7 +8,7 @@ import 'package:fptu_bike_parking_system/component/my_radio_button.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
 import 'package:fptu_bike_parking_system/core/const/frondend/message.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
-import 'package:fptu_bike_parking_system/representation/home.dart';
+import 'package:fptu_bike_parking_system/representation/navigation_bar.dart';
 import 'package:logger/logger.dart';
 
 import '../api/model/bai_model/zalopay_model.dart';
@@ -216,7 +216,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   ),
                                   const SizedBox(height: 5),
                                   Text(
-                                    UltilHelper.formatDateTime(DateTime.now()),
+                                    UltilHelper.formatDTS(DateTime.now()),
                                     style: Theme.of(context)
                                         .textTheme
                                         .labelSmall!
@@ -479,7 +479,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         //redirect to home screen if payment success
         if (type == 1) {
           //close payment screen
-          Navigator.of(context).pushReplacementNamed(HomeAppScreen.routeName);
+          Navigator.of(context).pushReplacementNamed(MyNavigationBar.routeName);
         }
       });
     } else {

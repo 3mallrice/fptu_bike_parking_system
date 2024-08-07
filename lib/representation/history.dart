@@ -8,7 +8,9 @@ import 'package:fptu_bike_parking_system/core/helper/util_helper.dart';
 import 'package:fptu_bike_parking_system/representation/add_feedback.dart';
 import 'package:logger/logger.dart';
 
+import '../component/empty_box.dart';
 import '../component/shadow_container.dart';
+import '../core/const/frondend/message.dart';
 
 class HistoryScreen extends StatefulWidget {
   static String routeName = '/history_screen';
@@ -66,8 +68,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   width: MediaQuery.of(context).size.width * 0.9,
                   child: (isLoading)
                       ? const Center(child: CircularProgressIndicator())
-                      : (apiResponse.data.isEmpty)
-                          ? const Center(child: Center(child: Text('No found')))
+                      : (apiResponse.data == null || apiResponse.data.isEmpty)
+                          ? EmptyBox(message: StaticMessage.emptyHistory)
                           : ListView.builder(
                               shrinkWrap: true,
                               itemCount: apiResponse.data.length,
@@ -130,7 +132,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                                 CrossAxisAlignment.center,
                                             children: [
                                               Expanded(
-                                                flex: 3,
+                                                flex: 1,
                                                 child: Column(
                                                   mainAxisAlignment:
                                                       MainAxisAlignment.center,
@@ -138,21 +140,28 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                                       CrossAxisAlignment.start,
                                                   children: [
                                                     historyInfo(
-                                                      'Time in:',
+                                                      'Time in',
                                                       UltilHelper
                                                           .formatDateTime(
                                                               apiResponse
                                                                   .data[index]
                                                                   .timeIn),
+                                                      isTime: true,
                                                     ),
                                                     const SizedBox(height: 10),
                                                     historyInfo(
-                                                      'Time out:',
-                                                      UltilHelper
-                                                          .formatDateTime(
-                                                              apiResponse
-                                                                  .data[index]
-                                                                  .timeOut),
+                                                      'Time out',
+                                                      apiResponse.data[index]
+                                                                  .timeOut !=
+                                                              null
+                                                          ? UltilHelper
+                                                              .formatDateTime(
+                                                                  apiResponse
+                                                                      .data[
+                                                                          index]
+                                                                      .timeOut)
+                                                          : "",
+                                                      isTime: true,
                                                     ),
                                                   ],
                                                 ),
@@ -161,22 +170,27 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                                 flex: 1,
                                                 child: Column(
                                                   crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
+                                                      CrossAxisAlignment.end,
                                                   mainAxisAlignment:
                                                       MainAxisAlignment.center,
                                                   children: [
                                                     historyInfo(
-                                                      'Gate in:',
+                                                      'Gate in',
                                                       apiResponse
                                                           .data[index].gateIn
                                                           .toString(),
                                                     ),
                                                     const SizedBox(height: 10),
                                                     historyInfo(
-                                                      'Gate out:',
-                                                      apiResponse
-                                                          .data[index].gateOut
-                                                          .toString(),
+                                                      'Gate out',
+                                                      apiResponse.data[index]
+                                                                  .gateOut !=
+                                                              null
+                                                          ? apiResponse
+                                                              .data[index]
+                                                              .gateOut
+                                                              .toString()
+                                                          : "",
                                                     ),
                                                   ],
                                                 ),
@@ -203,7 +217,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                                 CrossAxisAlignment.center,
                                             children: [
                                               IconButton(
-                                                onPressed: () {},
+                                                onPressed: () {
+                                                  //TODO: Share
+                                                },
                                                 icon: const Icon(
                                                     Icons.share_rounded),
                                                 color: Theme.of(context)
@@ -219,8 +235,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                                   children: [
                                                     Text(
                                                       apiResponse.data[index]
-                                                          .paymentMethod
-                                                          .toString(),
+                                                                  .paymentMethod !=
+                                                              null
+                                                          ? apiResponse
+                                                              .data[index]
+                                                              .paymentMethod
+                                                              .toString()
+                                                          : "",
                                                       style: Theme.of(context)
                                                           .textTheme
                                                           .bodyLarge!
@@ -231,29 +252,43 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                                                 .outline,
                                                           ),
                                                     ),
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment.end,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        Image.asset(
-                                                          AssetHelper.bic,
-                                                          width: 25,
-                                                          fit: BoxFit.fitWidth,
-                                                        ),
-                                                        const SizedBox(
-                                                            width: 5),
-                                                        Text(
-                                                          '${UltilHelper.formatNumber(apiResponse.data[index].amount)} bic',
-                                                          style: Theme.of(
-                                                                  context)
-                                                              .textTheme
-                                                              .displayMedium,
-                                                        ),
-                                                      ],
-                                                    )
+                                                    apiResponse.data[index]
+                                                                .amount !=
+                                                            null
+                                                        ? Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .end,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Image.asset(
+                                                                AssetHelper.bic,
+                                                                width: 25,
+                                                                fit: BoxFit
+                                                                    .fitWidth,
+                                                              ),
+                                                              const SizedBox(
+                                                                  width: 5),
+                                                              Text(
+                                                                '${UltilHelper.formatNumber(apiResponse.data[index].amount)} bic',
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .displayMedium,
+                                                              )
+                                                            ],
+                                                          )
+                                                        : Text(
+                                                            apiResponse
+                                                                .data[index]
+                                                                .status,
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .titleMedium,
+                                                          ),
                                                   ],
                                                 ),
                                               ),
@@ -275,21 +310,25 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-  Widget historyInfo(String title, String value) {
+  Widget historyInfo(String title, String value, {bool isTime = false}) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment:
+          !isTime ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
           title,
           style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                 color: Theme.of(context).colorScheme.onSecondary,
+                fontSize: 14,
               ),
+          textAlign: TextAlign.end,
         ),
         Text(
           value,
           style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                 color: Theme.of(context).colorScheme.outline,
+                fontSize: 12,
               ),
         ),
       ],
