@@ -6,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart'
 import 'package:fptu_bike_parking_system/api/model/bai_model/wallet_model.dart';
 import 'package:fptu_bike_parking_system/api/service/bai_be/wallet_service.dart';
 import 'package:fptu_bike_parking_system/core/helper/util_helper.dart';
+import 'package:fptu_bike_parking_system/representation/insight.dart';
 import 'package:fptu_bike_parking_system/representation/navigation_bar.dart';
 import 'package:fptu_bike_parking_system/representation/wallet_extra_screen.dart';
 import 'package:fptu_bike_parking_system/representation/wallet_screen.dart';
@@ -602,9 +603,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
               ),
               homeMainItem(
                 context,
-                () {
-                  //TODO: Do something here
-                },
+                () => Navigator.of(context).pushNamed(InsightScreen.routeName),
                 Icons.insert_chart_outlined_rounded,
                 'Insights',
               ),

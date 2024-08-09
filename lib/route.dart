@@ -6,6 +6,7 @@ import 'package:fptu_bike_parking_system/representation/add_feedback.dart';
 import 'package:fptu_bike_parking_system/representation/feedback.dart';
 import 'package:fptu_bike_parking_system/representation/fundin_screen.dart';
 import 'package:fptu_bike_parking_system/representation/history.dart';
+import 'package:fptu_bike_parking_system/representation/insight.dart';
 import 'package:fptu_bike_parking_system/representation/intro_screen.dart';
 import 'package:fptu_bike_parking_system/representation/login.dart';
 import 'package:fptu_bike_parking_system/representation/me.dart';
@@ -52,4 +53,5 @@ final Map<String, WidgetBuilder> routes = {
     );
   },
   ReceiptScreen.routeName: (context) => const ReceiptScreen(),
+  InsightScreen.routeName: (context) => const InsightScreen(),
 };
