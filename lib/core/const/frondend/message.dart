@@ -46,6 +46,7 @@ class ErrorMessage {
       "Action Failed! Please input valid fields for $message";
 
   static String underDevelopment = "This feature is under development!";
+  static String tokenInvalid = "Token is invalid!";
 }
 
 class ImageName {
@@ -59,6 +60,8 @@ class StaticMessage {
       "Oops! Looks like there are no ‘Bai’ items in the list. Please add some!";
   static String emptyHistory =
       "Oops! Looks like there are no history session in the list.";
+  static String tokenIsExpired =
+      "Oops! Your session has expired. Please login again!";
 }
 
 class ZaloPayMessage {

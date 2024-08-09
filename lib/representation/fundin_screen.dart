@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/api/model/bai_model/wallet_model.dart';
 import 'package:fptu_bike_parking_system/api/service/bai_be/package_service.dart';
 import 'package:fptu_bike_parking_system/api/service/bai_be/wallet_service.dart';
+import 'package:fptu_bike_parking_system/component/dialog.dart';
 import 'package:fptu_bike_parking_system/component/shadow_button.dart';
+import 'package:fptu_bike_parking_system/core/const/frondend/message.dart';
 import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
 import 'package:fptu_bike_parking_system/core/helper/util_helper.dart';
+import 'package:fptu_bike_parking_system/representation/login.dart';
 import 'package:fptu_bike_parking_system/representation/payment.dart';
 import 'package:logger/logger.dart';
 import 'package:logger/web.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
+import '../api/model/bai_model/api_response.dart';
 import '../api/model/bai_model/coin_package_model.dart';
 import '../component/app_bar_component.dart';
 import '../component/shadow_container.dart';
@@ -272,9 +276,31 @@ class _FundinScreenState extends State<FundinScreen> {
 
   Future<void> getBalance() async {
     try {
-      final int? result = await callWalletApi.getMainWalletBalance();
+      final APIResponse<int> result =
+          await callWalletApi.getMainWalletBalance();
+
+      if (result.isTokenValid == false &&
+          result.message == ErrorMessage.tokenInvalid) {
+        log.e('Token is invalid');
+
+        if (!mounted) return;
+        //show error dialog
+        OKDialog(
+          title: ErrorMessage.error,
+          content: Text(
+            ErrorMessage.errorWhileLoading,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          onClick: () => Navigator.of(context).pushNamedAndRemoveUntil(
+            LoginScreen.routeName,
+            (route) => false,
+          ),
+        );
+        return;
+      }
+
       setState(() {
-        balance = result ?? 0;
+        balance = result.data ?? 0;
         log.i('Main wallet balance: $balance');
       });
     } catch (e) {

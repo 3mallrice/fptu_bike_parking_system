@@ -8,6 +8,7 @@ import 'package:fptu_bike_parking_system/representation/navigation_bar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 
+import '../api/model/bai_model/api_response.dart';
 import '../component/app_bar_component.dart';
 import '../component/shadow_button.dart';
 import '../component/snackbar.dart';
@@ -28,7 +29,8 @@ class _AddBaiState extends State<AddBai> {
   var log = Logger();
   String? imageUrl;
   String? _selectedVehicleTypeId;
-  String? _plateNumber;
+  late String _plateNumber;
+  late String responseText;
   final TextEditingController _plateNumberController = TextEditingController();
   CallBikeApi api = CallBikeApi();
   bool isValidInput = true;
@@ -47,7 +49,6 @@ class _AddBaiState extends State<AddBai> {
   List<VehicleTypeModel> _vehicleType = [];
   bool isLoaded = false;
 
-  //get image from camera or gallery
   Future<void> selectImage(BuildContext context) async {
     try {
       ImageSource? source = await showSourceDialog(context);
@@ -56,20 +57,59 @@ class _AddBaiState extends State<AddBai> {
       XFile? imageFile = await ImagePicker().pickImage(source: source);
       if (imageFile == null) return;
 
+      String imagePath = imageFile.path;
+
       setState(() {
-        imageUrl = imageFile.path;
+        imageUrl = imagePath;
       });
 
       log.i('Image successfully picked: $imageUrl');
-    } catch (e) {
+
+      await detectPlateNumber(File(imagePath));
+    } catch (e, stackTrace) {
       log.e('Error picking image: $e');
+      log.e(stackTrace);
+    }
+  }
+
+// Get plate number from image
+  Future<void> detectPlateNumber(File imageFile) async {
+    try {
+      // Show loading
+      LoadingOverlayHelper.show(context);
+
+      // Detect plate number
+      PlateNumberResponse? plateNumberResponse =
+          await api.detectPlateNumber(imageFile);
+
+      // Hide loading
+      LoadingOverlayHelper.hide();
+
+      if (plateNumberResponse?.data?.plateNumber != null) {
+        _plateNumber = plateNumberResponse!.data!.plateNumber;
+
+        log.i('Plate number detected: $_plateNumber');
+
+        setState(() {
+          _plateNumberController.text = _plateNumber;
+        });
+      } else {
+        log.e('Failed to detect plate number');
+
+        //remove image
+        setState(() {
+          imageUrl = null;
+        });
+      }
+    } catch (e, stackTrace) {
+      LoadingOverlayHelper.hide();
+      log.e('Error detecting plate number: $e');
+      log.e(stackTrace);
     }
   }
 
   Future<void> _saveVehicleRegistration() async {
-    if (imageUrl != null &&
-        _selectedVehicleTypeId != null &&
-        _plateNumber != null) {
+    if (imageUrl != null && _selectedVehicleTypeId != null) {
       BaiModel baiModel = BaiModel(
         plateNumber: _plateNumber,
         plateImageFile: File(imageUrl!),
@@ -143,7 +183,6 @@ class _AddBaiState extends State<AddBai> {
 
   @override
   Widget build(BuildContext context) {
-    log.i('Building AddBai widget');
     return Scaffold(
       appBar: const AppBarCom(
         leading: true,
@@ -294,7 +333,7 @@ class _AddBaiState extends State<AddBai> {
                             setState(() {
                               isValidInput =
                                   Regex.plateRegExp.hasMatch(currentValue);
-                              _plateNumber = isValidInput ? currentValue : null;
+                              _plateNumber = isValidInput ? currentValue : '';
                             });
                           },
                           style: Theme.of(context).textTheme.bodyMedium,

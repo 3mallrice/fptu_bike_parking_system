@@ -15,6 +15,7 @@ import 'package:geolocator/geolocator.dart'
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:logger/logger.dart' show Logger;
 
+import '../api/model/bai_model/api_response.dart';
 import '../api/model/weather/weather.dart' show WeatherData;
 import '../api/service/weather/open_weather_api.dart' show OpenWeatherApi;
 import '../component/shadow_container.dart' show ShadowContainer;
@@ -118,9 +119,10 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
 
   Future<void> getBalance() async {
     try {
-      final int? result = await callWalletApi.getMainWalletBalance();
+      final APIResponse<int> result =
+          await callWalletApi.getMainWalletBalance();
       setState(() {
-        balance = result ?? 0;
+        balance = result.data ?? 0;
         log.i('Main wallet balance: $balance');
       });
     } catch (e) {

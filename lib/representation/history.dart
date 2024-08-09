@@ -56,253 +56,267 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Align(
-          alignment: Alignment.center,
-          child: Container(
-            margin: const EdgeInsets.only(top: 10),
-            child: Column(
-              children: [
-                //History list
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  child: (isLoading)
-                      ? const Center(child: CircularProgressIndicator())
-                      : (apiResponse.data == null || apiResponse.data.isEmpty)
-                          ? EmptyBox(message: StaticMessage.emptyHistory)
-                          : ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: apiResponse.data.length,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemBuilder: (context, index) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 20),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      Navigator.of(context).pushNamed(
-                                        AddFeedbackScreen.routeName,
-                                        arguments: apiResponse.data[index].id,
-                                      );
-                                    },
-                                    child: ShadowContainer(
-                                      border: Border.all(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .outline,
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 20,
-                                        horizontal: 40,
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          Text(
-                                            apiResponse.data[index].parkingArea,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyMedium!
-                                                .copyWith(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.w700,
-                                                ),
-                                          ),
-                                          Container(
-                                            margin: const EdgeInsets.symmetric(
-                                                vertical: 10),
-                                            child: DottedLine(
-                                              direction: Axis.horizontal,
-                                              alignment: WrapAlignment.center,
-                                              lineLength: double.infinity,
-                                              lineThickness: 1.0,
-                                              dashColor: Theme.of(context)
-                                                  .colorScheme
-                                                  .outline,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Align(
+            alignment: Alignment.center,
+            child: Container(
+              margin: const EdgeInsets.only(top: 10),
+              child: Column(
+                children: [
+                  //History list
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    child: (isLoading)
+                        ? const Center(child: CircularProgressIndicator())
+                        : (apiResponse.data == null || apiResponse.data.isEmpty)
+                            ? EmptyBox(message: StaticMessage.emptyHistory)
+                            : ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: apiResponse.data.length,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 20),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.of(context).pushNamed(
+                                          AddFeedbackScreen.routeName,
+                                          arguments: apiResponse.data[index].id,
+                                        );
+                                      },
+                                      child: ShadowContainer(
+                                        border: Border.all(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outline,
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 20,
+                                          horizontal: 40,
+                                        ),
+                                        child: Column(
+                                          children: [
+                                            Text(
+                                              apiResponse
+                                                  .data[index].parkingArea,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium!
+                                                  .copyWith(
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
                                             ),
-                                          ),
-                                          Text(
-                                            apiResponse.data[index].plateNumber,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headlineMedium,
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceEvenly,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              Expanded(
-                                                flex: 1,
-                                                child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    historyInfo(
-                                                      'Time in',
-                                                      UltilHelper
-                                                          .formatDateTime(
-                                                              apiResponse
-                                                                  .data[index]
-                                                                  .timeIn),
-                                                      isTime: true,
-                                                    ),
-                                                    const SizedBox(height: 10),
-                                                    historyInfo(
-                                                      'Time out',
-                                                      apiResponse.data[index]
-                                                                  .timeOut !=
-                                                              null
-                                                          ? UltilHelper
-                                                              .formatDateTime(
-                                                                  apiResponse
-                                                                      .data[
-                                                                          index]
-                                                                      .timeOut)
-                                                          : "",
-                                                      isTime: true,
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              Expanded(
-                                                flex: 1,
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.end,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    historyInfo(
-                                                      'Gate in',
-                                                      apiResponse
-                                                          .data[index].gateIn
-                                                          .toString(),
-                                                    ),
-                                                    const SizedBox(height: 10),
-                                                    historyInfo(
-                                                      'Gate out',
-                                                      apiResponse.data[index]
-                                                                  .gateOut !=
-                                                              null
-                                                          ? apiResponse
-                                                              .data[index]
-                                                              .gateOut
-                                                              .toString()
-                                                          : "",
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          Container(
-                                            margin: const EdgeInsets.symmetric(
-                                                vertical: 10),
-                                            child: DottedLine(
-                                              direction: Axis.horizontal,
-                                              alignment: WrapAlignment.center,
-                                              lineLength: double.infinity,
-                                              lineThickness: 1.0,
-                                              dashColor: Theme.of(context)
-                                                  .colorScheme
-                                                  .outline,
-                                            ),
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              IconButton(
-                                                onPressed: () {
-                                                  //TODO: Share
-                                                },
-                                                icon: const Icon(
-                                                    Icons.share_rounded),
-                                                color: Theme.of(context)
+                                            Container(
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 10),
+                                              child: DottedLine(
+                                                direction: Axis.horizontal,
+                                                alignment: WrapAlignment.center,
+                                                lineLength: double.infinity,
+                                                lineThickness: 1.0,
+                                                dashColor: Theme.of(context)
                                                     .colorScheme
                                                     .outline,
                                               ),
-                                              Expanded(
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.end,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Text(
-                                                      apiResponse.data[index]
-                                                                  .paymentMethod !=
-                                                              null
-                                                          ? apiResponse
-                                                              .data[index]
-                                                              .paymentMethod
-                                                              .toString()
-                                                          : "",
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .bodyLarge!
-                                                          .copyWith(
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .colorScheme
-                                                                .outline,
-                                                          ),
-                                                    ),
-                                                    apiResponse.data[index]
-                                                                .amount !=
-                                                            null
-                                                        ? Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .end,
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              Image.asset(
-                                                                AssetHelper.bic,
-                                                                width: 25,
-                                                                fit: BoxFit
-                                                                    .fitWidth,
-                                                              ),
-                                                              const SizedBox(
-                                                                  width: 5),
-                                                              Text(
-                                                                '${UltilHelper.formatNumber(apiResponse.data[index].amount)} bic',
-                                                                style: Theme.of(
-                                                                        context)
-                                                                    .textTheme
-                                                                    .displayMedium,
-                                                              )
-                                                            ],
-                                                          )
-                                                        : Text(
-                                                            apiResponse
-                                                                .data[index]
-                                                                .status,
-                                                            style: Theme.of(
-                                                                    context)
-                                                                .textTheme
-                                                                .titleMedium,
-                                                          ),
-                                                  ],
+                                            ),
+                                            Text(
+                                              apiResponse
+                                                  .data[index].plateNumber,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headlineMedium,
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceEvenly,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Expanded(
+                                                  flex: 1,
+                                                  child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      historyInfo(
+                                                        'Time in',
+                                                        UltilHelper
+                                                            .formatDateTime(
+                                                                apiResponse
+                                                                    .data[index]
+                                                                    .timeIn),
+                                                        isTime: true,
+                                                      ),
+                                                      const SizedBox(
+                                                          height: 10),
+                                                      historyInfo(
+                                                        'Time out',
+                                                        apiResponse.data[index]
+                                                                    .timeOut !=
+                                                                null
+                                                            ? UltilHelper
+                                                                .formatDateTime(
+                                                                    apiResponse
+                                                                        .data[
+                                                                            index]
+                                                                        .timeOut)
+                                                            : "",
+                                                        isTime: true,
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
+                                                Expanded(
+                                                  flex: 1,
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.end,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      historyInfo(
+                                                        'Gate in',
+                                                        apiResponse
+                                                            .data[index].gateIn
+                                                            .toString(),
+                                                      ),
+                                                      const SizedBox(
+                                                          height: 10),
+                                                      historyInfo(
+                                                        'Gate out',
+                                                        apiResponse.data[index]
+                                                                    .gateOut !=
+                                                                null
+                                                            ? apiResponse
+                                                                .data[index]
+                                                                .gateOut
+                                                                .toString()
+                                                            : "",
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            Container(
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 10),
+                                              child: DottedLine(
+                                                direction: Axis.horizontal,
+                                                alignment: WrapAlignment.center,
+                                                lineLength: double.infinity,
+                                                lineThickness: 1.0,
+                                                dashColor: Theme.of(context)
+                                                    .colorScheme
+                                                    .outline,
                                               ),
-                                            ],
-                                          )
-                                        ],
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                IconButton(
+                                                  onPressed: () {
+                                                    //TODO: Share
+                                                  },
+                                                  icon: const Icon(
+                                                      Icons.share_rounded),
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .outline,
+                                                ),
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.end,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Text(
+                                                        apiResponse.data[index]
+                                                                    .paymentMethod !=
+                                                                null
+                                                            ? apiResponse
+                                                                .data[index]
+                                                                .paymentMethod
+                                                                .toString()
+                                                            : "",
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .bodyLarge!
+                                                            .copyWith(
+                                                              color: Theme.of(
+                                                                      context)
+                                                                  .colorScheme
+                                                                  .outline,
+                                                            ),
+                                                      ),
+                                                      apiResponse.data[index]
+                                                                  .amount !=
+                                                              null
+                                                          ? Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .end,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                Image.asset(
+                                                                  AssetHelper
+                                                                      .bic,
+                                                                  width: 25,
+                                                                  fit: BoxFit
+                                                                      .fitWidth,
+                                                                ),
+                                                                const SizedBox(
+                                                                    width: 5),
+                                                                Text(
+                                                                  '${UltilHelper.formatNumber(apiResponse.data[index].amount)} bic',
+                                                                  style: Theme.of(
+                                                                          context)
+                                                                      .textTheme
+                                                                      .displayMedium,
+                                                                )
+                                                              ],
+                                                            )
+                                                          : Text(
+                                                              apiResponse
+                                                                  .data[index]
+                                                                  .status,
+                                                              style: Theme.of(
+                                                                      context)
+                                                                  .textTheme
+                                                                  .titleMedium,
+                                                            ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                );
-                              },
-                            ),
-                ),
-              ],
+                                  );
+                                },
+                              ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fptu_bike_parking_system/api/model/bai_model/api_response.dart';
 import 'package:fptu_bike_parking_system/api/model/bai_model/wallet_model.dart';
 import 'package:fptu_bike_parking_system/api/service/bai_be/wallet_service.dart';
 import 'package:fptu_bike_parking_system/core/helper/util_helper.dart';
@@ -49,9 +50,10 @@ class _MyWalletState extends State<MyWallet> {
 
   Future<void> getBalance() async {
     try {
-      final int? result = await callWalletApi.getMainWalletBalance();
+      final APIResponse<int> result =
+          await callWalletApi.getMainWalletBalance();
       setState(() {
-        balance = result ?? 0;
+        balance = result.data ?? 0;
         log.i('Main wallet balance: $balance');
       });
     } catch (e) {

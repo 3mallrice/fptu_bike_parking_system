@@ -44,4 +44,11 @@ class UltilHelper {
   static String formatNumber(int number) {
     return NumberFormat.decimalPattern('vi_VN').format(number);
   }
+
+  // Function to format currency
+  // eg: 100000 -> 100
+  static String formatCurrency(int number) {
+    return NumberFormat.currency(locale: 'vi_VN', symbol: '')
+        .format(number / 1000);
+  }
 }
