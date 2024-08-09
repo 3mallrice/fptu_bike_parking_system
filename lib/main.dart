@@ -1,7 +1,5 @@
 import 'dart:io';
 
-// import 'package:connectivity_plus_widget/connectivity/connectivity_plus_service.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
 import 'package:fptu_bike_parking_system/representation/splash_screen.dart';
@@ -9,7 +7,6 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
 
 import 'core/theme/theme_provider.dart';
-import 'firebase_options.dart';
 import 'route.dart';
 
 void main() async {
@@ -22,10 +19,6 @@ void main() async {
 
   //flutter init
   WidgetsFlutterBinding.ensureInitialized();
-  // ConnectivityPlusService().initConnectivityService();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
 
   /*This should be used while in development mode, 
   do NOT do this when you want to release to production, 

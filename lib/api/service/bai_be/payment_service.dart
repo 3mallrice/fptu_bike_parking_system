@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:fptu_bike_parking_system/api/model/bai_model/api_response.dart';
 import 'package:fptu_bike_parking_system/api/model/bai_model/zalopay_model.dart';
+import 'package:fptu_bike_parking_system/core/const/frondend/message.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
@@ -18,13 +19,16 @@ class CallPaymentApi {
 
   //POST: /api/deposit/{packageId}
   //Deposit money to get coin via ZaloPay
-  Future<ZaloPayModel?> depositCoin(String packageId) async {
+  Future<APIResponse<ZaloPayModel>> depositCoin(String packageId) async {
     try {
       token = GetLocalHelper.getBearerToken();
 
       if (token.isEmpty) {
         log.e('Token is empty');
-        return null;
+        return APIResponse(
+          isTokenValid: false,
+          message: ErrorMessage.tokenInvalid,
+        );
       }
 
       final response = await http.post(
@@ -42,34 +46,23 @@ class CallPaymentApi {
         );
 
         log.i('Deposit coin: $jsonResponse');
-        return apiResponse.data;
+        return apiResponse;
+      } else if (response.statusCode == 401) {
+        log.e('Token is invalid');
+
+        return APIResponse(
+          isTokenValid: false,
+          message: ErrorMessage.tokenInvalid,
+        );
       } else {
         log.e('Failed to deposit coin: ${response.statusCode}');
-        return null;
+        return APIResponse(
+            message:
+                "${ErrorMessage.somethingWentWrong}: Status code ${response.statusCode}");
       }
     } catch (e) {
       log.e('Error during deposit coin: $e');
+      return APIResponse(message: "${ErrorMessage.somethingWentWrong}: $e");
     }
-    return null;
-  }
-
-  //POST: /callback
-  //Callback from ZaloPay to open ZaloPay app
-  Future<bool> callbackZaloPay() async {
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/callback'),
-      );
-      if (response.statusCode == 200) {
-        log.i('Callback ZaloPay: ${response.body}');
-        return true;
-      } else {
-        log.e('Failed to callback ZaloPay: ${response.statusCode}');
-        return false;
-      }
-    } catch (e) {
-      log.e('Error during callback ZaloPay: $e');
-    }
-    return false;
   }
 }

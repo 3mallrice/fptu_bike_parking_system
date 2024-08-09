@@ -43,6 +43,7 @@ ThemeData lightMode = ThemeData(
   ),
   dividerColor: ColorLightMode.primaryText,
   useMaterial3: true,
+
   //Display: H1
   //headline: H2
   //title: H3

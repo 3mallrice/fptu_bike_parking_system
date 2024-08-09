@@ -6,11 +6,13 @@ class APIResponse<T> {
   final T? data;
   final String? message;
   final int? totalRecord;
+  final bool isTokenValid;
 
   APIResponse({
     this.data,
     this.message,
     this.totalRecord,
+    this.isTokenValid = true,
   });
 
   factory APIResponse.fromJson(
@@ -24,7 +26,7 @@ class APIResponse<T> {
 
   @override
   String toString() {
-    return 'APIResponse{data: $data, message: $message, totalRecord: $totalRecord}';
+    return 'APIResponse{data: $data, message: $message, totalRecord: $totalRecord, isTokenValid: $isTokenValid}';
   }
 }
 

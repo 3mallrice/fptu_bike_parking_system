@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/api/model/bai_model/login_model.dart';
 import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
 import 'package:fptu_bike_parking_system/representation/feedback.dart';
+import 'package:fptu_bike_parking_system/representation/navigation_bar.dart';
 import 'package:logger/logger.dart';
 
 import '../core/helper/asset_helper.dart';
@@ -32,20 +33,28 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    CircleAvatar(
-                      radius: 20,
-                      backgroundColor: Theme.of(context).colorScheme.surface,
-                      child: userData.avatar == null
-                          ? Image.asset(
-                              AssetHelper.imgLogo,
-                              fit: BoxFit.fill,
-                            )
-                          : ClipOval(
-                              child: Image.network(
-                                userData.avatar ?? '',
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pushNamed(
+                          MyNavigationBar.routeName,
+                          arguments: 3, //me screen
+                        );
+                      },
+                      child: CircleAvatar(
+                        radius: 20,
+                        backgroundColor: Theme.of(context).colorScheme.surface,
+                        child: userData.avatar == null
+                            ? Image.asset(
+                                AssetHelper.imgLogo,
                                 fit: BoxFit.fill,
+                              )
+                            : ClipOval(
+                                child: Image.network(
+                                  userData.avatar ?? '',
+                                  fit: BoxFit.fill,
+                                ),
                               ),
-                            ),
+                      ),
                     ),
                     const SizedBox(width: 10),
                     Column(

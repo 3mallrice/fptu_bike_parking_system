@@ -123,154 +123,91 @@ class _MeScreenState extends State<MeScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      InkWell(
-                        onTap: () {
+                      meItem(
+                        Icons.account_circle_outlined,
+                        Text(
+                          'View Profile',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium!
+                              .copyWith(fontSize: 18),
+                        ),
+                        () {
                           Navigator.of(context)
                               .pushNamed(ProfileScreen.routeName);
                         },
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.account_circle_outlined,
-                                color: Theme.of(context).colorScheme.outline,
-                                size: 28,
-                              ),
-                              const SizedBox(width: 20),
-                              Text(
-                                'View Profile',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium!
-                                    .copyWith(fontSize: 18),
-                              ),
-                            ],
-                          ),
-                        ),
                       ),
                       Divider(
                         color: Theme.of(context).colorScheme.outlineVariant,
                         thickness: 1,
                       ),
-                      InkWell(
-                        onTap: _toggleHideBalance,
-                        child: Container(
-                          padding: const EdgeInsets.all(10.0),
-                          width: double.infinity,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Icon(
-                                _hideBalance
-                                    ? Icons.visibility_off_outlined
-                                    : Icons.visibility_outlined,
-                                color: Theme.of(context).colorScheme.outline,
-                                size: 28,
-                              ),
-                              const SizedBox(width: 20),
-                              Expanded(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Hide Balance',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium!
-                                          .copyWith(fontSize: 18),
-                                    ),
-                                    Text(
-                                      '* Your balances on home screen will appear as ******\n* To reveal, hold on your balance',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall!
-                                          .copyWith(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSecondary,
-                                            fontSize: 12,
-                                          ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
+                      meItem(
+                        _hideBalance
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Hide Balance',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium!
+                                  .copyWith(fontSize: 18),
+                            ),
+                            Text(
+                              '* Your balances on home screen will appear as ******\n* To reveal, hold on your balance',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSecondary,
+                                    fontSize: 12,
+                                  ),
+                            ),
+                          ],
                         ),
+                        _toggleHideBalance,
                       ),
                       Divider(
                         color: Theme.of(context).colorScheme.outlineVariant,
                         thickness: 1,
                       ),
-                      InkWell(
-                        onTap: () {
-                          Navigator.of(context).pushNamed(AboutUs.routeName);
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.info_outlined,
-                                color: Theme.of(context).colorScheme.outline,
-                                size: 28,
-                              ),
-                              const SizedBox(width: 20),
-                              Text(
-                                'About Bai',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium!
-                                    .copyWith(fontSize: 18),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                      meItem(
+                          Icons.info_outlined,
+                          Text(
+                            'About Bai',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(fontSize: 18),
+                          ), () {
+                        Navigator.of(context).pushNamed(AboutUs.routeName);
+                      })
                     ],
                   ),
                 ),
                 const SizedBox(height: 20),
                 ShadowContainer(
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  child: GestureDetector(
-                    onTap: () => {
-                      _logout(),
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.logout_rounded,
-                            color: Theme.of(context).colorScheme.primary,
-                            size: 28,
-                          ),
-                          const SizedBox(width: 20),
-                          Text(
-                            'Logout',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium!
-                                .copyWith(
-                                  fontSize: 18,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    child: meItem(
+                        Icons.logout_rounded,
+                        iconColor: Theme.of(context).colorScheme.primary,
+                        Text(
+                          'Logout',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium!
+                              .copyWith(
+                                fontSize: 18,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                        ), () {
+                      _logout();
+                    })),
                 const SizedBox(height: 70),
               ],
             ),
@@ -288,5 +225,24 @@ class _MeScreenState extends State<MeScreen> {
       initials += part[0];
     }
     return initials.toUpperCase();
+  }
+
+  Widget meItem(IconData iconData, Widget content, VoidCallback onTap,
+      {Color? iconColor}) {
+    return ListTile(
+      iconColor: iconColor,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+      horizontalTitleGap: 10,
+      leadingAndTrailingTextStyle: Theme.of(context).textTheme.titleMedium,
+      leading: Icon(
+        iconData,
+        size: 28,
+      ),
+      title: Padding(
+        padding: const EdgeInsets.all(10),
+        child: content,
+      ),
+      onTap: onTap,
+    );
   }
 }

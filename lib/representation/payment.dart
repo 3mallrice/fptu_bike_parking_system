@@ -1,6 +1,7 @@
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_zalopay_sdk/flutter_zalopay_sdk.dart';
+import 'package:fptu_bike_parking_system/api/model/bai_model/api_response.dart';
 import 'package:fptu_bike_parking_system/api/model/bai_model/coin_package_model.dart';
 import 'package:fptu_bike_parking_system/api/service/bai_be/payment_service.dart';
 import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
@@ -56,10 +57,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
     });
 
     try {
-      final ZaloPayModel? zaloPayMd = await _paymentApi.depositCoin(packageId);
-      if (zaloPayMd != null) {
+      final APIResponse<ZaloPayModel> zaloPayMd =
+          await _paymentApi.depositCoin(packageId);
+      if (!zaloPayMd.isTokenValid) {}
+      if (zaloPayMd.data != null) {
         setState(() {
-          zaloPayModel = zaloPayMd;
+          zaloPayModel = zaloPayMd.data!;
           isLoading = false; // Đặt isLoading thành false khi hoàn thành
         });
       }

@@ -4,6 +4,7 @@ import 'package:fptu_bike_parking_system/api/model/bai_model/api_response.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
+import '../../../core/const/frondend/message.dart';
 import '../../../core/helper/local_storage_helper.dart';
 import '../../model/bai_model/wallet_model.dart';
 
@@ -96,13 +97,16 @@ class CallWalletApi {
 
   // GET: /api/wallet/balance/main
   // Get balance of user's main wallet
-  Future<int?> getMainWalletBalance() async {
+  Future<APIResponse<int>> getMainWalletBalance() async {
     try {
       token = GetLocalHelper.getBearerToken();
 
       if (token.isEmpty) {
         log.e('Token is empty');
-        return null;
+        return APIResponse<int>(
+          message: ErrorMessage.tokenInvalid,
+          isTokenValid: false,
+        );
       }
 
       final response = await http.get(
@@ -119,15 +123,23 @@ class CallWalletApi {
           (json) => int.parse(json.toString()),
         );
 
-        return apiResponse.data;
+        return apiResponse;
+      } else if (response.statusCode == 401) {
+        return APIResponse(
+          message: ErrorMessage.tokenInvalid,
+          isTokenValid: false,
+        );
       } else {
         log.e('Failed to get main wallet balance: ${response.statusCode}');
-        return null;
+        return APIResponse(
+            message:
+                "${ErrorMessage.somethingWentWrong}: Status code ${response.statusCode}");
       }
     } catch (e) {
       log.e('Error during get main wallet balance: $e');
+
+      return APIResponse(message: "${ErrorMessage.somethingWentWrong}: $e");
     }
-    return null;
   }
 
   // GET: /api/wallet/balance/extra
