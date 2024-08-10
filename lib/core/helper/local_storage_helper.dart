@@ -40,13 +40,15 @@ class LocalStorageKey {
 }
 
 class GetLocalHelper {
-  static UserData getUserData() {
-    return UserData.fromJson(
-        LocalStorageHelper.getValue(LocalStorageKey.userData));
+  static UserData? getUserData() {
+    return LocalStorageHelper.getValue(LocalStorageKey.userData) != null
+        ? UserData.fromJson(
+            LocalStorageHelper.getValue(LocalStorageKey.userData))
+        : null;
   }
 
-  static String getBearerToken() {
-    UserData userData = getUserData();
-    return 'Bearer ${userData.bearerToken ?? ""}';
+  static String? getBearerToken() {
+    UserData? userData = getUserData();
+    return userData != null ? 'Bearer ${userData.bearerToken ?? ""}' : null;
   }
 }

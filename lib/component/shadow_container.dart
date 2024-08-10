@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ShadowContainer extends StatelessWidget {
+  final AlignmentGeometry? alignment;
   final double? width;
   final double? height;
   final EdgeInsetsGeometry? margin;
@@ -14,6 +15,7 @@ class ShadowContainer extends StatelessWidget {
     /// A widget that wraps a child with a shadow effect.
     /// made by [Maotou] with ❤️.
     super.key,
+    this.alignment,
     this.width,
 
     /// The width of the container.
@@ -38,6 +40,7 @@ class ShadowContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      alignment: alignment,
       width: width ?? double.infinity,
       height: height,
       margin: margin,

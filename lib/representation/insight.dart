@@ -18,7 +18,6 @@ class InsightScreen extends StatefulWidget {
 class _InsightScreenState extends State<InsightScreen> {
   //fake data for testing
   // HowDidYouPark
-  // Dữ liệu thử nghiệm với sự thay đổi không đều
   List<HowDidYouParkAndSpend> howDidYouParkList = [
     HowDidYouParkAndSpend(
       date: DateTime.now(),

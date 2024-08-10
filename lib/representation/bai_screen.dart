@@ -1,5 +1,6 @@
 import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:flutter/material.dart';
+import 'package:fptu_bike_parking_system/api/model/bai_model/api_response.dart';
 import 'package:fptu_bike_parking_system/component/empty_box.dart';
 import 'package:logger/web.dart';
 
@@ -7,6 +8,7 @@ import '../api/model/bai_model/bai_model.dart';
 import '../api/service/bai_be/bai_service.dart';
 import '../component/image_not_found_component.dart';
 import '../component/loading_component.dart';
+import '../component/return_login_component.dart';
 import '../component/shadow_container.dart';
 import '../core/const/frondend/message.dart';
 import '../core/helper/asset_helper.dart';
@@ -33,12 +35,33 @@ class _BaiScreenState extends State<BaiScreen> {
     fetchBikes();
   }
 
+  //return login dialog
+  void returnLoginDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const InvalidTokenDialog();
+      },
+    );
+  }
+
   Future<void> fetchBikes() async {
     try {
-      final List<BaiModel>? fetchedBikes = await api.getBai();
+      final APIResponse<List<BaiModel>> fetchedBikes = await api.getBai();
+
+      if (fetchedBikes.isTokenValid == false &&
+          fetchedBikes.message == ErrorMessage.tokenInvalid) {
+        log.e('Token is invalid');
+
+        if (!mounted) return;
+        //show error dialog
+        returnLoginDialog();
+        return;
+      }
+
       if (mounted) {
         setState(() {
-          bikes = fetchedBikes;
+          bikes = fetchedBikes.data;
           isCalling = false;
         });
       }

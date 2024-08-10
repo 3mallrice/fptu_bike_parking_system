@@ -9,6 +9,8 @@ import 'package:fptu_bike_parking_system/representation/add_feedback.dart';
 import 'package:logger/logger.dart';
 
 import '../component/empty_box.dart';
+import '../component/loading_component.dart';
+import '../component/return_login_component.dart';
 import '../component/shadow_container.dart';
 import '../core/const/frondend/message.dart';
 
@@ -29,21 +31,36 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   Future<void> getCustomerHistories() async {
     try {
-      final APIResponse<List<HistoryModel>?>? result =
+      final APIResponse<List<HistoryModel>> result =
           await callHistoryAPI.getCustomerHistories();
-      setState(() {
-        if (result != null && result.data != null) {
-          apiResponse = result;
-        } else {
-          log.e('Failed to get customer histories: ${result?.message}');
-        }
-      });
+
+      if (result.isTokenValid == false &&
+          result.message == ErrorMessage.tokenInvalid) {
+        log.e('Token is invalid');
+
+        if (!mounted) return;
+        //show error dialog
+        returnLoginDialog();
+        return;
+      }
+
+      if (mounted) {
+        setState(() {
+          if (result.data != null) {
+            apiResponse = result;
+          } else {
+            log.e('Failed to get customer histories: ${result.message}');
+          }
+        });
+      }
     } catch (e) {
       log.e('Error during get customer histories: $e');
     } finally {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -67,8 +84,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   //History list
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.9,
-                    child: (isLoading)
-                        ? const Center(child: CircularProgressIndicator())
+                    child: isLoading
+                        ? const LoadingCircle()
                         : (apiResponse.data == null || apiResponse.data.isEmpty)
                             ? EmptyBox(message: StaticMessage.emptyHistory)
                             : ListView.builder(
@@ -285,7 +302,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                                                 const SizedBox(
                                                                     width: 5),
                                                                 Text(
-                                                                  '${UltilHelper.formatNumber(apiResponse.data[index].amount)} bic',
+                                                                  '${UltilHelper.formatMoney(apiResponse.data[index].amount)} bic',
                                                                   style: Theme.of(
                                                                           context)
                                                                       .textTheme
@@ -321,6 +338,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  //return login dialog
+  void returnLoginDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const InvalidTokenDialog();
+      },
     );
   }
 

@@ -41,7 +41,7 @@ class UltilHelper {
 
   // Function to format number
   // eg: 100000 -> 100.000
-  static String formatNumber(int number) {
+  static String formatMoney(int number) {
     return NumberFormat.decimalPattern('vi_VN').format(number);
   }
 

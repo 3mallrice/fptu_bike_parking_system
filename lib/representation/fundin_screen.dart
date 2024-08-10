@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/api/model/bai_model/wallet_model.dart';
 import 'package:fptu_bike_parking_system/api/service/bai_be/package_service.dart';
 import 'package:fptu_bike_parking_system/api/service/bai_be/wallet_service.dart';
-import 'package:fptu_bike_parking_system/component/dialog.dart';
+import 'package:fptu_bike_parking_system/component/loading_component.dart';
 import 'package:fptu_bike_parking_system/component/shadow_button.dart';
 import 'package:fptu_bike_parking_system/core/const/frondend/message.dart';
 import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
 import 'package:fptu_bike_parking_system/core/helper/util_helper.dart';
-import 'package:fptu_bike_parking_system/representation/login.dart';
 import 'package:fptu_bike_parking_system/representation/payment.dart';
 import 'package:logger/logger.dart';
 import 'package:logger/web.dart';
@@ -16,6 +15,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import '../api/model/bai_model/api_response.dart';
 import '../api/model/bai_model/coin_package_model.dart';
 import '../component/app_bar_component.dart';
+import '../component/return_login_component.dart';
 import '../component/shadow_container.dart';
 import '../core/helper/asset_helper.dart';
 import 'wallet_screen.dart';
@@ -31,7 +31,15 @@ class FundinScreen extends StatefulWidget {
 
 class _FundinScreenState extends State<FundinScreen> {
   final CallPackageApi _packageApi = CallPackageApi();
+  final CallWalletApi _walletApi = CallWalletApi();
+
   var log = Logger();
+  late int balance = 0;
+  late int extraBalance = 0;
+  DateTime? expiredDate;
+  bool _hideBalance = false;
+  bool _isLoading = true;
+  String? _error;
   List<CoinPackage> _packages = [];
 
   void _showPackageDetail(CoinPackage package) {
@@ -124,7 +132,7 @@ class _FundinScreenState extends State<FundinScreen> {
                 ),
                 Expanded(
                   child: Text(
-                    '${UltilHelper.formatNumber(package.price)}đ',
+                    '${UltilHelper.formatMoney(package.price)}đ',
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
                           color: Theme.of(context).colorScheme.outline,
                           fontSize: 19,
@@ -217,7 +225,7 @@ class _FundinScreenState extends State<FundinScreen> {
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   height: MediaQuery.of(context).size.height * 0.07,
                   buttonTitle:
-                      '${UltilHelper.formatNumber(package.price)} VND - BUY NOW',
+                      '${UltilHelper.formatMoney(package.price)} VND - BUY NOW',
                   textStyle: Theme.of(context).textTheme.titleLarge!.copyWith(
                         fontSize: 20,
                         color: Theme.of(context).colorScheme.surface,
@@ -248,14 +256,6 @@ class _FundinScreenState extends State<FundinScreen> {
     );
   }
 
-  CallWalletApi callWalletApi = CallWalletApi();
-  late int balance = 0;
-  late int extraBalance = 0;
-  DateTime? expiredDate;
-  bool _hideBalance = false;
-  bool _isLoading = true;
-  String? _error;
-
   Future<void> _loadHideBalance() async {
     bool? hideBalance =
         await LocalStorageHelper.getValue(LocalStorageKey.isHiddenBalance);
@@ -276,8 +276,7 @@ class _FundinScreenState extends State<FundinScreen> {
 
   Future<void> getBalance() async {
     try {
-      final APIResponse<int> result =
-          await callWalletApi.getMainWalletBalance();
+      final APIResponse<int> result = await _walletApi.getMainWalletBalance();
 
       if (result.isTokenValid == false &&
           result.message == ErrorMessage.tokenInvalid) {
@@ -285,17 +284,7 @@ class _FundinScreenState extends State<FundinScreen> {
 
         if (!mounted) return;
         //show error dialog
-        OKDialog(
-          title: ErrorMessage.error,
-          content: Text(
-            ErrorMessage.errorWhileLoading,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          onClick: () => Navigator.of(context).pushNamedAndRemoveUntil(
-            LoginScreen.routeName,
-            (route) => false,
-          ),
-        );
+        returnLoginDialog();
         return;
       }
 
@@ -310,17 +299,38 @@ class _FundinScreenState extends State<FundinScreen> {
 
   Future<void> getExtraBalance() async {
     try {
-      ExtraBalanceModel? extraBalanceModel =
-          await callWalletApi.getExtraWalletBalance();
-      if (extraBalanceModel != null) {
+      APIResponse<ExtraBalanceModel> extraBalanceModel =
+          await _walletApi.getExtraWalletBalance();
+
+      if (extraBalanceModel.isTokenValid == false &&
+          extraBalanceModel.message == ErrorMessage.tokenInvalid) {
+        log.e('Token is invalid');
+
+        if (!mounted) return;
+        //show error dialog
+        returnLoginDialog();
+        return;
+      }
+
+      if (extraBalanceModel.data != null) {
         setState(() {
-          extraBalance = extraBalanceModel.balance;
-          expiredDate = extraBalanceModel.expiredDate;
+          extraBalance = extraBalanceModel.data!.balance;
+          expiredDate = extraBalanceModel.data!.expiredDate;
         });
       }
     } catch (e) {
       log.e('Error during get extra balance: $e');
     }
+  }
+
+  //return login dialog
+  void returnLoginDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const InvalidTokenDialog();
+      },
+    );
   }
 
   Future<void> _loadPackages() async {
@@ -414,7 +424,7 @@ class _FundinScreenState extends State<FundinScreen> {
                             Text(
                               _hideBalance
                                   ? '******'
-                                  : 'bic ${UltilHelper.formatNumber(balance)}',
+                                  : 'bic ${UltilHelper.formatMoney(balance)}',
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
                           ],
@@ -429,7 +439,7 @@ class _FundinScreenState extends State<FundinScreen> {
                             Text(
                               _hideBalance
                                   ? '******'
-                                  : UltilHelper.formatNumber(extraBalance),
+                                  : UltilHelper.formatMoney(extraBalance),
                               style: Theme.of(context).textTheme.bodyMedium,
                             ),
                           ],
@@ -474,7 +484,7 @@ class _FundinScreenState extends State<FundinScreen> {
 
   Widget _buildPackagesSection() {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const LoadingCircle(isHeight: false, size: 50);
     } else if (_error != null) {
       return Center(child: Text('Error: $_error'));
     } else if (_packages.isEmpty) {
@@ -511,7 +521,7 @@ class _FundinScreenState extends State<FundinScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        '${UltilHelper.formatNumber(int.parse(packages[index].amount) + (packages[index].extraCoin ?? 0))} bic',
+                        '${UltilHelper.formatMoney(int.parse(packages[index].amount) + (packages[index].extraCoin ?? 0))} bic',
                         style:
                             Theme.of(context).textTheme.titleMedium!.copyWith(
                                   fontSize: 16,

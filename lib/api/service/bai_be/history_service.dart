@@ -6,23 +6,28 @@ import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/web.dart';
 
+import '../../../core/const/frondend/message.dart';
+import 'api_root.dart';
+
 class CallHistoryAPI {
-  static const String baseUrl = 'https://backend.khangbpa.com/api';
   static const apiName = '/session';
-  final String api = baseUrl + apiName;
+  final String api = APIRoot.root + apiName;
 
   String token = "";
   var log = Logger();
 
   // GET: /api/session/history
   // Get all user's history
-  Future<APIResponse<List<HistoryModel>?>?> getCustomerHistories() async {
+  Future<APIResponse<List<HistoryModel>>> getCustomerHistories() async {
     try {
-      token = GetLocalHelper.getBearerToken();
+      token = GetLocalHelper.getBearerToken() ?? "";
 
-      if (token.isEmpty) {
+      if (token == "") {
         log.e('Token is empty');
-        return null;
+        return APIResponse(
+          message: 'Token is empty',
+          isTokenValid: false,
+        );
       }
 
       final response = await http.get(
@@ -46,11 +51,15 @@ class CallHistoryAPI {
         return apiResponse;
       } else {
         log.e('Failed to get customer histories: ${response.statusCode}');
-        return null;
+        return APIResponse(
+          message: '${ErrorMessage.somethingWentWrong}: ${response.statusCode}',
+        );
       }
     } catch (e) {
       log.e('Error during get customer histories: $e');
     }
-    return null;
+    return APIResponse(
+      message: 'Error during get customer histories',
+    );
   }
 }

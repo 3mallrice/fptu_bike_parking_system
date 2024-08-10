@@ -10,6 +10,7 @@ import 'package:logger/logger.dart';
 
 import '../api/model/bai_model/api_response.dart';
 import '../component/app_bar_component.dart';
+import '../component/return_login_component.dart';
 import '../component/shadow_button.dart';
 import '../component/snackbar.dart';
 import '../core/const/frondend/message.dart';
@@ -58,10 +59,11 @@ class _AddBaiState extends State<AddBai> {
       if (imageFile == null) return;
 
       String imagePath = imageFile.path;
-
-      setState(() {
-        imageUrl = imagePath;
-      });
+      if (mounted) {
+        setState(() {
+          imageUrl = imagePath;
+        });
+      }
 
       log.i('Image successfully picked: $imageUrl');
 
@@ -90,22 +92,36 @@ class _AddBaiState extends State<AddBai> {
 
         log.i('Plate number detected: $_plateNumber');
 
-        setState(() {
-          _plateNumberController.text = _plateNumber;
-        });
+        if (mounted) {
+          setState(() {
+            _plateNumberController.text = _plateNumber;
+          });
+        }
       } else {
         log.e('Failed to detect plate number');
 
         //remove image
-        setState(() {
-          imageUrl = null;
-        });
+        if (mounted) {
+          setState(() {
+            imageUrl = null;
+          });
+        }
       }
     } catch (e, stackTrace) {
       LoadingOverlayHelper.hide();
       log.e('Error detecting plate number: $e');
       log.e(stackTrace);
     }
+  }
+
+  //return login dialog
+  void returnLoginDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const InvalidTokenDialog();
+      },
+    );
   }
 
   Future<void> _saveVehicleRegistration() async {
@@ -116,9 +132,19 @@ class _AddBaiState extends State<AddBai> {
         vehicleTypeId: _selectedVehicleTypeId!,
       );
 
-      BaiModel? result = await api.createBai(baiModel);
+      APIResponse<BaiModel> result = await api.createBai(baiModel);
 
-      if (result != null) {
+      if (result.isTokenValid == false &&
+          result.message == ErrorMessage.tokenInvalid) {
+        log.e('Token is invalid');
+
+        if (!mounted) return;
+        //show error dialog
+        returnLoginDialog();
+        return;
+      }
+
+      if (result.data != null) {
         log.i('Vehicle registration saved successfully');
         showCustomSnackBar(
           MySnackBar(
@@ -169,15 +195,19 @@ class _AddBaiState extends State<AddBai> {
     try {
       List<VehicleTypeModel>? vehicleType = await api.getVehicleType();
 
-      setState(() {
-        _vehicleType = vehicleType ?? [];
-        isLoaded = true;
-      });
+      if (mounted) {
+        setState(() {
+          _vehicleType = vehicleType ?? [];
+          isLoaded = true;
+        });
+      }
     } catch (e) {
       log.e('Error fetching vehicle type: $e');
-      setState(() {
-        isLoaded = true;
-      });
+      if (mounted) {
+        setState(() {
+          isLoaded = true;
+        });
+      }
     }
   }
 
@@ -268,9 +298,11 @@ class _AddBaiState extends State<AddBai> {
                             );
                           }).toList(),
                           onChanged: (String? newValue) {
-                            setState(() {
-                              _selectedVehicleTypeId = newValue;
-                            });
+                            if (mounted) {
+                              setState(() {
+                                _selectedVehicleTypeId = newValue;
+                              });
+                            }
                             log.i('Selected vehicle type: $newValue');
                           },
                           isExpanded: true,
@@ -319,22 +351,26 @@ class _AddBaiState extends State<AddBai> {
                           onChanged: (value) {
                             String updatedValue = value.toUpperCase();
 
-                            setState(() {
-                              _plateNumberController.value =
-                                  _plateNumberController.value.copyWith(
-                                text: updatedValue,
-                                selection: TextSelection.collapsed(
-                                    offset: updatedValue.length),
-                              );
-                            });
+                            if (mounted) {
+                              setState(() {
+                                _plateNumberController.value =
+                                    _plateNumberController.value.copyWith(
+                                  text: updatedValue,
+                                  selection: TextSelection.collapsed(
+                                      offset: updatedValue.length),
+                                );
+                              });
+                            }
                           },
                           onEditingComplete: () {
                             String currentValue = _plateNumberController.text;
-                            setState(() {
-                              isValidInput =
-                                  Regex.plateRegExp.hasMatch(currentValue);
-                              _plateNumber = isValidInput ? currentValue : '';
-                            });
+                            if (mounted) {
+                              setState(() {
+                                isValidInput =
+                                    Regex.plateRegExp.hasMatch(currentValue);
+                                _plateNumber = isValidInput ? currentValue : '';
+                              });
+                            }
                           },
                           style: Theme.of(context).textTheme.bodyMedium,
                           decoration: InputDecoration(

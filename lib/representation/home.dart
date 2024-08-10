@@ -10,15 +10,16 @@ import 'package:fptu_bike_parking_system/representation/insight.dart';
 import 'package:fptu_bike_parking_system/representation/navigation_bar.dart';
 import 'package:fptu_bike_parking_system/representation/wallet_extra_screen.dart';
 import 'package:fptu_bike_parking_system/representation/wallet_screen.dart';
-import 'package:geolocator/geolocator.dart'
-    show Geolocator, LocationAccuracy, Position;
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:logger/logger.dart' show Logger;
 
 import '../api/model/bai_model/api_response.dart';
 import '../api/model/weather/weather.dart' show WeatherData;
 import '../api/service/weather/open_weather_api.dart' show OpenWeatherApi;
+import '../component/return_login_component.dart';
 import '../component/shadow_container.dart' show ShadowContainer;
+import '../core/const/frondend/message.dart';
 import '../core/helper/asset_helper.dart' show AssetHelper;
 import '../core/helper/local_storage_helper.dart';
 import 'fundin_screen.dart' show FundinScreen;
@@ -35,6 +36,8 @@ class HomeAppScreen extends StatefulWidget {
 class _HomeAppScreenState extends State<HomeAppScreen> {
   bool _hideBalance = false;
   var log = Logger();
+  bool isAllowLocation = false;
+  bool isReloading = false;
 
   Future<void> _loadHideBalance() async {
     bool? hideBalance =
@@ -52,11 +55,21 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
   String visibility = "...";
   String aqi = "...";
 
-  Future getLocation() async {
-    await Geolocator.checkPermission();
-    await Geolocator.requestPermission();
+  Future<void> getLocation() async {
+    final permission = await Geolocator.checkPermission();
 
-    Position position = await Geolocator.getCurrentPosition(
+    if (permission == LocationPermission.denied) {
+      await Geolocator.requestPermission();
+    }
+
+    setState(() {
+      isAllowLocation = permission == LocationPermission.always ||
+          permission == LocationPermission.whileInUse;
+    });
+
+    if (!isAllowLocation) return;
+
+    final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.medium);
 
     if (mounted) {
@@ -69,21 +82,33 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
     log.i('Latitude: $lat/nLongitude: $lon');
   }
 
-  //get data from API
   void getWeather() async {
+    setState(() {
+      isReloading = true;
+    });
+
     await getLocation();
+    if (!isAllowLocation) {
+      setState(() {
+        isReloading = false;
+      });
+      return;
+    }
+
     weatherData = await OpenWeatherApi.fetchWeather(lat, lon);
-    visibility = (weatherData!.visibility / 1000).toStringAsFixed(2);
     aqi = await OpenWeatherApi.fetchAirQuality(lat, lon);
+    visibility = (weatherData!.visibility / 1000).toStringAsFixed(2);
+
     if (mounted) {
       setState(() {
-        weatherData = weatherData;
-        visibility = visibility;
-        aqi = aqi;
         log.i('Visibility: $visibility km');
+        log.i('Weather: ${weatherData!.weather[0].main}');
       });
     }
-    log.i('Weather: ${weatherData!.weather[0].main}');
+
+    setState(() {
+      isReloading = false;
+    });
   }
 
   @override
@@ -112,15 +137,25 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
     super.dispose();
   }
 
-  CallWalletApi callWalletApi = CallWalletApi();
+  final CallWalletApi _walletApi = CallWalletApi();
   late int balance = 0;
   late int extraBalance = 0;
   late FocusNode _focusNode;
 
   Future<void> getBalance() async {
     try {
-      final APIResponse<int> result =
-          await callWalletApi.getMainWalletBalance();
+      final APIResponse<int> result = await _walletApi.getMainWalletBalance();
+
+      if (result.isTokenValid == false &&
+          result.message == ErrorMessage.tokenInvalid) {
+        log.e('Token is invalid');
+
+        if (!mounted) return;
+        //show error dialog
+        returnLoginDialog();
+        return;
+      }
+
       setState(() {
         balance = result.data ?? 0;
         log.i('Main wallet balance: $balance');
@@ -132,16 +167,37 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
 
   Future<void> getExtraBalance() async {
     try {
-      ExtraBalanceModel? extraBalanceModel =
-          await callWalletApi.getExtraWalletBalance();
-      if (extraBalanceModel != null) {
+      APIResponse<ExtraBalanceModel> extraBalanceModel =
+          await _walletApi.getExtraWalletBalance();
+
+      if (extraBalanceModel.isTokenValid == false &&
+          extraBalanceModel.message == ErrorMessage.tokenInvalid) {
+        log.e('Token is invalid');
+
+        if (!mounted) return;
+        //show error dialog
+        returnLoginDialog();
+        return;
+      }
+
+      if (extraBalanceModel.data != null) {
         setState(() {
-          extraBalance = extraBalanceModel.balance;
+          extraBalance = extraBalanceModel.data!.balance;
         });
       }
     } catch (e) {
       log.e('Error during get extra balance: $e');
     }
+  }
+
+  //return login dialog
+  void returnLoginDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const InvalidTokenDialog();
+      },
+    );
   }
 
   @override
@@ -179,276 +235,343 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                           ),
                           Row(
                             children: [
-                              Text(
-                                '${weatherData?.name ?? '...'}, ${weatherData?.sys.country ?? '...'}',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium!
-                                    .copyWith(
-                                      fontSize: 12,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSecondary,
+                              isAllowLocation
+                                  ? Text(
+                                      isReloading
+                                          ? 'Loading...'
+                                          : '${weatherData?.name ?? '...'}, ${weatherData?.sys.country ?? '...'}',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium!
+                                          .copyWith(
+                                            fontSize: 12,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSecondary,
+                                          ),
+                                    )
+                                  : Text(
+                                      'Enable location permission',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium!
+                                          .copyWith(
+                                            fontSize: 12,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSecondary,
+                                          ),
                                     ),
-                              ),
                               const SizedBox(width: 5),
                               GestureDetector(
                                 onTap: () => getWeather(),
-                                child: Icon(
-                                  Icons.refresh_rounded,
-                                  color: Theme.of(context).colorScheme.primary,
-                                  size: 18,
-                                ),
+                                child: isReloading
+                                    ? Container(
+                                        margin: const EdgeInsets.symmetric(
+                                            horizontal: 5),
+                                        width: 10,
+                                        height: 10,
+                                        child: CircularProgressIndicator(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : Icon(
+                                        Icons.refresh_rounded,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        size: 18,
+                                      ),
                               ),
                             ],
                           ),
                         ],
                       ),
                       const SizedBox(height: 13),
-                      //weather data
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                (weatherData?.weather[0].icon == null)
-                                    ? const Icon(Icons.hourglass_top_rounded)
-                                    : Image.network(
-                                        'http://openweathermap.org/img/wn/${weatherData?.weather[0].icon}.png',
-                                        alignment: Alignment.center,
-                                        fit: BoxFit.contain,
-                                        filterQuality: FilterQuality.high,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                      ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            flex: 3,
-                            child: Column(
-                              children: [
-                                Text(
-                                  '${weatherData?.main.temp ?? '...'}°C',
-                                  style:
-                                      Theme.of(context).textTheme.titleMedium,
-                                ),
-                                Text(
-                                  'Real feel: ${weatherData?.main.feelsLike ?? '...'}°C',
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            // Temperature and cloud
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  flex: 2,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        FontAwesomeIcons.temperatureHalf,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary
-                                            .withOpacity(0.6),
-                                      ),
-                                      const SizedBox(height: 6),
-                                      Icon(
-                                        FontAwesomeIcons.cloud,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary
-                                            .withOpacity(0.6),
-                                      )
-                                    ],
+                      (isAllowLocation == false)
+                          ? Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 20, horizontal: 30),
+                              child: Column(
+                                children: [
+                                  Icon(
+                                    Icons.remove_circle_rounded,
+                                    size: 50,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
                                   ),
-                                ),
-                                const Expanded(
-                                  flex: 1,
-                                  child: SizedBox(),
-                                ),
-                                Expanded(
-                                  flex: 5,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '${weatherData?.main.temp ?? '...'}°C',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyMedium,
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Text(
-                                        '${weatherData?.clouds.all ?? '...'}%',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyMedium,
-                                      ),
-                                    ],
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    Message.enableLocationService,
+                                    style:
+                                        Theme.of(context).textTheme.bodyMedium,
+                                    textAlign: TextAlign.center,
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            // Wind speed and humidity
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  flex: 2,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        FontAwesomeIcons.wind,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary
-                                            .withOpacity(0.6),
-                                      ),
-                                      const SizedBox(height: 6),
-                                      Icon(
-                                        FontAwesomeIcons.droplet,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary
-                                            .withOpacity(0.6),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                const Expanded(
-                                  flex: 1,
-                                  child: SizedBox(),
-                                ),
-                                Expanded(
-                                  flex: 5,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '${weatherData?.wind.speed ?? '...'} m/s',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyMedium,
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Text(
-                                        '${weatherData?.main.humidity ?? '...'}%',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyMedium,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            // Wind speed and humidity
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  flex: 2,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.visibility_rounded,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary
-                                            .withOpacity(0.6),
-                                      ),
-                                      const SizedBox(height: 6),
-                                      Text(
-                                        'AQI',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyMedium!
-                                            .copyWith(
-                                              fontWeight: FontWeight.bold,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary
-                                                  .withOpacity(0.6),
-                                            ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                const Expanded(
-                                  flex: 1,
-                                  child: SizedBox(),
-                                ),
-                                Expanded(
-                                  flex: 5,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '$visibility km',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyMedium,
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Text(
-                                        aqi,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyMedium,
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      Align(
-                        alignment: Alignment.topRight,
-                        child: Text(
-                          'Last updated: ${weatherData == null ? 'loading...' : getLastUpdated(weatherData!)}',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall!
-                              .copyWith(
-                                fontSize: 10,
-                                color:
-                                    Theme.of(context).colorScheme.onSecondary,
+                                ],
                               ),
-                        ),
-                      ),
+                            )
+                          : Column(
+                              children: [
+                                //weather data
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Expanded(
+                                      flex: 1,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          (weatherData?.weather[0].icon == null)
+                                              ? const Icon(
+                                                  Icons.hourglass_top_rounded)
+                                              : Image.network(
+                                                  'http://openweathermap.org/img/wn/${weatherData?.weather[0].icon}.png',
+                                                  alignment: Alignment.center,
+                                                  fit: BoxFit.contain,
+                                                  filterQuality:
+                                                      FilterQuality.high,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .primary,
+                                                ),
+                                        ],
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 3,
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            '${weatherData?.main.temp ?? '...'}°C',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium,
+                                          ),
+                                          Text(
+                                            'Real feel: ${weatherData?.main.feelsLike ?? '...'}°C',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium,
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Expanded(
+                                      flex: 1,
+                                      // Temperature and cloud
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            flex: 2,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  FontAwesomeIcons
+                                                      .temperatureHalf,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .primary
+                                                      .withOpacity(0.6),
+                                                ),
+                                                const SizedBox(height: 6),
+                                                Icon(
+                                                  FontAwesomeIcons.cloud,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .primary
+                                                      .withOpacity(0.6),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                          const Expanded(
+                                            flex: 1,
+                                            child: SizedBox(),
+                                          ),
+                                          Expanded(
+                                            flex: 5,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  '${weatherData?.main.temp ?? '...'}°C',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium,
+                                                ),
+                                                const SizedBox(height: 10),
+                                                Text(
+                                                  '${weatherData?.clouds.all ?? '...'}%',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 1,
+                                      // Wind speed and humidity
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            flex: 2,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  FontAwesomeIcons.wind,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .primary
+                                                      .withOpacity(0.6),
+                                                ),
+                                                const SizedBox(height: 6),
+                                                Icon(
+                                                  FontAwesomeIcons.droplet,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .primary
+                                                      .withOpacity(0.6),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                          const Expanded(
+                                            flex: 1,
+                                            child: SizedBox(),
+                                          ),
+                                          Expanded(
+                                            flex: 5,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  '${weatherData?.wind.speed ?? '...'} m/s',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium,
+                                                ),
+                                                const SizedBox(height: 10),
+                                                Text(
+                                                  '${weatherData?.main.humidity ?? '...'}%',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 1,
+                                      // Wind speed and humidity
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            flex: 2,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  Icons.visibility_rounded,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .primary
+                                                      .withOpacity(0.6),
+                                                ),
+                                                const SizedBox(height: 6),
+                                                Text(
+                                                  'AQI',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium!
+                                                      .copyWith(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .primary
+                                                            .withOpacity(0.6),
+                                                      ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                          const Expanded(
+                                            flex: 1,
+                                            child: SizedBox(),
+                                          ),
+                                          Expanded(
+                                            flex: 5,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  '$visibility km',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium,
+                                                ),
+                                                const SizedBox(height: 10),
+                                                Text(
+                                                  aqi,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  maxLines: 1,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Align(
+                                  alignment: Alignment.topRight,
+                                  child: Text(
+                                    'Last updated: ${weatherData == null ? 'loading...' : getLastUpdated(weatherData!)}',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall!
+                                        .copyWith(
+                                          fontSize: 10,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSecondary,
+                                        ),
+                                  ),
+                                ),
+                              ],
+                            )
                     ],
                   ),
                 ),
@@ -510,6 +633,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
         indicatorPadding: 5,
         autoPlayInterval: 5000,
         isLoop: true,
+        height: MediaQuery.of(context).size.height * 0.27,
         children: [
           bannerSliderItem(context, AssetHelper.banner1),
           bannerSliderItem(context, AssetHelper.banner2),
@@ -549,7 +673,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                       Text(
                         _hideBalance
                             ? '******'
-                            : UltilHelper.formatNumber(balance),
+                            : UltilHelper.formatMoney(balance),
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                     ],
@@ -575,7 +699,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
                       Text(
                         _hideBalance
                             ? '******'
-                            : UltilHelper.formatNumber(extraBalance),
+                            : UltilHelper.formatMoney(extraBalance),
                         style:
                             Theme.of(context).textTheme.titleMedium!.copyWith(
                                   fontWeight: FontWeight.w500,

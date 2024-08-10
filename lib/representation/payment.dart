@@ -8,12 +8,13 @@ import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
 import 'package:fptu_bike_parking_system/component/my_radio_button.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
 import 'package:fptu_bike_parking_system/core/const/frondend/message.dart';
-import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
-import 'package:fptu_bike_parking_system/representation/navigation_bar.dart';
+import 'package:fptu_bike_parking_system/representation/receipt.dart';
 import 'package:logger/logger.dart';
 
 import '../api/model/bai_model/zalopay_model.dart';
+import '../component/return_login_component.dart';
 import '../component/snackbar.dart';
+import '../core/helper/asset_helper.dart';
 import '../core/helper/loading_overlay_helper.dart';
 import '../core/helper/util_helper.dart';
 
@@ -33,7 +34,7 @@ class PaymentScreen extends StatefulWidget {
 
 class _PaymentScreenState extends State<PaymentScreen> {
   // State variable to track the selected payment option
-  int selectedPaymentOption = 1; // Default selection = ZaloPay
+  int selectedPaymentOption = 0;
   late final CoinPackage _package = widget.package;
   var log = Logger();
 
@@ -44,6 +45,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   int type = 0;
   late Color btnColor = Theme.of(context).colorScheme.primary;
   late String txtPay = LabelMessage.pay.toUpperCase();
+  bool isOverload = false;
 
   @override
   initState() {
@@ -59,18 +61,26 @@ class _PaymentScreenState extends State<PaymentScreen> {
     try {
       final APIResponse<ZaloPayModel> zaloPayMd =
           await _paymentApi.depositCoin(packageId);
-      if (!zaloPayMd.isTokenValid) {}
+
+      if (zaloPayMd.isTokenValid == false &&
+          zaloPayMd.message == ErrorMessage.tokenInvalid) {
+        log.e('Token is invalid');
+
+        if (!mounted) return;
+        //show error dialog
+        returnLoginDialog();
+        return;
+      }
+
       if (zaloPayMd.data != null) {
         setState(() {
           zaloPayModel = zaloPayMd.data!;
-          isLoading = false; // Đặt isLoading thành false khi hoàn thành
         });
       }
     } catch (e) {
       log.e('Error during buy now: $e');
       setState(() {
-        isLoading =
-            false; // Đảm bảo isLoading được đặt thành false ngay cả khi xảy ra lỗi
+        isLoading = false;
       });
     }
   }
@@ -110,17 +120,20 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      onPopInvoked: (didPop) {
-        dispose();
-        LoadingOverlayHelper.hide();
-      },
-      child: Scaffold(
-        appBar: const AppBarCom(
-          leading: true,
-          appBarText: 'Payment',
-        ),
-        body: Column(
+    return Scaffold(
+      appBar: const AppBarCom(
+        leading: true,
+        appBarText: 'Payment',
+      ),
+      body: PopScope(
+        onPopInvoked: (didPop) {
+          dispose();
+          //check if loading overlay is showing, hide it
+          if (isOverload) {
+            LoadingOverlayHelper.hide();
+          }
+        },
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
@@ -235,8 +248,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
                                       Text(
-                                        UltilHelper.formatNumber(
-                                            _package.price),
+                                        UltilHelper.formatMoney(_package.price),
                                         style: Theme.of(context)
                                             .textTheme
                                             .displayMedium!
@@ -316,7 +328,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                             ),
                                             Text(
                                               // Message show that buy package name
-                                              'Buy ${_package.packageName} to get ${UltilHelper.formatNumber(int.parse(_package.amount))} bic coins',
+                                              'Buy ${_package.packageName} to get ${UltilHelper.formatMoney(int.parse(_package.amount))} bic coins',
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .bodyLarge!
@@ -436,6 +448,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   ),
                   GestureDetector(
                     onTap: () {
+                      if (selectedPaymentOption == 0) {
+                        showSnackBar(ErrorMessage.paymentMethod);
+                        return;
+                      }
                       btnPay(context);
                     },
                     child: Container(
@@ -474,6 +490,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
   void btnPay(BuildContext context) {
     if (selectedPaymentOption == 1) {
       LoadingOverlayHelper.show(context);
+      if (mounted) {
+        setState(() {
+          isOverload = true;
+        });
+      }
       //open ZaloPay app
       openZaloPayApp(_package).then((_) {
         LoadingOverlayHelper.hide();
@@ -482,7 +503,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         //redirect to home screen if payment success
         if (type == 1) {
           //close payment screen
-          Navigator.of(context).pushReplacementNamed(MyNavigationBar.routeName);
+          Navigator.of(context).pushReplacementNamed(ReceiptScreen.routeName);
         }
       });
     } else {
@@ -519,6 +540,16 @@ class _PaymentScreenState extends State<PaymentScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
+    );
+  }
+
+  //return login dialog
+  void returnLoginDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const InvalidTokenDialog();
+      },
     );
   }
 }

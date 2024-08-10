@@ -5,6 +5,8 @@ class Message {
   static String loginSuccess = "Login success, welcome back!";
 
   static String actionSuccessfully({String? action}) => "$action successfully!";
+  static String enableLocationService =
+      "Enable location permission\nto get weather information!";
 }
 
 class ListName {
@@ -47,6 +49,7 @@ class ErrorMessage {
 
   static String underDevelopment = "This feature is under development!";
   static String tokenInvalid = "Token is invalid!";
+  static String paymentMethod = "Please select a payment method!";
 }
 
 class ImageName {

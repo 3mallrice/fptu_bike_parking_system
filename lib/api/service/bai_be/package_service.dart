@@ -5,10 +5,11 @@ import 'package:fptu_bike_parking_system/api/model/bai_model/coin_package_model.
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
+import 'api_root.dart';
+
 class CallPackageApi {
-  static const String baseUrl = 'https://backend.khangbpa.com/api';
   static const apiName = '/packages';
-  final String api = baseUrl + apiName;
+  final String api = APIRoot.root + apiName;
 
   String token = "";
   var log = Logger();
@@ -18,7 +19,7 @@ class CallPackageApi {
   Future<List<CoinPackage>?> getPackages() async {
     try {
       final response = await http.get(
-        Uri.parse('$api/active'),
+        Uri.parse('$api/customer'),
       );
       if (response.statusCode == 200) {
         var jsonResponse = jsonDecode(response.body);

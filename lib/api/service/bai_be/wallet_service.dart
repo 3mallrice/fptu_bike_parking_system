@@ -7,24 +7,27 @@ import 'package:logger/logger.dart';
 import '../../../core/const/frondend/message.dart';
 import '../../../core/helper/local_storage_helper.dart';
 import '../../model/bai_model/wallet_model.dart';
+import 'api_root.dart';
 
 class CallWalletApi {
-  static const String baseUrl = 'https://backend.khangbpa.com/api';
   static const apiName = '/wallet';
-  final String api = baseUrl + apiName;
+  final String api = APIRoot.root + apiName;
 
   String token = "";
   var log = Logger();
 
   // GET: /api/wallet/transaction/main
   // Get all transaction of user's main wallet
-  Future<List<WalletModel>?> getMainWalletTransactions() async {
+  Future<APIResponse<List<WalletModel>>> getMainWalletTransactions() async {
     try {
-      token = GetLocalHelper.getBearerToken();
+      token = GetLocalHelper.getBearerToken() ?? "";
 
-      if (token.isEmpty) {
+      if (token == "") {
         log.e('Token is empty');
-        return null;
+        return APIResponse(
+          message: ErrorMessage.tokenInvalid,
+          isTokenValid: false,
+        );
       }
 
       final response = await http.get(
@@ -44,26 +47,31 @@ class CallWalletApi {
               .toList(),
         );
 
-        return apiResponse.data;
+        return apiResponse;
       } else {
         log.e('Failed to get main wallet transactions: ${response.statusCode}');
-        return null;
+        return APIResponse(
+            message:
+                "${ErrorMessage.somethingWentWrong}: Status code ${response.statusCode}");
       }
     } catch (e) {
       log.e('Error during get main wallet transactions: $e');
+      return APIResponse(message: "${ErrorMessage.somethingWentWrong}: $e");
     }
-    return null;
   }
 
   // GET: /api/wallet/transaction/extra
   // Get all transaction of user's extra wallet
-  Future<List<WalletModel>?> getExtraWalletTransactions() async {
+  Future<APIResponse<List<WalletModel>>> getExtraWalletTransactions() async {
     try {
-      token = GetLocalHelper.getBearerToken();
+      token = GetLocalHelper.getBearerToken() ?? "";
 
-      if (token.isEmpty) {
+      if (token == "") {
         log.e('Token is empty');
-        return null;
+        return APIResponse(
+          message: ErrorMessage.tokenInvalid,
+          isTokenValid: false,
+        );
       }
 
       final response = await http.get(
@@ -83,25 +91,27 @@ class CallWalletApi {
               .toList(),
         );
 
-        return apiResponse.data;
+        return apiResponse;
       } else {
         log.e(
             'Failed to get extra wallet transactions: ${response.statusCode}');
-        return null;
+        return APIResponse(
+            message:
+                "${ErrorMessage.somethingWentWrong}: Status code ${response.statusCode}");
       }
     } catch (e) {
       log.e('Error during get extra wallet transactions: $e');
+      return APIResponse(message: "${ErrorMessage.somethingWentWrong}: $e");
     }
-    return null;
   }
 
   // GET: /api/wallet/balance/main
   // Get balance of user's main wallet
   Future<APIResponse<int>> getMainWalletBalance() async {
     try {
-      token = GetLocalHelper.getBearerToken();
+      token = GetLocalHelper.getBearerToken() ?? "";
 
-      if (token.isEmpty) {
+      if (token == "") {
         log.e('Token is empty');
         return APIResponse<int>(
           message: ErrorMessage.tokenInvalid,
@@ -144,13 +154,16 @@ class CallWalletApi {
 
   // GET: /api/wallet/balance/extra
   // Get balance of user's extra wallet
-  Future<ExtraBalanceModel?> getExtraWalletBalance() async {
+  Future<APIResponse<ExtraBalanceModel>> getExtraWalletBalance() async {
     try {
-      token = GetLocalHelper.getBearerToken();
+      token = GetLocalHelper.getBearerToken() ?? "";
 
-      if (token.isEmpty) {
+      if (token == "") {
         log.e('Token is empty');
-        return null;
+        return APIResponse<ExtraBalanceModel>(
+          message: ErrorMessage.tokenInvalid,
+          isTokenValid: false,
+        );
       }
 
       final response = await http.get(
@@ -167,14 +180,16 @@ class CallWalletApi {
           (json) => ExtraBalanceModel.fromJson(json as Map<String, dynamic>),
         );
 
-        return apiResponse.data;
+        return apiResponse;
       } else {
         log.e('Failed to get extra wallet balance: ${response.statusCode}');
-        return null;
+        return APIResponse(
+            message:
+                "${ErrorMessage.somethingWentWrong}: Status code ${response.statusCode}");
       }
     } catch (e) {
       log.e('Error during get extra wallet balance: $e');
+      return APIResponse(message: "${ErrorMessage.somethingWentWrong}: $e");
     }
-    return null;
   }
 }

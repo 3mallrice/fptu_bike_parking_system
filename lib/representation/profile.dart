@@ -21,9 +21,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    userData = UserData.fromJson(
-      LocalStorageHelper.getValue(LocalStorageKey.userData),
-    );
+    userData = GetLocalHelper.getUserData();
   }
 
   @override
@@ -66,7 +64,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         )
                       : ClipOval(
                           child: Image.network(
-                            userData!.avatar!,
+                            userData?.avatar ?? '',
                             fit: BoxFit.fill,
                           ),
                         ),
