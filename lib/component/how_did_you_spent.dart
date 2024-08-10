@@ -2,7 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 import '../api/model/bai_model/chart.dart';
-import '../core/helper/util_helper.dart';
+import '../core/const/utilities/util_helper.dart';
 
 class HowDidYouSpend extends StatelessWidget {
   final List<HowDidYouParkAndSpend> howDidYouSpendList;
