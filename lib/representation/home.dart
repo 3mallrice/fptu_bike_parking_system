@@ -5,7 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart'
     show FontAwesomeIcons;
 import 'package:fptu_bike_parking_system/api/model/bai_model/wallet_model.dart';
 import 'package:fptu_bike_parking_system/api/service/bai_be/wallet_service.dart';
-import 'package:fptu_bike_parking_system/core/helper/util_helper.dart';
+import 'package:fptu_bike_parking_system/core/const/utilities/util_helper.dart';
 import 'package:fptu_bike_parking_system/representation/insight.dart';
 import 'package:fptu_bike_parking_system/representation/navigation_bar.dart';
 import 'package:fptu_bike_parking_system/representation/wallet_extra_screen.dart';
