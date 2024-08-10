@@ -1,5 +1,6 @@
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
 import 'package:fptu_bike_parking_system/core/const/frondend/message.dart';
@@ -8,6 +9,7 @@ import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
 import 'package:logger/logger.dart';
 
 import '../api/model/bai_model/wallet_model.dart';
+import '../component/snackbar.dart';
 
 class ReceiptScreen extends StatefulWidget {
   final WalletModel transaction;
@@ -78,12 +80,40 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                           height: 30,
                           fit: BoxFit.contain,
                         ),
-                        Text(
-                          'ID: Copy',
-                          style:
-                              Theme.of(context).textTheme.titleMedium!.copyWith(
-                                    fontWeight: FontWeight.w500,
+                        GestureDetector(
+                          onTap: () {
+                            //save to clipboard
+                            Clipboard.setData(
+                              ClipboardData(text: transaction.id),
+                            );
+                            // Hiển thị thông báo cho người dùng biết đã sao chép thành công
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: MySnackBar(
+                                  prefix: Icon(
+                                    Icons.check_circle_rounded,
+                                    color:
+                                        Theme.of(context).colorScheme.surface,
                                   ),
+                                  message: Message.copyToClipboard,
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.onError,
+                                ),
+                                behavior: SnackBarBehavior.floating,
+                                backgroundColor: Colors.transparent,
+                                elevation: 0,
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'ID: Copy',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(
+                                  fontWeight: FontWeight.w500,
+                                ),
+                          ),
                         ),
                       ],
                     ),
