@@ -14,7 +14,7 @@ import 'package:transition/transition.dart';
 import '../api/model/bai_model/api_response.dart';
 import '../component/dialog.dart';
 import '../core/const/frondend/message.dart';
-import '../core/helper/util_helper.dart';
+import '../core/const/utilities/util_helper.dart';
 import 'login.dart';
 
 class WalletExtraScreen extends StatefulWidget {

@@ -14,9 +14,9 @@ import 'package:logger/logger.dart';
 import '../api/model/bai_model/zalopay_model.dart';
 import '../component/return_login_component.dart';
 import '../component/snackbar.dart';
+import '../core/const/utilities/util_helper.dart';
 import '../core/helper/asset_helper.dart';
 import '../core/helper/loading_overlay_helper.dart';
-import '../core/helper/util_helper.dart';
 
 class PaymentScreen extends StatefulWidget {
   final CoinPackage package;
