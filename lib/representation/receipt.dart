@@ -342,7 +342,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: GestureDetector(
               onTap: () {
-                log.e("Clicked!!");
+                Navigator.of(context).pop();
               },
               child: Text(
                 LabelMessage.close,
