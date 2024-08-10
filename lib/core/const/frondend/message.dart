@@ -7,6 +7,7 @@ class Message {
   static String actionSuccessfully({String? action}) => "$action successfully!";
   static String enableLocationService =
       "Enable location permission\nto get weather information!";
+  static String copyToClipboard = "Copied to clipboard!";
 }
 
 class ListName {
