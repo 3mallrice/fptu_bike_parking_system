@@ -9,10 +9,12 @@ import 'package:http_parser/http_parser.dart';
 import 'package:logger/web.dart';
 import 'package:mime/mime.dart';
 
+import '../../../core/const/frondend/message.dart';
+import 'api_root.dart';
+
 class CallBikeApi {
-  static const String baseUrl = 'https://backend.khangbpa.com/api';
   static const apiName = '/vehicles';
-  final String api = baseUrl + apiName;
+  final String api = APIRoot.root + apiName;
 
   static const String detectUrl =
       'https://platenumber.khangbpa.com/detect_read';
@@ -21,18 +23,21 @@ class CallBikeApi {
   var log = Logger();
 
   // Post vehicle
-  Future<BaiModel?> createBai(BaiModel? baiModel) async {
+  Future<APIResponse<BaiModel>> createBai(BaiModel? baiModel) async {
     try {
       if (baiModel == null) {
         log.e('Bai model is null');
-        return null;
+        return APIResponse(message: 'Bai model is null');
       }
 
-      token = GetLocalHelper.getBearerToken();
+      token = GetLocalHelper.getBearerToken() ?? "";
 
-      if (token.isEmpty) {
+      if (token == "") {
         log.e('Token is empty');
-        return null;
+        return APIResponse(
+          message: ErrorMessage.tokenInvalid,
+          isTokenValid: false,
+        );
       }
 
       // Tạo multipart request
@@ -62,15 +67,20 @@ class CallBikeApi {
       var response = await http.Response.fromStream(await request.send());
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return BaiModel.fromJson(jsonDecode(response.body));
+        return APIResponse.fromJson(
+          jsonDecode(response.body),
+          (json) => BaiModel.fromJson(json as Map<String, dynamic>),
+        );
       } else {
         log.e('Failed to create bai: ${response.statusCode}');
-        return null;
+        return APIResponse(
+          message: "${ErrorMessage.somethingWentWrong}: ${response.statusCode}",
+        );
       }
     } catch (e) {
       log.e('Error during create bai: $e');
+      return APIResponse(message: "${ErrorMessage.somethingWentWrong}: $e");
     }
-    return null;
   }
 
   Future<List<VehicleTypeModel>?> getVehicleType() async {
@@ -85,8 +95,6 @@ class CallBikeApi {
               .map((json) => VehicleTypeModel.fromJson(json))
               .toList();
         } else if (jsonResponse is Map) {
-          // Xử lý trường hợp phản hồi là một Map
-          // Giả sử các loại xe nằm trong trường 'data'
           var jsonList = jsonResponse['data'] as List;
           return jsonList
               .map((json) => VehicleTypeModel.fromJson(json))
@@ -105,13 +113,16 @@ class CallBikeApi {
     return null;
   }
 
-  Future<List<BaiModel>?> getBai() async {
+  Future<APIResponse<List<BaiModel>>> getBai() async {
     try {
-      token = GetLocalHelper.getBearerToken();
+      token = GetLocalHelper.getBearerToken() ?? "";
 
-      if (token.isEmpty) {
+      if (token == "") {
         log.e('Token is empty');
-        return null;
+        return APIResponse(
+          message: ErrorMessage.tokenInvalid,
+          isTokenValid: false,
+        );
       }
 
       final response = await http.get(
@@ -130,14 +141,16 @@ class CallBikeApi {
               .map((item) => BaiModel.fromJson(item as Map<String, dynamic>))
               .toList(),
         );
-        return apiResponse.data;
+        return apiResponse;
       } else {
         log.e('Failed to get vehicle: ${response.statusCode} ${response.body}');
-        return null;
+        return APIResponse(
+          message: "${ErrorMessage.somethingWentWrong}: ${response.statusCode}",
+        );
       }
     } catch (e) {
       log.e('Error during get bai: $e');
-      return null;
+      return APIResponse(message: "${ErrorMessage.somethingWentWrong}: $e");
     }
   }
 

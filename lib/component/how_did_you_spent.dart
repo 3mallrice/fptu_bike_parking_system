@@ -65,7 +65,7 @@ class HowDidYouSpend extends StatelessWidget {
                 getTooltipItems: (touchedSpots) {
                   return touchedSpots.map((touchedSpot) {
                     return LineTooltipItem(
-                      '${UltilHelper.formatNumber(touchedSpot.y.round())} VND',
+                      '${UltilHelper.formatMoney(touchedSpot.y.round())} VND',
                       Theme.of(context).textTheme.bodySmall!.copyWith(
                             color: Theme.of(context).colorScheme.surface,
                             fontWeight: FontWeight.bold,

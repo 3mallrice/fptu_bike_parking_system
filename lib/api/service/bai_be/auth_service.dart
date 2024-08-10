@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:fptu_bike_parking_system/api/service/bai_be/api_root.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
@@ -8,9 +9,8 @@ import '../../model/bai_model/api_response.dart';
 import '../../model/bai_model/login_model.dart';
 
 class CallAuthApi {
-  static const String baseUrl = 'https://backend.khangbpa.com/api';
   static const apiName = '/auth';
-  final String api = baseUrl + apiName;
+  final String api = APIRoot.root + apiName;
 
   String token = "";
   var log = Logger();

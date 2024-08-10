@@ -4,9 +4,10 @@ import 'package:fptu_bike_parking_system/component/shadow_container.dart';
 import 'package:fptu_bike_parking_system/core/helper/google_auth.dart';
 import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
 import 'package:fptu_bike_parking_system/representation/about_screen.dart';
-import 'package:fptu_bike_parking_system/representation/login.dart';
 import 'package:fptu_bike_parking_system/representation/profile.dart';
 import 'package:logger/logger.dart';
+
+import 'login.dart';
 
 class MeScreen extends StatefulWidget {
   const MeScreen({super.key});
@@ -57,8 +58,7 @@ class _MeScreenState extends State<MeScreen> {
   @override
   void initState() {
     super.initState();
-    userData = UserData.fromJson(
-        LocalStorageHelper.getValue(LocalStorageKey.userData));
+    userData = GetLocalHelper.getUserData();
     _loadHideBalance();
   }
 
@@ -67,149 +67,169 @@ class _MeScreenState extends State<MeScreen> {
     return PopScope(
       canPop: false,
       child: Scaffold(
-        body: SingleChildScrollView(
-          child: Align(
-            alignment: Alignment.center,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const SizedBox(height: 20),
-                Container(
-                  // padding: const EdgeInsets.all(1),
-                  height: MediaQuery.of(context).size.width * 0.36,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.primary,
-                      width: 2,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Align(
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 20),
+                  Container(
+                    // padding: const EdgeInsets.all(1),
+                    height: MediaQuery.of(context).size.width * 0.36,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.primary,
+                        width: 2,
+                      ),
+                      color: Theme.of(context).colorScheme.outline,
                     ),
-                    color: Theme.of(context).colorScheme.outline,
-                  ),
-                  child: userData == null
-                      ? Text(
-                          getInitials(userData?.name ?? 'Anonymous User'),
-                          style: Theme.of(context)
-                              .textTheme
-                              .displayLarge!
-                              .copyWith(
-                                fontSize: 64,
-                                fontWeight: FontWeight.w900,
-                                color: Theme.of(context).colorScheme.surface,
-                              ),
-                        )
-                      : ClipOval(
-                          child: Image.network(
-                            userData!.avatar!,
-                            fit: BoxFit.fill,
+                    child: userData == null
+                        ? Text(
+                            getInitials(userData?.name ?? 'Anonymous User'),
+                            style: Theme.of(context)
+                                .textTheme
+                                .displayLarge!
+                                .copyWith(
+                                  fontSize: 64,
+                                  fontWeight: FontWeight.w900,
+                                  color: Theme.of(context).colorScheme.surface,
+                                ),
+                          )
+                        : ClipOval(
+                            child: Image.network(
+                              userData?.avatar ?? '',
+                              fit: BoxFit.fill,
+                            ),
                           ),
-                        ),
-                ),
-                const SizedBox(height: 15),
-                Text(
-                  userData?.name ?? 'Anonymous',
-                  style: Theme.of(context).textTheme.displayMedium,
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  userData?.email ?? 'anonymous@fpt.edu.vn',
-                  style: Theme.of(context).textTheme.labelMedium,
-                ),
-                const SizedBox(height: 40),
-                ShadowContainer(
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      meItem(
-                        Icons.account_circle_outlined,
-                        Text(
-                          'View Profile',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium!
-                              .copyWith(fontSize: 18),
-                        ),
-                        () {
-                          Navigator.of(context)
-                              .pushNamed(ProfileScreen.routeName);
-                        },
-                      ),
-                      Divider(
-                        color: Theme.of(context).colorScheme.outlineVariant,
-                        thickness: 1,
-                      ),
-                      meItem(
-                        _hideBalance
-                            ? Icons.visibility_off_outlined
-                            : Icons.visibility_outlined,
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Hide Balance',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium!
-                                  .copyWith(fontSize: 18),
-                            ),
-                            Text(
-                              '* Your balances on home screen will appear as ******\n* To reveal, hold on your balance',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall!
-                                  .copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSecondary,
-                                    fontSize: 12,
-                                  ),
-                            ),
-                          ],
-                        ),
-                        _toggleHideBalance,
-                      ),
-                      Divider(
-                        color: Theme.of(context).colorScheme.outlineVariant,
-                        thickness: 1,
-                      ),
-                      meItem(
-                          Icons.info_outlined,
+                  ),
+                  const SizedBox(height: 15),
+                  Text(
+                    userData?.name ?? 'Anonymous',
+                    style: Theme.of(context).textTheme.displayMedium,
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    userData?.email ?? 'anonymous@fpt.edu.vn',
+                    style: Theme.of(context).textTheme.labelMedium,
+                  ),
+                  const SizedBox(height: 40),
+                  ShadowContainer(
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        meItem(
+                          Icons.account_circle_outlined,
                           Text(
-                            'About Bai',
+                            'View Profile',
                             style: Theme.of(context)
                                 .textTheme
                                 .titleMedium!
                                 .copyWith(fontSize: 18),
-                          ), () {
-                        Navigator.of(context).pushNamed(AboutUs.routeName);
-                      })
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-                ShadowContainer(
-                    width: MediaQuery.of(context).size.width * 0.9,
-                    child: meItem(
-                        Icons.logout_rounded,
-                        iconColor: Theme.of(context).colorScheme.primary,
-                        Text(
-                          'Logout',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium!
-                              .copyWith(
-                                fontSize: 18,
-                                color: Theme.of(context).colorScheme.primary,
+                          ),
+                          () {
+                            Navigator.of(context)
+                                .pushNamed(ProfileScreen.routeName);
+                          },
+                        ),
+                        Divider(
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                          thickness: 1,
+                        ),
+                        meItem(
+                          _hideBalance
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Hide Balance',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium!
+                                    .copyWith(fontSize: 18),
                               ),
-                        ), () {
-                      _logout();
-                    })),
-                const SizedBox(height: 70),
-              ],
+                              Text(
+                                '* Your balances on home screen will appear as ******\n* To reveal, hold on your balance',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSecondary,
+                                      fontSize: 12,
+                                    ),
+                              ),
+                            ],
+                          ),
+                          _toggleHideBalance,
+                        ),
+                        Divider(
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                          thickness: 1,
+                        ),
+                        meItem(
+                            Icons.rule_rounded,
+                            Text(
+                              'Parking Rules',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium!
+                                  .copyWith(fontSize: 18),
+                            ), () {
+                          // TODO: Navigate to Parking Rules
+                        }),
+                        Divider(
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                          thickness: 1,
+                        ),
+                        meItem(
+                            Icons.info_outlined,
+                            Text(
+                              'About Bai',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium!
+                                  .copyWith(fontSize: 18),
+                            ), () {
+                          Navigator.of(context).pushNamed(AboutUs.routeName);
+                        })
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ShadowContainer(
+                    alignment: Alignment.center,
+                    width: MediaQuery.of(context).size.width * 0.5,
+                    height: 60,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    color: Theme.of(context).colorScheme.primary,
+                    child: GestureDetector(
+                      onTap: () {
+                        _logout();
+                      },
+                      child: Text(
+                        'Logout',
+                        style:
+                            Theme.of(context).textTheme.titleMedium!.copyWith(
+                                  fontSize: 18,
+                                  color: Theme.of(context).colorScheme.surface,
+                                ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.width * 0.05),
+                ],
+              ),
             ),
           ),
         ),
@@ -227,10 +247,9 @@ class _MeScreenState extends State<MeScreen> {
     return initials.toUpperCase();
   }
 
-  Widget meItem(IconData iconData, Widget content, VoidCallback onTap,
-      {Color? iconColor}) {
+  // a ListTile with icon, content and onTap event
+  Widget meItem(IconData? iconData, Widget content, VoidCallback onTap) {
     return ListTile(
-      iconColor: iconColor,
       contentPadding: const EdgeInsets.symmetric(horizontal: 10),
       horizontalTitleGap: 10,
       leadingAndTrailingTextStyle: Theme.of(context).textTheme.titleMedium,
@@ -238,10 +257,7 @@ class _MeScreenState extends State<MeScreen> {
         iconData,
         size: 28,
       ),
-      title: Padding(
-        padding: const EdgeInsets.all(10),
-        child: content,
-      ),
+      title: Padding(padding: const EdgeInsets.all(10), child: content),
       onTap: onTap,
     );
   }

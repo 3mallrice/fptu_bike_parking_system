@@ -2,13 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/api/model/bai_model/api_response.dart';
 import 'package:fptu_bike_parking_system/api/model/bai_model/wallet_model.dart';
 import 'package:fptu_bike_parking_system/api/service/bai_be/wallet_service.dart';
+import 'package:fptu_bike_parking_system/component/loading_component.dart';
 import 'package:fptu_bike_parking_system/core/helper/util_helper.dart';
+import 'package:fptu_bike_parking_system/representation/receipt.dart';
 import 'package:fptu_bike_parking_system/representation/wallet_extra_screen.dart';
 import 'package:logger/logger.dart';
 import 'package:transition/transition.dart';
 
 import '../component/app_bar_component.dart';
+import '../component/return_login_component.dart';
 import '../component/shadow_container.dart';
+import '../core/const/frondend/message.dart';
 import '../core/helper/local_storage_helper.dart';
 import 'fundin_screen.dart';
 import 'navigation_bar.dart';
@@ -31,6 +35,16 @@ class _MyWalletState extends State<MyWallet> {
   bool isLoading = true;
   String? errorMessage;
 
+  //return login dialog
+  void returnLoginDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const InvalidTokenDialog();
+      },
+    );
+  }
+
   Future<void> _loadHideBalance() async {
     bool? hideBalance =
         await LocalStorageHelper.getValue(LocalStorageKey.isHiddenBalance);
@@ -52,6 +66,17 @@ class _MyWalletState extends State<MyWallet> {
     try {
       final APIResponse<int> result =
           await callWalletApi.getMainWalletBalance();
+
+      if (result.isTokenValid == false &&
+          result.message == ErrorMessage.tokenInvalid) {
+        log.e('Token is invalid');
+
+        if (!mounted) return;
+        //show error dialog
+        returnLoginDialog();
+        return;
+      }
+
       setState(() {
         balance = result.data ?? 0;
         log.i('Main wallet balance: $balance');
@@ -68,10 +93,20 @@ class _MyWalletState extends State<MyWallet> {
     });
 
     try {
-      final List<WalletModel>? result =
+      final APIResponse<List<WalletModel>> result =
           await callWalletApi.getMainWalletTransactions();
+
+      if (result.isTokenValid == false &&
+          result.message == ErrorMessage.tokenInvalid) {
+        log.e('Token is invalid');
+
+        if (!mounted) return;
+        //show error dialog
+        returnLoginDialog();
+        return;
+      }
       setState(() {
-        transactions = result ?? [];
+        transactions = result.data ?? [];
       });
     } catch (e) {
       log.e('Error during get main wallet transactions: $e');
@@ -179,7 +214,7 @@ class _MyWalletState extends State<MyWallet> {
                         Text(
                           _hideBalance
                               ? '******'
-                              : '${UltilHelper.formatNumber(balance)} bic',
+                              : '${UltilHelper.formatMoney(balance)} bic',
                           style: Theme.of(context)
                               .textTheme
                               .displayMedium!
@@ -229,7 +264,7 @@ class _MyWalletState extends State<MyWallet> {
 
               // List of transaction
               isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? const LoadingCircle()
                   : errorMessage != null
                       ? Center(
                           child: Text(
@@ -252,75 +287,79 @@ class _MyWalletState extends State<MyWallet> {
                                 Color itemBackgroundColor = index % 2 == 0
                                     ? Colors.white
                                     : Theme.of(context).colorScheme.secondary;
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 10),
-                                  child: Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.9,
-                                    color: itemBackgroundColor,
-                                    child: ListTile(
-                                      leading: CircleAvatar(
-                                        backgroundColor: transactions[index]
-                                                    .transactionType ==
-                                                'IN'
-                                            ? Theme.of(context)
-                                                .colorScheme
-                                                .primary
-                                            : Theme.of(context)
-                                                .colorScheme
-                                                .outline,
-                                        child: Icon(
-                                          transactions[index].transactionType ==
-                                                  'IN'
-                                              ? Icons.attach_money_rounded
-                                              : Icons.local_parking_rounded,
-                                        ),
-                                      ),
-                                      title: Text(
-                                        transactions[index].transactionType ==
-                                                'IN'
-                                            ? 'Deposit'
-                                            : 'Parking Fee',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleSmall,
-                                      ),
-                                      subtitle: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            transactions[index]
-                                                    .transactionDescription ??
-                                                '',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyLarge,
-                                          ),
-                                          Text(
-                                            UltilHelper.formatDate(
-                                                transactions[index].date),
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodySmall!
-                                                .copyWith(
-                                                  color: Theme.of(context)
+                                return GestureDetector(
+                                  onTap: () {
+                                    //Open receipt screen
+                                    Navigator.of(context).pushNamed(
+                                      ReceiptScreen.routeName,
+                                      arguments: transactions[index],
+                                    );
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(bottom: 10),
+                                    child: Container(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.9,
+                                      color: itemBackgroundColor,
+                                      child: ListTile(
+                                        leading: CircleAvatar(
+                                          backgroundColor:
+                                              transactions[index].type == 'IN'
+                                                  ? Theme.of(context)
                                                       .colorScheme
-                                                      .onSecondary,
-                                                ),
-                                          )
-                                        ],
-                                      ),
-                                      trailing: Text(
-                                        (transactions[index].transactionType ==
-                                                    'IN'
-                                                ? '+'
-                                                : '-') +
-                                            UltilHelper.formatNumber(
-                                                transactions[index].amount),
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium,
+                                                      .primary
+                                                  : Theme.of(context)
+                                                      .colorScheme
+                                                      .outline,
+                                          child: Icon(
+                                            transactions[index].type == 'IN'
+                                                ? Icons.attach_money_rounded
+                                                : Icons.local_parking_rounded,
+                                          ),
+                                        ),
+                                        title: Text(
+                                          transactions[index].type == 'IN'
+                                              ? 'Deposit'
+                                              : 'Parking Fee',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleSmall,
+                                        ),
+                                        subtitle: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              transactions[index].description ??
+                                                  '',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyLarge,
+                                            ),
+                                            Text(
+                                              UltilHelper.formatDate(
+                                                  transactions[index].date),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodySmall!
+                                                  .copyWith(
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .onSecondary,
+                                                  ),
+                                            )
+                                          ],
+                                        ),
+                                        trailing: Text(
+                                          (transactions[index].type == 'IN'
+                                                  ? '+'
+                                                  : '-') +
+                                              UltilHelper.formatMoney(
+                                                  transactions[index].amount),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium,
+                                        ),
                                       ),
                                     ),
                                   ),

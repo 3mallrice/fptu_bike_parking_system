@@ -7,9 +7,10 @@ import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
 import '../../../core/helper/local_storage_helper.dart';
+import 'api_root.dart';
 
 class CallPaymentApi {
-  static const String baseUrl = 'https://backend.khangbpa.com/api';
+  static const String baseUrl = APIRoot.root;
 
   // static const apiName = '/deposit';
   // final String api = baseUrl + apiName;
@@ -21,9 +22,9 @@ class CallPaymentApi {
   //Deposit money to get coin via ZaloPay
   Future<APIResponse<ZaloPayModel>> depositCoin(String packageId) async {
     try {
-      token = GetLocalHelper.getBearerToken();
+      token = GetLocalHelper.getBearerToken() ?? "";
 
-      if (token.isEmpty) {
+      if (token == "") {
         log.e('Token is empty');
         return APIResponse(
           isTokenValid: false,

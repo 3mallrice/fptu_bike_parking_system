@@ -13,8 +13,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     var log = Logger();
-    late UserData? userData = UserData.fromJson(
-        LocalStorageHelper.getValue(LocalStorageKey.userData));
+    late UserData? userData = GetLocalHelper.getUserData();
     log.i('$userData');
     return SafeArea(
       child: AppBar(
@@ -43,7 +42,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                       child: CircleAvatar(
                         radius: 20,
                         backgroundColor: Theme.of(context).colorScheme.surface,
-                        child: userData.avatar == null
+                        child: userData == null
                             ? Image.asset(
                                 AssetHelper.imgLogo,
                                 fit: BoxFit.fill,
@@ -66,7 +65,9 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                         Text(
-                          userData.name?.toUpperCase() ?? 'Anonymous',
+                          userData != null
+                              ? userData.name?.toUpperCase() ?? 'Anonymous'
+                              : 'Anonymous',
                           style:
                               Theme.of(context).textTheme.bodyMedium!.copyWith(
                                     fontWeight: FontWeight.bold,

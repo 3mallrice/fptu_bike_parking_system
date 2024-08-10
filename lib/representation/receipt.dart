@@ -4,10 +4,14 @@ import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
 import 'package:fptu_bike_parking_system/core/const/frondend/message.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
+import 'package:fptu_bike_parking_system/core/helper/util_helper.dart';
 import 'package:logger/logger.dart';
 
+import '../api/model/bai_model/wallet_model.dart';
+
 class ReceiptScreen extends StatefulWidget {
-  const ReceiptScreen({super.key});
+  final WalletModel transaction;
+  const ReceiptScreen({super.key, required this.transaction});
 
   static const String routeName = '/receipt_screen';
 
@@ -16,7 +20,8 @@ class ReceiptScreen extends StatefulWidget {
 }
 
 class _ReceiptScreenState extends State<ReceiptScreen> {
-  String status = "pending";
+  late WalletModel transaction = widget.transaction;
+  late String status = transaction.status;
   Color? statusColor;
   String? statusText;
   IconData? statusIcon;
@@ -26,21 +31,26 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
   @override
   Widget build(BuildContext context) {
     switch (status) {
-      case "fail":
+      case "PENDING":
         statusColor = Theme.of(context).colorScheme.error;
         statusText = "Fail transaction";
         statusIcon = Icons.pending;
         break;
-      case "successful":
+      case "SUCCEED":
         statusColor = Theme.of(context).colorScheme.onError;
         statusText = "Successful transaction";
         statusIcon = Icons.check_circle;
         break;
-      case "pending":
+      case "FAILED":
+        statusColor = Theme.of(context).colorScheme.error;
+        statusText = "Fail transaction";
+        statusIcon = Icons.cancel;
+        break;
       default:
         statusColor = Theme.of(context).colorScheme.outline;
         statusText = "Pending transaction";
         statusIcon = Icons.cancel;
+        break;
     }
 
     return Scaffold(
@@ -133,7 +143,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Text(
-                                  'Move Money',
+                                  'Transaction Details',
                                   style: Theme.of(context)
                                       .textTheme
                                       .displayMedium!
@@ -144,7 +154,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                                 ),
                                 const SizedBox(height: 5),
                                 Text(
-                                  '19/05/2024 08:20',
+                                  UltilHelper.formatDateTime(transaction.date),
                                   style: Theme.of(context)
                                       .textTheme
                                       .labelSmall!
@@ -160,7 +170,10 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     Text(
-                                      '80.000',
+                                      // if transactionType == 'IN' then '+' else '-' before amount
+                                      transaction.type == 'IN'
+                                          ? '+ ${UltilHelper.formatMoney(transaction.amount)}'
+                                          : '- ${UltilHelper.formatMoney(transaction.amount)}',
                                       style: Theme.of(context)
                                           .textTheme
                                           .displayMedium!
@@ -219,7 +232,9 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                                                 .bodyLarge,
                                           ),
                                           Text(
-                                            'Fund In',
+                                            transaction.type == 'IN'
+                                                ? 'Deposit'
+                                                : 'Parking Fee',
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .bodyLarge!
@@ -240,7 +255,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                                                 .bodyLarge,
                                           ),
                                           Text(
-                                            'Fund in via existing package',
+                                            transaction.description ?? "N/A",
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .bodyLarge!

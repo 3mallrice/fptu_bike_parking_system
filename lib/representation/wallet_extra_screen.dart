@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/api/model/bai_model/wallet_model.dart';
 import 'package:fptu_bike_parking_system/api/service/bai_be/wallet_service.dart';
 import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
+import 'package:fptu_bike_parking_system/component/loading_component.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
 import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
 import 'package:fptu_bike_parking_system/representation/fundin_screen.dart';
@@ -10,7 +11,11 @@ import 'package:fptu_bike_parking_system/representation/wallet_screen.dart';
 import 'package:logger/logger.dart';
 import 'package:transition/transition.dart';
 
+import '../api/model/bai_model/api_response.dart';
+import '../component/dialog.dart';
+import '../core/const/frondend/message.dart';
 import '../core/helper/util_helper.dart';
+import 'login.dart';
 
 class WalletExtraScreen extends StatefulWidget {
   const WalletExtraScreen({super.key});
@@ -24,7 +29,7 @@ class WalletExtraScreen extends StatefulWidget {
 class _WalletExtraScreenState extends State<WalletExtraScreen> {
   bool _hideBalance = false;
   var log = Logger();
-  CallWalletApi callWalletApi = CallWalletApi();
+  final CallWalletApi _walletApi = CallWalletApi();
   late int extraBalance = 0;
   DateTime? expiredDate;
   List<WalletModel> transactions = [];
@@ -35,27 +40,62 @@ class _WalletExtraScreenState extends State<WalletExtraScreen> {
     bool? hideBalance =
         await LocalStorageHelper.getValue(LocalStorageKey.isHiddenBalance);
     log.i('Hide balance: $hideBalance');
-    setState(() {
-      _hideBalance = hideBalance ?? false;
-    });
+    if (mounted) {
+      setState(() {
+        _hideBalance = hideBalance ?? false;
+      });
+    }
   }
 
   void _toggleHideBalance() async {
-    setState(() {
-      log.i('Toggle hide balance: $_hideBalance');
-      _hideBalance = !_hideBalance;
-    });
+    if (mounted) {
+      setState(() {
+        log.i('Toggle hide balance: $_hideBalance');
+        _hideBalance = !_hideBalance;
+      });
+    }
     // await LocalStorageHelper.setValue('hide_balance', _hideBalance);
+  }
+
+  // Show dialog when token is invalid
+  void returnLoginDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return OKDialog(
+          title: ErrorMessage.error,
+          content: Text(
+            ErrorMessage.errorWhileLoading,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          onClick: () => Navigator.of(context).pushNamedAndRemoveUntil(
+            LoginScreen.routeName,
+            (route) => false,
+          ),
+        );
+      },
+    );
   }
 
   Future<void> getExtraBalance() async {
     try {
-      ExtraBalanceModel? extraBalanceModel =
-          await callWalletApi.getExtraWalletBalance();
-      if (extraBalanceModel != null) {
+      APIResponse<ExtraBalanceModel> extraBalanceModel =
+          await _walletApi.getExtraWalletBalance();
+
+      if (extraBalanceModel.isTokenValid == false &&
+          extraBalanceModel.message == ErrorMessage.tokenInvalid) {
+        log.e('Token is invalid');
+
+        if (!mounted) return;
+        //show error dialog
+        returnLoginDialog();
+        return;
+      }
+
+      if (extraBalanceModel.data != null) {
         setState(() {
-          extraBalance = extraBalanceModel.balance;
-          expiredDate = extraBalanceModel.expiredDate;
+          extraBalance = extraBalanceModel.data!.balance;
+          expiredDate = extraBalanceModel.data!.expiredDate;
         });
       }
     } catch (e) {
@@ -70,10 +110,21 @@ class _WalletExtraScreenState extends State<WalletExtraScreen> {
     });
 
     try {
-      final List<WalletModel>? result =
-          await callWalletApi.getExtraWalletTransactions();
+      final APIResponse<List<WalletModel>> result =
+          await _walletApi.getExtraWalletTransactions();
+
+      if (result.isTokenValid == false &&
+          result.message == ErrorMessage.tokenInvalid) {
+        log.e('Token is invalid');
+
+        if (!mounted) return;
+        //show error dialog
+        returnLoginDialog();
+        return;
+      }
+
       setState(() {
-        transactions = result ?? [];
+        transactions = result.data ?? [];
       });
     } catch (e) {
       log.e('Error during get extra wallet transactions: $e');
@@ -184,7 +235,7 @@ class _WalletExtraScreenState extends State<WalletExtraScreen> {
                         Text(
                           _hideBalance
                               ? '******'
-                              : '${UltilHelper.formatNumber(extraBalance)} bic',
+                              : '${UltilHelper.formatMoney(extraBalance)} bic',
                           style: Theme.of(context)
                               .textTheme
                               .displayMedium!
@@ -197,8 +248,8 @@ class _WalletExtraScreenState extends State<WalletExtraScreen> {
                         ),
                         Text(
                           expiredDate != null
-                              ? '${UltilHelper.formatNumber(extraBalance)} bic will expire on ${UltilHelper.formatDate(expiredDate!)}'
-                              : '${UltilHelper.formatNumber(extraBalance)} bic',
+                              ? '${UltilHelper.formatMoney(extraBalance)} bic will expire on ${UltilHelper.formatDate(expiredDate!)}'
+                              : '${UltilHelper.formatMoney(extraBalance)} bic',
                           style: Theme.of(context)
                               .textTheme
                               .bodySmall!
@@ -253,7 +304,7 @@ class _WalletExtraScreenState extends State<WalletExtraScreen> {
 
               // List of transaction
               isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? const LoadingCircle()
                   : errorMessage != null
                       ? Center(
                           child: Text(
@@ -284,25 +335,22 @@ class _WalletExtraScreenState extends State<WalletExtraScreen> {
                                     color: itemBackgroundColor,
                                     child: ListTile(
                                       leading: CircleAvatar(
-                                        backgroundColor: transactions[index]
-                                                    .transactionType ==
-                                                'IN'
-                                            ? Theme.of(context)
-                                                .colorScheme
-                                                .primary
-                                            : Theme.of(context)
-                                                .colorScheme
-                                                .outline,
+                                        backgroundColor:
+                                            transactions[index].type == 'IN'
+                                                ? Theme.of(context)
+                                                    .colorScheme
+                                                    .primary
+                                                : Theme.of(context)
+                                                    .colorScheme
+                                                    .outline,
                                         child: Icon(
-                                          transactions[index].transactionType ==
-                                                  'IN'
+                                          transactions[index].type == 'IN'
                                               ? Icons.attach_money_rounded
                                               : Icons.local_parking_rounded,
                                         ),
                                       ),
                                       title: Text(
-                                        transactions[index].transactionType ==
-                                                'IN'
+                                        transactions[index].type == 'IN'
                                             ? 'Deposit'
                                             : 'Parking Fee',
                                         style: Theme.of(context)
@@ -314,8 +362,7 @@ class _WalletExtraScreenState extends State<WalletExtraScreen> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            transactions[index]
-                                                    .transactionDescription ??
+                                            transactions[index].description ??
                                                 '',
                                             style: Theme.of(context)
                                                 .textTheme
@@ -336,11 +383,10 @@ class _WalletExtraScreenState extends State<WalletExtraScreen> {
                                         ],
                                       ),
                                       trailing: Text(
-                                        (transactions[index].transactionType ==
-                                                    'IN'
+                                        (transactions[index].type == 'IN'
                                                 ? '+'
                                                 : '-') +
-                                            UltilHelper.formatNumber(
+                                            UltilHelper.formatMoney(
                                                 transactions[index].amount),
                                         style: Theme.of(context)
                                             .textTheme

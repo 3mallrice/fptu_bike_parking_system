@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fptu_bike_parking_system/api/model/bai_model/wallet_model.dart';
 import 'package:fptu_bike_parking_system/representation/about_screen.dart';
 import 'package:fptu_bike_parking_system/representation/add_bai_screen.dart';
 import 'package:fptu_bike_parking_system/representation/add_feedback.dart';
@@ -52,6 +53,12 @@ final Map<String, WidgetBuilder> routes = {
       package: agrs,
     );
   },
-  ReceiptScreen.routeName: (context) => const ReceiptScreen(),
+  ReceiptScreen.routeName: (context) {
+    final args = ModalRoute.of(context)!.settings.arguments as WalletModel;
+
+    return ReceiptScreen(
+      transaction: args,
+    );
+  },
   InsightScreen.routeName: (context) => const InsightScreen(),
 };
