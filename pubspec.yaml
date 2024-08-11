@@ -60,12 +60,13 @@ dependencies:
   webview_flutter: ^4.8.0
   flutter_lints: ^4.0.0
   loading_animation_widget: ^1.2.1
-  fancy_shimmer_image: ^2.0.3
+  cached_network_image: ^3.4.0
   animated_custom_dropdown: ^3.1.1
   http_parser: ^4.0.2
   flutter_zalopay_sdk: ^0.1.14
   mime: ^1.0.5
   fl_chart: ^0.68.0
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_test:

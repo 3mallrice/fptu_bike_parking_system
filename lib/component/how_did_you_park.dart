@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-import '../api/model/bai_model/chart.dart';
+import '../api/model/bai_model/statistic.dart';
 
 class HowDidYouPark extends StatelessWidget {
   final List<HowDidYouParkAndSpend> howDidYouParkList;
@@ -14,7 +14,7 @@ class HowDidYouPark extends StatelessWidget {
   Widget build(BuildContext context) {
     //Bar chart for HowDidYouPark
     return AspectRatio(
-      aspectRatio: 16 / 9,
+      aspectRatio: 3 / 2,
       child: Padding(
         padding: const EdgeInsets.all(5),
         child: BarChart(
@@ -77,20 +77,23 @@ class HowDidYouPark extends StatelessWidget {
                   showTitles: true,
                   reservedSize: 40,
                   getTitlesWidget: (value, meta) {
-                    String day = '';
-                    for (var data in howDidYouParkList) {
-                      if (data.date.day == value) {
-                        //format Aug 01
-                        day = data.date.day.toString();
+                    if (value % 5 == 0) {
+                      // Chỉ hiển thị nhãn cho mỗi ngày chẵn
+                      String day = '';
+                      for (var data in howDidYouParkList) {
+                        if (data.date.day == value) {
+                          day = '${data.date.day}/${data.date.month}';
+                        }
                       }
+                      return SideTitleWidget(
+                        axisSide: meta.axisSide,
+                        child: Text(
+                          day,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      );
                     }
-                    return SideTitleWidget(
-                      axisSide: meta.axisSide,
-                      child: Text(
-                        day,
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    );
+                    return const SizedBox.shrink();
                   },
                 ),
               ),

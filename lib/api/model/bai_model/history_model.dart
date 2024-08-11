@@ -9,6 +9,7 @@ class HistoryModel {
   final String? gateOut;
   final String? paymentMethod;
   final String parkingArea;
+  final bool isFeedback;
 
   HistoryModel({
     required this.id,
@@ -21,6 +22,7 @@ class HistoryModel {
     this.gateOut,
     this.paymentMethod,
     required this.parkingArea,
+    required this.isFeedback,
   });
 
   factory HistoryModel.fromJson(Map<String, dynamic> json) {
@@ -35,6 +37,7 @@ class HistoryModel {
       gateOut: json['gateOut'],
       paymentMethod: json['paymentMethod'],
       parkingArea: json['parkingArea'],
+      isFeedback: json['isFeedback'],
     );
   }
 }

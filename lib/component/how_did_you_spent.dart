@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-import '../api/model/bai_model/chart.dart';
+import '../api/model/bai_model/statistic.dart';
 import '../core/const/utilities/util_helper.dart';
 
 class HowDidYouSpend extends StatelessWidget {
@@ -14,7 +14,7 @@ class HowDidYouSpend extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: 16 / 9,
+      aspectRatio: 3 / 2,
       child: Padding(
         padding: const EdgeInsets.all(5),
         child: LineChart(
@@ -23,11 +23,12 @@ class HowDidYouSpend extends StatelessWidget {
               LineChartBarData(
                 spots: howDidYouSpendList.map((data) {
                   return FlSpot(
-                    data.date.day.toDouble(),
+                    data.date.millisecondsSinceEpoch.toDouble(),
                     data.amount.toDouble(),
                   );
                 }).toList(),
-                isCurved: true,
+                isCurved: false,
+                curveSmoothness: 0.2,
                 color: Theme.of(context).colorScheme.primary,
                 dotData: const FlDotData(show: false),
                 belowBarData: BarAreaData(
@@ -75,6 +76,15 @@ class HowDidYouSpend extends StatelessWidget {
                 },
               ),
             ),
+            minX: howDidYouSpendList.isNotEmpty
+                ? howDidYouSpendList.first.date.millisecondsSinceEpoch
+                    .toDouble()
+                : 0,
+            maxX: howDidYouSpendList.isNotEmpty
+                ? howDidYouSpendList.last.date.millisecondsSinceEpoch.toDouble()
+                : 0,
+            minY: 0,
+
             titlesData: FlTitlesData(
               bottomTitles: AxisTitles(
                 sideTitles: SideTitles(
@@ -82,12 +92,12 @@ class HowDidYouSpend extends StatelessWidget {
                   reservedSize: 40,
                   getTitlesWidget: (value, meta) {
                     String day = '';
-                    for (var data in howDidYouSpendList) {
-                      if (data.date.day == value) {
-                        //format Aug 01
-                        day = data.date.day.toString();
-                      }
-                    }
+                    DateTime date =
+                        DateTime.fromMillisecondsSinceEpoch(value.toInt());
+
+                    //format day
+                    day = '${date.day}/${date.month}';
+
                     return SideTitleWidget(
                       axisSide: meta.axisSide,
                       child: Text(

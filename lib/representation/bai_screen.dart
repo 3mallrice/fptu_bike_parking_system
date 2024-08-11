@@ -1,8 +1,10 @@
-import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/api/model/bai_model/api_response.dart';
 import 'package:fptu_bike_parking_system/component/empty_box.dart';
+import 'package:fptu_bike_parking_system/core/const/utilities/util_helper.dart';
 import 'package:logger/web.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../api/model/bai_model/bai_model.dart';
 import '../api/service/bai_be/bai_service.dart';
@@ -79,25 +81,28 @@ class _BaiScreenState extends State<BaiScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            child: Align(
-              alignment: Alignment.center,
-              child: Container(
-                margin: const EdgeInsets.only(top: 10),
-                child: Column(
-                  children: [
-                    _buildTotalBikeContainer(context),
-                    const SizedBox(height: 30),
-                    _buildBikeInformation(context),
-                  ],
+      body: RefreshIndicator(
+        onRefresh: fetchBikes,
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              child: Align(
+                alignment: Alignment.center,
+                child: Container(
+                  margin: const EdgeInsets.only(top: 10),
+                  child: Column(
+                    children: [
+                      _buildTotalBikeContainer(context),
+                      const SizedBox(height: 30),
+                      _buildBikeInformation(context),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          if (isCalling) const LoadingCircle()
-        ],
+            if (isCalling) const LoadingCircle()
+          ],
+        ),
       ),
     );
   }
@@ -170,6 +175,7 @@ class _BaiScreenState extends State<BaiScreen> {
         itemCount: bikes?.length ?? 0,
         physics: const NeverScrollableScrollPhysics(),
         itemBuilder: (context, index) {
+          final bai = bikes![index];
           return Padding(
             padding: const EdgeInsets.only(bottom: 20),
             child: ShadowContainer(
@@ -183,15 +189,18 @@ class _BaiScreenState extends State<BaiScreen> {
                         topLeft: Radius.circular(10),
                         topRight: Radius.circular(10),
                       ),
-                      child: FancyShimmerImage(
+                      child: CachedNetworkImage(
                         width: double.infinity,
-                        imageUrl: bikes![index].plateImage!,
-                        boxFit: BoxFit.cover,
-                        errorWidget: const ImageNotFound(),
-                        shimmerBaseColor:
-                            Theme.of(context).colorScheme.background,
-                        shimmerHighlightColor:
-                            Theme.of(context).colorScheme.outlineVariant,
+                        imageUrl: bai.plateImage,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Shimmer.fromColors(
+                          baseColor: Theme.of(context).colorScheme.background,
+                          highlightColor:
+                              Theme.of(context).colorScheme.outlineVariant,
+                          child: Container(color: Colors.grey),
+                        ),
+                        errorWidget: (context, url, error) =>
+                            const ImageNotFound(),
                       ),
                     ),
                   ),
@@ -211,21 +220,45 @@ class _BaiScreenState extends State<BaiScreen> {
                         ),
                         const SizedBox(width: 10),
                         Text(
-                          bikes![index].plateNumber!,
+                          bikes![index].plateNumber,
                           style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          UltilHelper.formatDateMMMddyyyy(
+                              bikes![index].createDate),
+                          style: Theme.of(context).textTheme.bodySmall,
                         ),
                       ],
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(10.0),
+                    padding: const EdgeInsets.only(top: 5, left: 10),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const SizedBox(width: 10),
                         Text(
-                          bikes![index].vehicleType!,
+                          UltilHelper.formatDateMMMddyyyy(
+                              bikes![index].createDate),
+                          style:
+                              Theme.of(context).textTheme.bodySmall!.copyWith(
+                                    fontSize: 11,
+                                  ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10, left: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const SizedBox(width: 10),
+                        Text(
+                          bikes![index].vehicleType,
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                         const SizedBox(width: 10),
@@ -238,10 +271,10 @@ class _BaiScreenState extends State<BaiScreen> {
                             shape: BoxShape.rectangle,
                             borderRadius: BorderRadius.circular(16),
                             color:
-                                _getStatusColor(bikes![index].status!, context),
+                                _getStatusColor(bikes![index].status, context),
                           ),
                           child: Text(
-                            bikes![index].status!,
+                            bikes![index].status,
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium!

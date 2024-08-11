@@ -39,6 +39,16 @@ class UltilHelper {
     return DateFormat('dd/MM/yyyy HH:mm').format(date);
   }
 
+  // Function to format date
+  static String formatDateOnly(DateTime date) {
+    return DateFormat('dd/MM/yyyy').format(date);
+  }
+
+  // Function to format date: August 12, 2021
+  static String formatDateMMMddyyyy(DateTime date) {
+    return DateFormat('MMMM dd, yyyy').format(date);
+  }
+
   // Function to format number
   // eg: 100000 -> 100.000
   static String formatMoney(int number) {

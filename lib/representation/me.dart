@@ -207,16 +207,14 @@ class _MeScreenState extends State<MeScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  ShadowContainer(
-                    alignment: Alignment.center,
-                    width: MediaQuery.of(context).size.width * 0.5,
-                    height: 60,
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    color: Theme.of(context).colorScheme.primary,
-                    child: GestureDetector(
-                      onTap: () {
-                        _logout();
-                      },
+                  GestureDetector(
+                    onTap: _logout,
+                    child: ShadowContainer(
+                      alignment: Alignment.center,
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      height: 60,
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      color: Theme.of(context).colorScheme.primary,
                       child: Text(
                         'Logout',
                         style:
