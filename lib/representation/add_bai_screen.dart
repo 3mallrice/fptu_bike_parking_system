@@ -30,7 +30,6 @@ class _AddBaiState extends State<AddBai> {
   var log = Logger();
   String? imageUrl;
   String? _selectedVehicleTypeId;
-  late String _plateNumber;
   late String responseText;
   final TextEditingController _plateNumberController = TextEditingController();
   CallBikeApi api = CallBikeApi();
@@ -62,6 +61,7 @@ class _AddBaiState extends State<AddBai> {
       if (mounted) {
         setState(() {
           imageUrl = imagePath;
+          _plateNumberController.clear();
         });
       }
 
@@ -74,7 +74,7 @@ class _AddBaiState extends State<AddBai> {
     }
   }
 
-// Get plate number from image
+  // Get plate number from image
   Future<void> detectPlateNumber(File imageFile) async {
     try {
       // Show loading
@@ -88,13 +88,10 @@ class _AddBaiState extends State<AddBai> {
       LoadingOverlayHelper.hide();
 
       if (plateNumberResponse?.data?.plateNumber != null) {
-        _plateNumber = plateNumberResponse!.data!.plateNumber;
-
-        log.i('Plate number detected: $_plateNumber');
-
         if (mounted) {
           setState(() {
-            _plateNumberController.text = _plateNumber;
+            _plateNumberController.text =
+                plateNumberResponse!.data!.plateNumber;
           });
         }
       } else {
@@ -104,6 +101,7 @@ class _AddBaiState extends State<AddBai> {
         if (mounted) {
           setState(() {
             imageUrl = null;
+            _plateNumberController.clear();
           });
         }
       }
@@ -126,13 +124,30 @@ class _AddBaiState extends State<AddBai> {
 
   Future<void> _saveVehicleRegistration() async {
     if (imageUrl != null && _selectedVehicleTypeId != null) {
-      BaiModel baiModel = BaiModel(
-        plateNumber: _plateNumber,
-        plateImageFile: File(imageUrl!),
+      if (_plateNumberController.text.isEmpty) {
+        log.e('Plate number is empty');
+        showCustomSnackBar(
+          MySnackBar(
+            prefix: Icon(
+              Icons.cancel_rounded,
+              color: backgroundColor,
+            ),
+            message: 'Plate number is required.',
+            backgroundColor: onUnsuccessful,
+          ),
+        );
+        return;
+      }
+
+      AddBaiModel addBaiModel = AddBaiModel(
+        plateNumber: _plateNumberController.text,
+        plateImage: File(imageUrl!),
         vehicleTypeId: _selectedVehicleTypeId!,
       );
 
-      APIResponse<BaiModel> result = await api.createBai(baiModel);
+      log.i('Saving vehicle registration: $addBaiModel');
+
+      APIResponse<AddBaiRespModel> result = await api.createBai(addBaiModel);
 
       if (result.isTokenValid == false &&
           result.message == ErrorMessage.tokenInvalid) {
@@ -170,7 +185,7 @@ class _AddBaiState extends State<AddBai> {
               Icons.cancel_rounded,
               color: backgroundColor,
             ),
-            message: ErrorMessage.inputRequired(message: ListName.bai),
+            message: ErrorMessage.somethingWentWrong,
             backgroundColor: onUnsuccessful,
           ),
         );
@@ -348,6 +363,9 @@ class _AddBaiState extends State<AddBai> {
                         height: MediaQuery.of(context).size.height * 0.065,
                         child: TextField(
                           controller: _plateNumberController,
+                          readOnly: imageUrl == null,
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.done,
                           onChanged: (value) {
                             String updatedValue = value.toUpperCase();
 
@@ -368,7 +386,8 @@ class _AddBaiState extends State<AddBai> {
                               setState(() {
                                 isValidInput =
                                     Regex.plateRegExp.hasMatch(currentValue);
-                                _plateNumber = isValidInput ? currentValue : '';
+                                _plateNumberController.text =
+                                    isValidInput ? currentValue : '';
                               });
                             }
                           },

@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:fptu_bike_parking_system/api/model/bai_model/feedback_model.dart';
 import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
+import 'package:fptu_bike_parking_system/component/loading_component.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
-import 'package:fptu_bike_parking_system/representation/add_feedback.dart';
-import 'package:intl/intl.dart';
+import 'package:fptu_bike_parking_system/core/const/utilities/util_helper.dart';
+import 'package:logger/logger.dart';
+
+import '../api/service/bai_be/feedback_service.dart';
+import '../component/return_login_component.dart';
+import '../core/const/frondend/message.dart';
 
 class FeedbackScreen extends StatefulWidget {
   const FeedbackScreen({super.key});
@@ -14,138 +20,154 @@ class FeedbackScreen extends StatefulWidget {
 }
 
 class _FeedbackScreenState extends State<FeedbackScreen> {
-  // Feedback List
-  List<Feedback> feedbacks = [
-    Feedback(
-      feedbackId: '1',
-      feedbackTitle: 'Increased Utilization at Central Plaza Parking Lot',
-      parkingArea: 'FPTU',
-      date: DateTime.now(),
-      feedbackText:
-          'We have observed a significant increase in the utilization of the Central Plaza Parking Lot over the past month. This trend indicates a growing demand for bike parking facilities in this area',
-    ),
-    Feedback(
-      feedbackId: '2',
-      feedbackTitle: 'Customer Preference for Green Park Bike Station',
-      parkingArea: 'FPTU',
-      date: DateTime.now(),
-      feedbackText:
-          'Our data analysis reveals a notable preference among customers for the Green Park Bike Station. With its convenient location and secure facilities, it continues to be a top choice for cyclists in the area.',
-    ),
-    Feedback(
-      feedbackId: '3',
-      feedbackTitle: 'Promoting Usage Diversity at Riverside Bike Dock',
-      parkingArea: 'FPTU',
-      date: DateTime.now(),
-      feedbackText:
-          'We have implementing strategies to encourage diverse usage patterns at the Riverside Bike Dock. By offering incentives and promotions, we aim to attract a broader range of users to this facility.',
-    ),
-  ];
+  final callFeedbackApi = FeedbackApi();
+  bool isLoading = false;
+  List<FeedbackModel> feedbacks = [];
+
+  var log = Logger();
+
+  @override
+  void initState() {
+    super.initState();
+    getFeedbacks();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarCom(
+      appBar: const AppBarCom(
         leading: true,
         appBarText: 'Feedback',
-        action: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: IconButton(
-              onPressed: () =>
-                  Navigator.of(context).pushNamed(AddFeedbackScreen.routeName),
-              icon: Icon(
-                Icons.post_add_rounded,
-                color: Theme.of(context).colorScheme.onSecondary,
-              ),
-              iconSize: 21,
-            ),
-          )
-        ],
       ),
       body: SingleChildScrollView(
         child: Align(
           child: SizedBox(
             width: MediaQuery.of(context).size.width * 0.9,
-            child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: feedbacks.length,
-                physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: ShadowContainer(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            feedbacks[index].feedbackTitle,
-                            style: Theme.of(context).textTheme.headlineMedium,
-                            textAlign: TextAlign.center,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.local_parking_rounded,
-                                color:
-                                    Theme.of(context).colorScheme.onSecondary,
+            child: isLoading
+                ? const Center(
+                    child: LoadingCircle(),
+                  )
+                : RefreshIndicator(
+                    onRefresh: getFeedbacks,
+                    child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: feedbacks.length,
+                        itemBuilder: (context, index) {
+                          final feedback = feedbacks[index];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: ShadowContainer(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    feedback.title,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineMedium,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.local_parking_rounded,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondary,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        feedback.parkingAreaName,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium,
+                                      )
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.calendar_month_rounded,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondary,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        UltilHelper.formatDateMMMddyyyy(
+                                            feedback.createdDate),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium,
+                                      )
+                                    ],
+                                  ),
+                                  Text(
+                                    feedback.description,
+                                    style:
+                                        Theme.of(context).textTheme.bodyMedium,
+                                    textAlign: TextAlign.justify,
+                                  ),
+                                ],
                               ),
-                              const SizedBox(width: 10),
-                              Text(
-                                feedbacks[index].parkingArea,
-                                style: Theme.of(context).textTheme.bodyMedium,
-                              )
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.calendar_month_rounded,
-                                color:
-                                    Theme.of(context).colorScheme.onSecondary,
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                DateFormat('MMMM dd, yyyy')
-                                    .format(feedbacks[index].date),
-                                style: Theme.of(context).textTheme.bodyMedium,
-                              )
-                            ],
-                          ),
-                          Text(
-                            feedbacks[index].feedbackText!,
-                            style: Theme.of(context).textTheme.bodyMedium,
-                            textAlign: TextAlign.justify,
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }),
+                            ),
+                          );
+                        }),
+                  ),
           ),
         ),
       ),
     );
   }
-}
 
-class Feedback {
-  String feedbackId;
-  String feedbackTitle;
-  String parkingArea;
-  DateTime date;
-  String? feedbackText;
+  Future<void> getFeedbacks() async {
+    setState(() {
+      isLoading = true;
+    });
 
-  Feedback({
-    required this.feedbackId,
-    required this.feedbackTitle,
-    required this.parkingArea,
-    required this.date,
-    this.feedbackText,
-  });
+    try {
+      final response = await callFeedbackApi.getFeedbacks();
+      if (response.isTokenValid) {
+        if (response.data != null) {
+          setState(() {
+            feedbacks = response.data!;
+          });
+        }
+      } else if (response.message == ErrorMessage.tokenInvalid &&
+          !response.isTokenValid) {
+        log.e('Token is invalid');
+
+        if (!mounted) return;
+        //show error dialog
+        returnLoginDialog();
+        return;
+      } else {
+        log.e('Failed to get feedbacks: ${response.message}');
+      }
+    } catch (e) {
+      // Handle error
+      log.e('Error during get feedbacks: $e');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  //return login dialog
+  void returnLoginDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const InvalidTokenDialog();
+      },
+    );
+  }
 }

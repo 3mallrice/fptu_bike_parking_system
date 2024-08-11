@@ -3,7 +3,6 @@ import 'package:flutter/widgets.dart';
 import 'package:fptu_bike_parking_system/api/model/bai_model/wallet_model.dart';
 import 'package:fptu_bike_parking_system/representation/about_screen.dart';
 import 'package:fptu_bike_parking_system/representation/add_bai_screen.dart';
-import 'package:fptu_bike_parking_system/representation/add_feedback.dart';
 import 'package:fptu_bike_parking_system/representation/feedback.dart';
 import 'package:fptu_bike_parking_system/representation/fundin_screen.dart';
 import 'package:fptu_bike_parking_system/representation/history.dart';
@@ -39,7 +38,6 @@ final Map<String, WidgetBuilder> routes = {
   ProfileScreen.routeName: (context) => const ProfileScreen(),
   AboutUs.routeName: (context) => const AboutUs(),
   FeedbackScreen.routeName: (context) => const FeedbackScreen(),
-  AddFeedbackScreen.routeName: (context) => const AddFeedbackScreen(),
   SplashScreen.routeName: (context) => const SplashScreen(),
   IntroScreen.routeName: (context) => const IntroScreen(),
   LoginScreen.routeName: (context) => const LoginScreen(),

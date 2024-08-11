@@ -23,16 +23,17 @@ class CallBikeApi {
   var log = Logger();
 
   // Post vehicle
-  Future<APIResponse<BaiModel>> createBai(BaiModel? baiModel) async {
+  Future<APIResponse<AddBaiRespModel>> createBai(
+      AddBaiModel? addBaiModel) async {
     try {
-      if (baiModel == null) {
+      if (addBaiModel == null) {
         log.e('Bai model is null');
         return APIResponse(message: 'Bai model is null');
       }
 
       token = GetLocalHelper.getBearerToken() ?? "";
 
-      if (token == "") {
+      if (token.isEmpty) {
         log.e('Token is empty');
         return APIResponse(
           message: ErrorMessage.tokenInvalid,
@@ -40,36 +41,39 @@ class CallBikeApi {
         );
       }
 
-      // Tạo multipart request
       var request = http.MultipartRequest('POST', Uri.parse('$api/customer'));
       request.headers['Authorization'] = token;
-      request.headers['Content-Type'] = 'multipart/form-data';
 
       // Thêm các trường dữ liệu vào request
-      request.fields['plateNumber'] = baiModel.plateNumber!;
-      request.fields['vehicleTypeId'] = baiModel.vehicleTypeId!;
+      request.fields['PlateNumber'] = addBaiModel.plateNumber;
+      request.fields['VehicleTypeId'] = addBaiModel.vehicleTypeId;
 
       // Thêm file ảnh vào request
-      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
       var fileStream =
-          http.ByteStream(baiModel.plateImageFile!.openRead().cast());
-      var length = await baiModel.plateImageFile!.length();
+          http.ByteStream(addBaiModel.plateImage.openRead().cast());
+      var length = await addBaiModel.plateImage.length();
+
+      // Xác định MIME type của ảnh
+      final mimeType =
+          lookupMimeType(addBaiModel.plateImage.path) ?? 'image/jpeg';
+      final mediaType = MediaType.parse(mimeType);
+
       var multipartFile = http.MultipartFile(
         'PlateImage',
         fileStream,
         length,
-        contentType: MediaType('image', 'png'),
-        filename: '$fileName.png',
+        contentType: mediaType,
+        filename: addBaiModel.plateImage.path.split('/').last,
       );
       request.files.add(multipartFile);
 
-      // Gửi request và chờ response
       var response = await http.Response.fromStream(await request.send());
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+        final responseJson = jsonDecode(response.body);
         return APIResponse.fromJson(
-          jsonDecode(response.body),
-          (json) => BaiModel.fromJson(json as Map<String, dynamic>),
+          responseJson,
+          (json) => AddBaiRespModel.fromJson(json as Map<String, dynamic>),
         );
       } else {
         log.e('Failed to create bai: ${response.statusCode}');

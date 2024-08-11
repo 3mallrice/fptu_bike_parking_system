@@ -11,10 +11,16 @@ class HowDidYouParkAndSpend {
 
   factory HowDidYouParkAndSpend.fromJson(Map<String, dynamic> json) {
     return HowDidYouParkAndSpend(
-      date: json['date'],
-      numberOfParkings: json['numberOfParkings'],
+      date: DateTime.parse(json['date']),
+      numberOfParkings: json['totalPayment'],
       amount: json['amount'],
     );
+  }
+
+  //toString method
+  @override
+  String toString() {
+    return 'HowDidYouParkAndSpend{date: $date, numberOfParkings: $numberOfParkings, amount: $amount}';
   }
 }
 
@@ -29,8 +35,14 @@ class PaymentMethodUsage {
 
   factory PaymentMethodUsage.fromJson(Map<String, dynamic> json) {
     return PaymentMethodUsage(
-      method: json['method'],
-      count: json['count'],
+      method: json['paymentMethod'],
+      count: json['totalPayment'],
     );
+  }
+
+  //toString method
+  @override
+  String toString() {
+    return 'PaymentMethodUsage{method: $method, count: $count}';
   }
 }

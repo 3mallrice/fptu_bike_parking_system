@@ -1,29 +1,84 @@
 import 'dart:io';
 
 class BaiModel {
-  final String? plateNumber;
-  final File? plateImageFile;
-  final String? plateImage;
-  final String? vehicleTypeId;
-  final String? status;
-  final String? vehicleType;
+  final String id;
+  final String plateNumber;
+  final String plateImage;
+  final String status;
+  final String vehicleType;
+  final DateTime createDate;
 
   BaiModel({
-    this.status,
-    this.vehicleType,
-    this.plateNumber,
-    this.plateImageFile,
-    this.vehicleTypeId,
-    this.plateImage, 
+    required this.id,
+    required this.plateNumber,
+    required this.plateImage,
+    required this.status,
+    required this.vehicleType,
+    required this.createDate,
   });
 
   factory BaiModel.fromJson(Map<String, dynamic> json) {
     return BaiModel(
+      id: json['id'],
       plateNumber: json['plateNumber'],
       plateImage: json['plateImage'],
       status: json['statusVehicle'],
       vehicleType: json['vehicleTypeName'],
+      createDate: DateTime.parse(json['createDate']),
     );
+  }
+
+  //toString
+  @override
+  String toString() {
+    return 'BaiModel{id: $id, plateNumber: $plateNumber, plateImage: $plateImage, status: $status, vehicleType: $vehicleType, createDate: $createDate}';
+  }
+}
+
+class AddBaiModel {
+  final String plateNumber;
+  final File plateImage;
+  final String vehicleTypeId;
+
+  AddBaiModel({
+    required this.plateNumber,
+    required this.plateImage,
+    required this.vehicleTypeId,
+  });
+
+  //toString
+  @override
+  String toString() {
+    return 'AddBaiModel{plateNumber: $plateNumber, plateImage: $plateImage, vehicleTypeId: $vehicleTypeId}';
+  }
+}
+
+class AddBaiRespModel {
+  final String vehicleId;
+  final String imagePlateNumber;
+  final String vehicleTypeName;
+  final String plateNumber;
+
+  AddBaiRespModel({
+    required this.vehicleId,
+    required this.imagePlateNumber,
+    required this.vehicleTypeName,
+    required this.plateNumber,
+  });
+
+  factory AddBaiRespModel.fromJson(Map<String, dynamic> json) {
+    return AddBaiRespModel(
+      vehicleId: json['vehicleId'],
+      imagePlateNumber: json['imagePlateNumber'],
+      vehicleTypeName: json['vehicleTypeName'],
+      plateNumber: json['plateNumber'],
+    );
+  }
+
+  //toString
+  @override
+  String toString() {
+    return 'AddBaiResponse{vehicleId: $vehicleId, imagePlateNumber: $imagePlateNumber, vehicleTypeName: $vehicleTypeName, plateNumber: $plateNumber}';
   }
 }
 
