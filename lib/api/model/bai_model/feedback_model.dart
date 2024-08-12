@@ -5,7 +5,6 @@ class FeedbackModel {
   final String description;
   final DateTime createdDate;
   final String sessionId;
-  final String isFeedback;
 
   FeedbackModel({
     required this.id,
@@ -14,7 +13,6 @@ class FeedbackModel {
     required this.description,
     required this.createdDate,
     required this.sessionId,
-    required this.isFeedback,
   });
 
   factory FeedbackModel.fromJson(Map<String, dynamic> json) {
@@ -25,7 +23,6 @@ class FeedbackModel {
       description: json['description'],
       createdDate: DateTime.parse(json['createdDate']),
       sessionId: json['sessionId'],
-      isFeedback: json['isFeedback'],
     );
   }
 }

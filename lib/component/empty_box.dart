@@ -30,7 +30,7 @@ class EmptyBox extends StatelessWidget {
           ),
           const SizedBox(height: 15),
           Text(
-            message ?? StaticMessage.emptyList,
+            message ?? EmptyBoxMessage.empty,
             style: Theme.of(context).textTheme.titleMedium!.copyWith(
                   fontWeight: FontWeight.normal,
                   color: Theme.of(context).colorScheme.onSecondary,

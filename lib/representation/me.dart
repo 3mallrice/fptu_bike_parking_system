@@ -177,21 +177,21 @@ class _MeScreenState extends State<MeScreen> {
                           color: Theme.of(context).colorScheme.outlineVariant,
                           thickness: 1,
                         ),
-                        meItem(
-                            Icons.rule_rounded,
-                            Text(
-                              'Parking Rules',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium!
-                                  .copyWith(fontSize: 18),
-                            ), () {
-                          // TODO: Navigate to Parking Rules
-                        }),
-                        Divider(
-                          color: Theme.of(context).colorScheme.outlineVariant,
-                          thickness: 1,
-                        ),
+                        // meItem(
+                        //     Icons.rule_rounded,
+                        //     Text(
+                        //       'Parking Rules',
+                        //       style: Theme.of(context)
+                        //           .textTheme
+                        //           .titleMedium!
+                        //           .copyWith(fontSize: 18),
+                        //     ), () {
+                        //   // TODO: Navigate to Parking Rules
+                        // }),
+                        // Divider(
+                        //   color: Theme.of(context).colorScheme.outlineVariant,
+                        //   thickness: 1,
+                        // ),
                         meItem(
                             Icons.info_outlined,
                             Text(
