@@ -12,7 +12,7 @@ class InvalidTokenDialog extends StatelessWidget {
     return OKDialog(
       title: ErrorMessage.error,
       content: Text(
-        ErrorMessage.errorWhileLoading,
+        ErrorMessage.tokenIsExpired,
         style: Theme.of(context).textTheme.bodyMedium,
       ),
       onClick: () => Navigator.of(context).pushNamedAndRemoveUntil(

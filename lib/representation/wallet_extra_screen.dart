@@ -13,6 +13,7 @@ import 'package:transition/transition.dart';
 
 import '../api/model/bai_model/api_response.dart';
 import '../component/dialog.dart';
+import '../component/empty_box.dart';
 import '../core/const/frondend/message.dart';
 import '../core/const/utilities/util_helper.dart';
 import '../core/helper/return_login_dialog.dart';
@@ -311,12 +312,9 @@ class _WalletExtraScreenState extends State<WalletExtraScreen> {
                           ),
                         )
                       : transactions.isEmpty
-                          ? Center(
-                              child: Text(
-                                'No transaction found',
-                                style: Theme.of(context).textTheme.bodyMedium,
-                              ),
-                            )
+                          ? EmptyBox(
+                              message: EmptyBoxMessage.emptyList(
+                                  label: ListName.transaction))
                           : ListView.builder(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),

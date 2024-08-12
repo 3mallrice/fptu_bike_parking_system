@@ -97,7 +97,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       child: isLoading
                           ? const LoadingCircle()
                           : (histories.isEmpty)
-                              ? EmptyBox(message: StaticMessage.emptyHistory)
+                              ? EmptyBox(
+                                  message: EmptyBoxMessage.emptyList(
+                                      label: ListName.history))
                               : ListView.builder(
                                   shrinkWrap: true,
                                   itemCount: histories.length,

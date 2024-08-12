@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/api/model/bai_model/feedback_model.dart';
 import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
+import 'package:fptu_bike_parking_system/component/empty_box.dart';
 import 'package:fptu_bike_parking_system/component/loading_component.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
 import 'package:fptu_bike_parking_system/core/const/utilities/util_helper.dart';
@@ -49,77 +50,86 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   )
                 : RefreshIndicator(
                     onRefresh: getFeedbacks,
-                    child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: feedbacks.length,
-                        itemBuilder: (context, index) {
-                          final feedback = feedbacks[index];
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: ShadowContainer(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    feedback.title,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineMedium,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
+                    child: (feedbacks.isEmpty)
+                        ? EmptyBox(
+                            message: EmptyBoxMessage.emptyList(
+                                label: ListName.feedback))
+                        : ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: feedbacks.length,
+                            itemBuilder: (context, index) {
+                              final feedback = feedbacks[index];
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                child: ShadowContainer(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: [
-                                      Icon(
-                                        Icons.local_parking_rounded,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSecondary,
-                                      ),
-                                      const SizedBox(width: 10),
                                       Text(
-                                        feedback.parkingAreaName,
+                                        feedback.title,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headlineMedium,
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.local_parking_rounded,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSecondary,
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Text(
+                                            feedback.parkingAreaName,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium,
+                                          )
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.calendar_month_rounded,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSecondary,
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Text(
+                                            UltilHelper.formatDateMMMddyyyy(
+                                                feedback.createdDate),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium,
+                                          )
+                                        ],
+                                      ),
+                                      Text(
+                                        feedback.description,
                                         style: Theme.of(context)
                                             .textTheme
                                             .bodyMedium,
-                                      )
-                                    ],
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.calendar_month_rounded,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSecondary,
+                                        textAlign: TextAlign.justify,
                                       ),
-                                      const SizedBox(width: 10),
-                                      Text(
-                                        UltilHelper.formatDateMMMddyyyy(
-                                            feedback.createdDate),
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyMedium,
-                                      )
                                     ],
                                   ),
-                                  Text(
-                                    feedback.description,
-                                    style:
-                                        Theme.of(context).textTheme.bodyMedium,
-                                    textAlign: TextAlign.justify,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        }),
+                                ),
+                              );
+                            }),
                   ),
           ),
         ),

@@ -1,13 +1,23 @@
 class Message {
   static String saveImageSuccessfully = "Image saved successfully!";
   static String saveImageUnSuccessfully = "Saved unsuccessfully!";
-  static String permissionDeny = "Permission denied!";
+  static String permissionDeny = "Permission denied";
+  static String permissionDenyMessage({required String message}) =>
+      "Permission denied! Only $message with an active status can perform this action";
   static String loginSuccess = "Login success, welcome back!";
 
   static String actionSuccessfully({String? action}) => "$action successfully!";
   static String enableLocationService =
       "Enable location permission\nto get weather information!";
   static String copyToClipboard = "Copied to clipboard!";
+  static String deleteConfirmation({String? message}) =>
+      "Are you sure you want to delete $message?";
+  static String confirmTitle = "Are you sure?";
+
+  static deleteSuccess({required String message}) =>
+      "Delete $message successfully!";
+  static deleteUnSuccess({required String message}) =>
+      "Delete $message failed!";
 }
 
 class ListName {
@@ -15,12 +25,16 @@ class ListName {
   static String vehicleType = "Vehicle Type";
   static String plateNumber = "Plate Number";
   static String vehicle = "Vehicle";
+  static String transaction = "Transaction";
+  static String history = "History";
+  static String feedback = "Feedback";
 }
 
 class LabelMessage {
   static String ok = "OK";
 
-  static String add({String? message}) => "Add ${message ?? ""}";
+  static String add({String? message}) =>
+      "Add ${message != null ? message.toLowerCase() : ""}";
   static String save = "Save";
   static String cancel = "Cancel";
   static String confirm = "Confirm";
@@ -51,6 +65,10 @@ class ErrorMessage {
   static String underDevelopment = "This feature is under development!";
   static String tokenInvalid = "Token is invalid!";
   static String paymentMethod = "Please select a payment method!";
+  static String notFound({String? message}) =>
+      "$message not found! Please contact the administrator.";
+  static String tokenIsExpired =
+      "Oops! Your session has expired. Please login again!";
 }
 
 class ImageName {
@@ -58,14 +76,16 @@ class ImageName {
       "${prefix ?? "image"}_${DateTime.now().millisecondsSinceEpoch}";
 }
 
-class StaticMessage {
-  static String emptyList = "Empty List!";
-  static String emptyBaiList =
-      "Oops! Looks like there are no ‘Bai’ items in the list. Please add some!";
-  static String emptyHistory =
-      "Oops! Looks like there are no history session in the list.";
-  static String tokenIsExpired =
-      "Oops! Your session has expired. Please login again!";
+class EmptyBoxMessage {
+  static String emptyListWithAction({required String label}) {
+    return "Oops! Looks like there are no ${label.toLowerCase()} in the list. Please add some!";
+  }
+
+  static String emptyList({required String label}) {
+    return "Oops! Looks like there are no ${label.toLowerCase()} in the list.";
+  }
+
+  static String empty = "Oops! Looks like there are no data in the list.";
 }
 
 class ZaloPayMessage {

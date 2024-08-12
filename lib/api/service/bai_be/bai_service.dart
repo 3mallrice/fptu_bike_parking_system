@@ -15,9 +15,7 @@ import 'api_root.dart';
 class CallBikeApi {
   static const apiName = '/vehicles';
   final String api = APIRoot.root + apiName;
-
-  static const String detectUrl =
-      'https://platenumber.khangbpa.com/detect_read';
+  final String detectUrl = 'https://platenumber.khangbpa.com';
 
   String token = "";
   var log = Logger();
@@ -162,7 +160,7 @@ class CallBikeApi {
   //'Content-Type: multipart/form-data'
   // detect plate number
   Future<PlateNumberResponse?> detectPlateNumber(File imageFile) async {
-    final url = Uri.parse(detectUrl);
+    final url = Uri.parse('$detectUrl/detect_read');
 
     // Xác định MIME type của ảnh
     final mimeType = lookupMimeType(imageFile.path);
@@ -194,6 +192,49 @@ class CallBikeApi {
     } catch (e) {
       log.e('Error during POST request: $e');
       return null;
+    }
+  }
+
+  //DELETE: /vehicles/customer/{id}
+  // Delete vehicle
+  Future<APIResponse<int>> deleteBai(String id) async {
+    try {
+      token = GetLocalHelper.getBearerToken() ?? "";
+      if (token == "") {
+        log.e('Token is empty');
+        return APIResponse(
+          message: ErrorMessage.tokenInvalid,
+          isTokenValid: false,
+        );
+      }
+      final response = await http.delete(
+        Uri.parse('$api/customer/$id'),
+        headers: {
+          'Authorization': token,
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return APIResponse(
+          data: response.statusCode,
+          message: Message.deleteSuccess(message: ListName.vehicle),
+        );
+      }
+
+      final errorMessage = response.statusCode == 404
+          ? ErrorMessage.notFound(message: ListName.vehicle)
+          : "${ErrorMessage.somethingWentWrong}: ${response.statusCode}";
+
+      log.e('Failed to delete vehicle: ${response.statusCode}');
+      return APIResponse(
+        data: response.statusCode,
+        message: errorMessage,
+      );
+
+    } catch (e) {
+      log.e('Error during delete bai: $e');
+      return APIResponse(message: "${ErrorMessage.somethingWentWrong}: $e");
     }
   }
 }

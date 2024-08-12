@@ -10,6 +10,7 @@ import 'package:logger/logger.dart';
 import 'package:transition/transition.dart';
 
 import '../component/app_bar_component.dart';
+import '../component/empty_box.dart';
 import '../component/shadow_container.dart';
 import '../core/const/frondend/message.dart';
 import '../core/helper/local_storage_helper.dart';
@@ -261,12 +262,9 @@ class _MyWalletState extends State<MyWallet> {
                           ),
                         )
                       : transactions.isEmpty
-                          ? Center(
-                              child: Text(
-                                'No transaction found',
-                                style: Theme.of(context).textTheme.bodyMedium,
-                              ),
-                            )
+                          ? EmptyBox(
+                              message: EmptyBoxMessage.emptyList(
+                                  label: ListName.transaction))
                           : ListView.builder(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
