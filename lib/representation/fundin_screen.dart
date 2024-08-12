@@ -15,9 +15,9 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import '../api/model/bai_model/api_response.dart';
 import '../api/model/bai_model/coin_package_model.dart';
 import '../component/app_bar_component.dart';
-import '../component/return_login_component.dart';
 import '../component/shadow_container.dart';
 import '../core/helper/asset_helper.dart';
+import '../core/helper/return_login_dialog.dart';
 import 'wallet_screen.dart';
 
 class FundinScreen extends StatefulWidget {
@@ -283,8 +283,8 @@ class _FundinScreenState extends State<FundinScreen> {
         log.e('Token is invalid');
 
         if (!mounted) return;
-        //show error dialog
-        returnLoginDialog();
+        //show login dialog
+        ReturnLoginDialog.returnLogin(context);
         return;
       }
 
@@ -307,8 +307,8 @@ class _FundinScreenState extends State<FundinScreen> {
         log.e('Token is invalid');
 
         if (!mounted) return;
-        //show error dialog
-        returnLoginDialog();
+        //show login dialog
+        ReturnLoginDialog.returnLogin(context);
         return;
       }
 
@@ -321,16 +321,6 @@ class _FundinScreenState extends State<FundinScreen> {
     } catch (e) {
       log.e('Error during get extra balance: $e');
     }
-  }
-
-  //return login dialog
-  void returnLoginDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return const InvalidTokenDialog();
-      },
-    );
   }
 
   Future<void> _loadPackages() async {

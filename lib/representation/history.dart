@@ -14,9 +14,9 @@ import 'package:logger/logger.dart';
 import '../api/model/bai_model/feedback_model.dart';
 import '../component/empty_box.dart';
 import '../component/loading_component.dart';
-import '../component/return_login_component.dart';
 import '../component/shadow_container.dart';
 import '../core/const/frondend/message.dart';
+import '../core/helper/return_login_dialog.dart';
 
 class HistoryScreen extends StatefulWidget {
   static String routeName = '/history_screen';
@@ -45,8 +45,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
         log.e('Token is invalid');
 
         if (!mounted) return;
-        //show error dialog
-        returnLoginDialog();
+        //show login dialog
+        ReturnLoginDialog.returnLogin(context);
         return;
       }
 
@@ -355,16 +355,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  //return login dialog
-  void returnLoginDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return const InvalidTokenDialog();
-      },
     );
   }
 

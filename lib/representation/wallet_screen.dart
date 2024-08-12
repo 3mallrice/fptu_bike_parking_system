@@ -10,10 +10,10 @@ import 'package:logger/logger.dart';
 import 'package:transition/transition.dart';
 
 import '../component/app_bar_component.dart';
-import '../component/return_login_component.dart';
 import '../component/shadow_container.dart';
 import '../core/const/frondend/message.dart';
 import '../core/helper/local_storage_helper.dart';
+import '../core/helper/return_login_dialog.dart';
 import 'fundin_screen.dart';
 import 'navigation_bar.dart';
 
@@ -35,16 +35,6 @@ class _MyWalletState extends State<MyWallet> {
   bool isLoading = true;
   String? errorMessage;
 
-  //return login dialog
-  void returnLoginDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return const InvalidTokenDialog();
-      },
-    );
-  }
-
   Future<void> _loadHideBalance() async {
     bool? hideBalance =
         await LocalStorageHelper.getValue(LocalStorageKey.isHiddenBalance);
@@ -62,20 +52,24 @@ class _MyWalletState extends State<MyWallet> {
     // await LocalStorageHelper.setValue('hide_balance', _hideBalance);
   }
 
+  void checkToken(APIResponse result) {
+    if (result.isTokenValid == false &&
+        result.message == ErrorMessage.tokenInvalid) {
+      log.e('Token is invalid');
+
+      if (!mounted) return;
+      ReturnLoginDialog.returnLogin(context);
+      return;
+    }
+  }
+
   Future<void> getBalance() async {
     try {
       final APIResponse<int> result =
           await callWalletApi.getMainWalletBalance();
 
-      if (result.isTokenValid == false &&
-          result.message == ErrorMessage.tokenInvalid) {
-        log.e('Token is invalid');
-
-        if (!mounted) return;
-        //show error dialog
-        returnLoginDialog();
-        return;
-      }
+      checkToken(result);
+      if (!mounted) return;
 
       setState(() {
         balance = result.data ?? 0;
@@ -96,15 +90,9 @@ class _MyWalletState extends State<MyWallet> {
       final APIResponse<List<WalletModel>> result =
           await callWalletApi.getMainWalletTransactions();
 
-      if (result.isTokenValid == false &&
-          result.message == ErrorMessage.tokenInvalid) {
-        log.e('Token is invalid');
+      checkToken(result);
+      if (!mounted) return;
 
-        if (!mounted) return;
-        //show error dialog
-        returnLoginDialog();
-        return;
-      }
       setState(() {
         transactions = result.data ?? [];
       });

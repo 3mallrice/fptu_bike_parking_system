@@ -10,10 +10,10 @@ import '../api/model/bai_model/bai_model.dart';
 import '../api/service/bai_be/bai_service.dart';
 import '../component/image_not_found_component.dart';
 import '../component/loading_component.dart';
-import '../component/return_login_component.dart';
 import '../component/shadow_container.dart';
 import '../core/const/frondend/message.dart';
 import '../core/helper/asset_helper.dart';
+import '../core/helper/return_login_dialog.dart';
 import '../representation/add_bai_screen.dart';
 
 class BaiScreen extends StatefulWidget {
@@ -37,16 +37,6 @@ class _BaiScreenState extends State<BaiScreen> {
     fetchBikes();
   }
 
-  //return login dialog
-  void returnLoginDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return const InvalidTokenDialog();
-      },
-    );
-  }
-
   Future<void> fetchBikes() async {
     try {
       final APIResponse<List<BaiModel>> fetchedBikes = await api.getBai();
@@ -56,8 +46,8 @@ class _BaiScreenState extends State<BaiScreen> {
         log.e('Token is invalid');
 
         if (!mounted) return;
-        //show error dialog
-        returnLoginDialog();
+        //show login dialog
+        ReturnLoginDialog.returnLogin(context);
         return;
       }
 

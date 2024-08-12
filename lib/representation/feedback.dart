@@ -7,8 +7,8 @@ import 'package:fptu_bike_parking_system/core/const/utilities/util_helper.dart';
 import 'package:logger/logger.dart';
 
 import '../api/service/bai_be/feedback_service.dart';
-import '../component/return_login_component.dart';
 import '../core/const/frondend/message.dart';
+import '../core/helper/return_login_dialog.dart';
 
 class FeedbackScreen extends StatefulWidget {
   const FeedbackScreen({super.key});
@@ -145,8 +145,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         log.e('Token is invalid');
 
         if (!mounted) return;
-        //show error dialog
-        returnLoginDialog();
+        //show login dialog
+        ReturnLoginDialog.returnLogin(context);
         return;
       } else {
         log.e('Failed to get feedbacks: ${response.message}');
@@ -159,15 +159,5 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         isLoading = false;
       });
     }
-  }
-
-  //return login dialog
-  void returnLoginDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return const InvalidTokenDialog();
-      },
-    );
   }
 }
