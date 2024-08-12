@@ -17,11 +17,11 @@ import 'package:logger/logger.dart' show Logger;
 import '../api/model/bai_model/api_response.dart';
 import '../api/model/weather/weather.dart' show WeatherData;
 import '../api/service/weather/open_weather_api.dart' show OpenWeatherApi;
-import '../component/return_login_component.dart';
 import '../component/shadow_container.dart' show ShadowContainer;
 import '../core/const/frondend/message.dart';
 import '../core/helper/asset_helper.dart' show AssetHelper;
 import '../core/helper/local_storage_helper.dart';
+import '../core/helper/return_login_dialog.dart';
 import 'fundin_screen.dart' show FundinScreen;
 
 class HomeAppScreen extends StatefulWidget {
@@ -151,8 +151,8 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
         log.e('Token is invalid');
 
         if (!mounted) return;
-        //show error dialog
-        returnLoginDialog();
+        //show login dialog
+        ReturnLoginDialog.returnLogin(context);
         return;
       }
 
@@ -175,8 +175,8 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
         log.e('Token is invalid');
 
         if (!mounted) return;
-        //show error dialog
-        returnLoginDialog();
+        //show login dialog
+        ReturnLoginDialog.returnLogin(context);
         return;
       }
 
@@ -188,16 +188,6 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
     } catch (e) {
       log.e('Error during get extra balance: $e');
     }
-  }
-
-  //return login dialog
-  void returnLoginDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return const InvalidTokenDialog();
-      },
-    );
   }
 
   @override

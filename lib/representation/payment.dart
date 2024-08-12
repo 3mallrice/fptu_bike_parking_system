@@ -12,11 +12,11 @@ import 'package:fptu_bike_parking_system/representation/receipt.dart';
 import 'package:logger/logger.dart';
 
 import '../api/model/bai_model/zalopay_model.dart';
-import '../component/return_login_component.dart';
 import '../component/snackbar.dart';
 import '../core/const/utilities/util_helper.dart';
 import '../core/helper/asset_helper.dart';
 import '../core/helper/loading_overlay_helper.dart';
+import '../core/helper/return_login_dialog.dart';
 
 class PaymentScreen extends StatefulWidget {
   final CoinPackage package;
@@ -67,8 +67,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
         log.e('Token is invalid');
 
         if (!mounted) return;
-        //show error dialog
-        returnLoginDialog();
+        //show login dialog
+        ReturnLoginDialog.returnLogin(context);
         return;
       }
 
@@ -540,16 +540,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-    );
-  }
-
-  //return login dialog
-  void returnLoginDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return const InvalidTokenDialog();
-      },
     );
   }
 }

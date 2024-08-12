@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/api/model/bai_model/bai_model.dart';
 import 'package:fptu_bike_parking_system/api/service/bai_be/bai_service.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
+import 'package:fptu_bike_parking_system/core/helper/return_login_dialog.dart';
 import 'package:fptu_bike_parking_system/representation/navigation_bar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 
 import '../api/model/bai_model/api_response.dart';
 import '../component/app_bar_component.dart';
-import '../component/return_login_component.dart';
 import '../component/shadow_button.dart';
 import '../component/snackbar.dart';
 import '../core/const/frondend/message.dart';
@@ -112,16 +112,6 @@ class _AddBaiState extends State<AddBai> {
     }
   }
 
-  //return login dialog
-  void returnLoginDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return const InvalidTokenDialog();
-      },
-    );
-  }
-
   Future<void> _saveVehicleRegistration() async {
     if (imageUrl != null && _selectedVehicleTypeId != null) {
       if (_plateNumberController.text.isEmpty) {
@@ -154,8 +144,8 @@ class _AddBaiState extends State<AddBai> {
         log.e('Token is invalid');
 
         if (!mounted) return;
-        //show error dialog
-        returnLoginDialog();
+        //show login dialog
+        ReturnLoginDialog.returnLogin(context);
         return;
       }
 

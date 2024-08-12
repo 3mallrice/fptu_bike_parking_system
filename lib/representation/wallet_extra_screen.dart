@@ -15,6 +15,7 @@ import '../api/model/bai_model/api_response.dart';
 import '../component/dialog.dart';
 import '../core/const/frondend/message.dart';
 import '../core/const/utilities/util_helper.dart';
+import '../core/helper/return_login_dialog.dart';
 import 'login.dart';
 
 class WalletExtraScreen extends StatefulWidget {
@@ -77,20 +78,24 @@ class _WalletExtraScreenState extends State<WalletExtraScreen> {
     );
   }
 
+  void checkToken(APIResponse result) {
+    if (result.isTokenValid == false &&
+        result.message == ErrorMessage.tokenInvalid) {
+      log.e('Token is invalid');
+
+      if (!mounted) return;
+      ReturnLoginDialog.returnLogin(context);
+      return;
+    }
+  }
+
   Future<void> getExtraBalance() async {
     try {
       APIResponse<ExtraBalanceModel> extraBalanceModel =
           await _walletApi.getExtraWalletBalance();
 
-      if (extraBalanceModel.isTokenValid == false &&
-          extraBalanceModel.message == ErrorMessage.tokenInvalid) {
-        log.e('Token is invalid');
-
-        if (!mounted) return;
-        //show error dialog
-        returnLoginDialog();
-        return;
-      }
+      checkToken(extraBalanceModel);
+      if (!mounted) return;
 
       if (extraBalanceModel.data != null) {
         setState(() {
@@ -113,15 +118,8 @@ class _WalletExtraScreenState extends State<WalletExtraScreen> {
       final APIResponse<List<WalletModel>> result =
           await _walletApi.getExtraWalletTransactions();
 
-      if (result.isTokenValid == false &&
-          result.message == ErrorMessage.tokenInvalid) {
-        log.e('Token is invalid');
-
-        if (!mounted) return;
-        //show error dialog
-        returnLoginDialog();
-        return;
-      }
+      checkToken(result);
+      if (!mounted) return;
 
       setState(() {
         transactions = result.data ?? [];
