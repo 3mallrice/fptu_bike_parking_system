@@ -61,7 +61,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         leading: true,
         appBarText: 'Feedback',
       ),
-      body: _isFirstLoadRunning
+      body: feedbacks.isEmpty
           ? const Center(child: LoadingCircle())
           : RefreshIndicator(
               onRefresh: getFeedbacks,
@@ -154,27 +154,22 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                                       alignment: Alignment.bottomCenter,
                                       child: LoadingCircle(
                                         size: 30,
+                                        isHeight: false,
                                       )),
                                 )
                               : const SizedBox();
                         } else if (_hasNextPage == false) {
-                          return Padding(
+                          return Container(
                             padding: const EdgeInsets.all(8.0),
-                            child: Align(
-                              alignment: Alignment.bottomCenter,
-                              child: Container(
-                                padding: const EdgeInsets.all(8.0),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
-                                ),
-                                child: Text(
-                                  'No more feedbacks',
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
+                            margin: const EdgeInsets.only(bottom: 10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Theme.of(context).colorScheme.secondary,
+                            ),
+                            child: Text(
+                              Message.noMore(message: ListName.feedback),
+                              style: Theme.of(context).textTheme.bodyMedium,
+                              textAlign: TextAlign.center,
                             ),
                           );
                         }

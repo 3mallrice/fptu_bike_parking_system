@@ -29,10 +29,9 @@ class HistoryScreen extends StatefulWidget {
 
 class _HistoryScreenState extends State<HistoryScreen> {
   final ScrollController _scrollController = ScrollController();
-  int pageSize = 3;
+  int pageSize = 5;
   int pageIndex = 1;
   bool _hasNextPage = true;
-  bool _isFirstLoadRunning = false;
   bool _isLoadMoreRunning = false;
 
   var log = Logger();
@@ -45,7 +44,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   Future<void> getCustomerHistories() async {
     setState(() {
-      _isFirstLoadRunning = true;
       pageIndex = 1; // Reset page index when refreshing
     });
     try {
@@ -73,12 +71,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
       }
     } catch (e) {
       log.e('Error during get customer histories: $e');
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isFirstLoadRunning = false;
-        });
-      }
     }
   }
 
@@ -98,7 +90,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   void _loadMore() async {
     if (_hasNextPage &&
-        !_isFirstLoadRunning &&
         !_isLoadMoreRunning &&
         _scrollController.position.extentAfter < 300) {
       setState(() {
@@ -134,7 +125,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         onRefresh: () async {
           await getCustomerHistories();
         },
-        child: _isFirstLoadRunning
+        child: histories.isEmpty
             ? const Center(
                 child: LoadingCircle(
                   size: 30,
@@ -144,242 +135,249 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 ? EmptyBox(
                     message: EmptyBoxMessage.emptyList(label: ListName.history))
                 : Center(
-                    child: ListView.builder(
-                      controller: _scrollController,
-                      itemCount: histories.length + 1,
-                      itemBuilder: (context, index) {
-                        if (index < histories.length) {
-                          final history = histories[index];
-                          return GestureDetector(
-                            onTap: () {
-                              if (!history.isFeedback) {
-                                addFeedbackDialog(history.id);
-                              } else {
-                                log.i('Feedback already added');
-                              }
-                            },
-                            child: ShadowContainer(
-                              border: Border.all(
-                                color: Theme.of(context).colorScheme.outline,
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 20,
-                                horizontal: 40,
-                              ),
-                              margin: const EdgeInsets.all(10),
-                              child: Column(
-                                children: [
-                                  Text(
-                                    history.parkingArea,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium!
-                                        .copyWith(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                  ),
-                                  Container(
-                                    margin: const EdgeInsets.symmetric(
-                                        vertical: 10),
-                                    child: DottedLine(
-                                      direction: Axis.horizontal,
-                                      alignment: WrapAlignment.center,
-                                      lineLength: double.infinity,
-                                      lineThickness: 1.0,
-                                      dashColor:
-                                          Theme.of(context).colorScheme.outline,
+                    child: Container(
+                      margin: EdgeInsets.symmetric(
+                        horizontal: MediaQuery.of(context).size.width * 0.05,
+                      ),
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        itemCount: histories.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index < histories.length) {
+                            final history = histories[index];
+                            return GestureDetector(
+                              onTap: () {
+                                if (!history.isFeedback) {
+                                  addFeedbackDialog(history.id);
+                                } else {
+                                  log.i('Feedback already added');
+                                }
+                              },
+                              child: ShadowContainer(
+                                border: Border.all(
+                                  color: Theme.of(context).colorScheme.outline,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 20,
+                                  horizontal: 40,
+                                ),
+                                margin:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      history.parkingArea,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium!
+                                          .copyWith(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w700,
+                                          ),
                                     ),
-                                  ),
-                                  Text(
-                                    history.plateNumber,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineMedium,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Expanded(
-                                        flex: 1,
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            historyInfo(
-                                              'Time in',
-                                              UltilHelper.formatDateTime(
-                                                  history.timeIn),
-                                              isTime: true,
-                                            ),
-                                            const SizedBox(height: 10),
-                                            historyInfo(
-                                              'Time out',
-                                              history.timeOut != null
-                                                  ? UltilHelper.formatDateTime(
-                                                      history.timeOut!)
-                                                  : "",
-                                              isTime: true,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Expanded(
-                                        flex: 1,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.end,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            historyInfo(
-                                              'Gate in',
-                                              history.gateIn.toString(),
-                                            ),
-                                            const SizedBox(height: 10),
-                                            historyInfo(
-                                              'Gate out',
-                                              history.gateOut != null
-                                                  ? history.gateOut.toString()
-                                                  : "",
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Container(
-                                    margin: const EdgeInsets.symmetric(
-                                        vertical: 10),
-                                    child: DottedLine(
-                                      direction: Axis.horizontal,
-                                      alignment: WrapAlignment.center,
-                                      lineLength: double.infinity,
-                                      lineThickness: 1.0,
-                                      dashColor:
-                                          Theme.of(context).colorScheme.outline,
-                                    ),
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      IconButton(
-                                        onPressed: () {
-                                          //TODO: Share
-                                        },
-                                        icon: const Icon(Icons.share_rounded),
-                                        color: Theme.of(context)
+                                    Container(
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 10),
+                                      child: DottedLine(
+                                        direction: Axis.horizontal,
+                                        alignment: WrapAlignment.center,
+                                        lineLength: double.infinity,
+                                        lineThickness: 1.0,
+                                        dashColor: Theme.of(context)
                                             .colorScheme
                                             .outline,
                                       ),
-                                      (!history.isFeedback)
-                                          ? Icon(Icons.rate_review_rounded,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .outline)
-                                          : const SizedBox(),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.end,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              history.paymentMethod != null
-                                                  ? history.paymentMethod
-                                                      .toString()
-                                                  : "",
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyLarge!
-                                                  .copyWith(
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .outline,
-                                                  ),
-                                            ),
-                                            history.amount != null
-                                                ? Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.end,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Image.asset(
-                                                        AssetHelper.bic,
-                                                        width: 25,
-                                                        fit: BoxFit.fitWidth,
-                                                      ),
-                                                      const SizedBox(width: 5),
-                                                      Text(
-                                                        history.amount != null
-                                                            ? '${UltilHelper.formatMoney(history.amount!)} bic'
-                                                            : '',
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .displayMedium,
-                                                      )
-                                                    ],
-                                                  )
-                                                : Text(
-                                                    history.status,
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .titleMedium,
-                                                  ),
-                                          ],
+                                    ),
+                                    Text(
+                                      history.plateNumber,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineMedium,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Expanded(
+                                          flex: 1,
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              historyInfo(
+                                                'Time in',
+                                                UltilHelper.formatDateTime(
+                                                    history.timeIn),
+                                                isTime: true,
+                                              ),
+                                              const SizedBox(height: 10),
+                                              historyInfo(
+                                                'Time out',
+                                                history.timeOut != null
+                                                    ? UltilHelper
+                                                        .formatDateTime(
+                                                            history.timeOut!)
+                                                    : "",
+                                                isTime: true,
+                                              ),
+                                            ],
+                                          ),
                                         ),
+                                        Expanded(
+                                          flex: 1,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              historyInfo(
+                                                'Gate in',
+                                                history.gateIn.toString(),
+                                              ),
+                                              const SizedBox(height: 10),
+                                              historyInfo(
+                                                'Gate out',
+                                                history.gateOut != null
+                                                    ? history.gateOut.toString()
+                                                    : "",
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Container(
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 10),
+                                      child: DottedLine(
+                                        direction: Axis.horizontal,
+                                        alignment: WrapAlignment.center,
+                                        lineLength: double.infinity,
+                                        lineThickness: 1.0,
+                                        dashColor: Theme.of(context)
+                                            .colorScheme
+                                            .outline,
                                       ),
-                                    ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        IconButton(
+                                          onPressed: () {
+                                            //TODO: Share
+                                          },
+                                          icon: const Icon(Icons.share_rounded),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outline,
+                                        ),
+                                        (!history.isFeedback)
+                                            ? Icon(Icons.rate_review_rounded,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .outline)
+                                            : const SizedBox(),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                history.paymentMethod != null
+                                                    ? history.paymentMethod
+                                                        .toString()
+                                                    : "",
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyLarge!
+                                                    .copyWith(
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .outline,
+                                                    ),
+                                              ),
+                                              history.amount != null
+                                                  ? Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment.end,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Image.asset(
+                                                          AssetHelper.bic,
+                                                          width: 25,
+                                                          fit: BoxFit.fitWidth,
+                                                        ),
+                                                        const SizedBox(
+                                                            width: 5),
+                                                        Text(
+                                                          history.amount != null
+                                                              ? '${UltilHelper.formatMoney(history.amount!)} bic'
+                                                              : '',
+                                                          style: Theme.of(
+                                                                  context)
+                                                              .textTheme
+                                                              .displayMedium,
+                                                        )
+                                                      ],
+                                                    )
+                                                  : Text(
+                                                      history.status,
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .titleMedium,
+                                                    ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              ),
+                            );
+                          } else if (_hasNextPage) {
+                            return _isLoadMoreRunning
+                                ? const Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Align(
+                                        alignment: Alignment.bottomCenter,
+                                        child: LoadingCircle(
+                                          size: 30,
+                                          isHeight: false,
+                                        )),
                                   )
-                                ],
+                                : const SizedBox();
+                          } else if (_hasNextPage == false) {
+                            return Container(
+                              padding: const EdgeInsets.all(8.0),
+                              margin: const EdgeInsets.only(
+                                  bottom: 10, left: 10, right: 10),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Theme.of(context).colorScheme.secondary,
                               ),
-                            ),
-                          );
-                        } else if (_hasNextPage) {
-                          return _isLoadMoreRunning
-                              ? const Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Align(
-                                      alignment: Alignment.bottomCenter,
-                                      child: LoadingCircle(
-                                        size: 30,
-                                      )),
-                                )
-                              : const SizedBox();
-                        } else if (_hasNextPage == false) {
-                          return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Align(
-                              alignment: Alignment.bottomCenter,
-                              child: Container(
-                                padding: const EdgeInsets.all(8.0),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
-                                ),
-                                child: Text(
-                                  'No more histories',
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                  textAlign: TextAlign.center,
-                                ),
+                              child: Text(
+                                Message.noMore(message: ListName.history),
+                                style: Theme.of(context).textTheme.bodyMedium,
+                                textAlign: TextAlign.center,
                               ),
-                            ),
-                          );
-                        }
-                        return null;
-                      },
+                            );
+                          }
+                          return null;
+                        },
+                      ),
                     ),
                   ),
       ),
