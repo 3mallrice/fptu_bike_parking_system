@@ -62,7 +62,8 @@ class FeedbackApi {
 
   // GET: /api/feedbacks/customers
   // Get feedbacks of Bai Be
-  Future<APIResponse<List<FeedbackModel>>> getFeedbacks() async {
+  Future<APIResponse<List<FeedbackModel>>> getFeedbacks(
+      int pageIndex, int pageSize) async {
     try {
       token = GetLocalHelper.getBearerToken() ?? "";
 
@@ -75,7 +76,7 @@ class FeedbackApi {
       }
 
       final response = await http.get(
-        Uri.parse(api),
+        Uri.parse('$api?pageIndex=$pageIndex&pageSize=$pageSize'),
         headers: {
           'Authorization': token,
           'Content-Type': 'application/json',
