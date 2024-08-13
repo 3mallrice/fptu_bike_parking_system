@@ -18,6 +18,9 @@ class Message {
       "Delete $message successfully!";
   static deleteUnSuccess({required String message}) =>
       "Delete $message failed!";
+
+  static String noMore({required String message}) =>
+      "No more $message to load!";
 }
 
 class ListName {
@@ -39,6 +42,7 @@ class LabelMessage {
   static String cancel = "Cancel";
   static String confirm = "Confirm";
   static String delete = "Delete";
+  static String edit = "Edit";
   static String yes = "Yes";
   static String no = "No";
   static String close = "Close";
