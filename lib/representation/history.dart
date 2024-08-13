@@ -432,7 +432,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       context: context,
       builder: (context) {
         return ConfirmDialog(
-          title: 'Add feedback',
+          title: LabelMessage.add(message: ListName.feedback),
           content: SizedBox(
             height: MediaQuery.of(context).size.height * 0.4,
             child: Column(

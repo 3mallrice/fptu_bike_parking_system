@@ -61,4 +61,21 @@ class UltilHelper {
     return NumberFormat.currency(locale: 'vi_VN', symbol: '')
         .format(number / 1000);
   }
+
+  // Function to format plate number
+  // eg: 4digit: 29A12345 -> 29A1 - 2345
+  // eg: 5digit: 29A123456 -> 29A1 - 234.56
+  // eg: 5digit electric: 29MĐ123456 -> 29MĐ1 - 234.56
+  static String formatPlateNumber(String plateNumber) {
+    switch (plateNumber.length) {
+      case 8:
+        return '${plateNumber.substring(0, 4)}-${plateNumber.substring(4)}';
+      case 9:
+        return '${plateNumber.substring(0, 4)}-${plateNumber.substring(4, 7)}.${plateNumber.substring(7)}';
+      case 10:
+        return '${plateNumber.substring(0, 5)}-${plateNumber.substring(5, 8)}.${plateNumber.substring(8)}';
+      default:
+        return plateNumber;
+    }
+  }
 }
