@@ -23,7 +23,7 @@ class FeedbackScreen extends StatefulWidget {
 class _FeedbackScreenState extends State<FeedbackScreen> {
   //pagination
   ScrollController _scrollController = ScrollController();
-  int pageSize = 5;
+  int pageSize = 10;
   int pageIndex = 1;
 
   // There is next page or not
@@ -178,6 +178,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                             ),
                           );
                         }
+                        return null;
                       },
                     ),
             ),

@@ -18,7 +18,8 @@ class CallHistoryAPI {
 
   // GET: /api/session/history
   // Get all user's history
-  Future<APIResponse<List<HistoryModel>>> getCustomerHistories() async {
+  Future<APIResponse<List<HistoryModel>>> getCustomerHistories(
+      int pageSize, int pageIndex) async {
     try {
       token = GetLocalHelper.getBearerToken() ?? "";
 
@@ -31,7 +32,7 @@ class CallHistoryAPI {
       }
 
       final response = await http.get(
-        Uri.parse('$api/history'),
+        Uri.parse('$api/history?PageIndex=$pageIndex&PageSize=$pageSize'),
         headers: {
           'Authorization': token,
           'Content-Type': 'application/json',
