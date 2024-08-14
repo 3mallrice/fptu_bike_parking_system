@@ -77,5 +77,10 @@
 		<string>zalopay</string>
 		<string>zalopay.api.v2</string>
 	</array>
+	<key>LSApplicationQueriesSchemes</key>
+    <array>
+      <string>sms</string>
+      <string>tel</string>
+    </array>
 </dict>
 </plist>
