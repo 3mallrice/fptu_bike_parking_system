@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:fptu_bike_parking_system/api/model/bai_model/api_response.dart';
+import 'package:bai_system/api/model/bai_model/api_response.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
-import 'package:fptu_bike_parking_system/representation/login.dart';
+import 'package:bai_system/core/helper/asset_helper.dart';
+import 'package:bai_system/representation/login.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class IntroScreen extends StatefulWidget {

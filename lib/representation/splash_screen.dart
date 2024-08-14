@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
-import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
-import 'package:fptu_bike_parking_system/representation/intro_screen.dart';
-import 'package:fptu_bike_parking_system/representation/login.dart';
+import 'package:bai_system/core/helper/asset_helper.dart';
+import 'package:bai_system/core/helper/local_storage_helper.dart';
+import 'package:bai_system/representation/intro_screen.dart';
+import 'package:bai_system/representation/login.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

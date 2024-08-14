@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:fptu_bike_parking_system/api/model/bai_model/api_response.dart';
-import 'package:fptu_bike_parking_system/api/model/bai_model/bai_model.dart';
-import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
+import 'package:bai_system/api/model/bai_model/api_response.dart';
+import 'package:bai_system/api/model/bai_model/bai_model.dart';
+import 'package:bai_system/core/helper/local_storage_helper.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:logger/web.dart';

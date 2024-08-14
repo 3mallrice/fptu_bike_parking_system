@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
-import 'package:fptu_bike_parking_system/representation/splash_screen.dart';
+import 'package:bai_system/core/helper/local_storage_helper.dart';
+import 'package:bai_system/representation/splash_screen.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
 

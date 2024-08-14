@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:fptu_bike_parking_system/api/model/bai_model/feedback_model.dart';
-import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
-import 'package:fptu_bike_parking_system/component/empty_box.dart';
-import 'package:fptu_bike_parking_system/component/loading_component.dart';
-import 'package:fptu_bike_parking_system/component/shadow_container.dart';
-import 'package:fptu_bike_parking_system/core/const/utilities/util_helper.dart';
+import 'package:bai_system/api/model/bai_model/feedback_model.dart';
+import 'package:bai_system/component/app_bar_component.dart';
+import 'package:bai_system/component/empty_box.dart';
+import 'package:bai_system/component/loading_component.dart';
+import 'package:bai_system/component/shadow_container.dart';
+import 'package:bai_system/core/const/utilities/util_helper.dart';
 import 'package:logger/logger.dart';
 
 import '../api/service/bai_be/feedback_service.dart';

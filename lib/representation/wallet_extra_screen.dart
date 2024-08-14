@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:fptu_bike_parking_system/api/model/bai_model/wallet_model.dart';
-import 'package:fptu_bike_parking_system/api/service/bai_be/wallet_service.dart';
-import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
-import 'package:fptu_bike_parking_system/component/loading_component.dart';
-import 'package:fptu_bike_parking_system/component/shadow_container.dart';
-import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
-import 'package:fptu_bike_parking_system/representation/fundin_screen.dart';
-import 'package:fptu_bike_parking_system/representation/navigation_bar.dart';
-import 'package:fptu_bike_parking_system/representation/receipt.dart';
-import 'package:fptu_bike_parking_system/representation/wallet_screen.dart';
+import 'package:bai_system/api/model/bai_model/wallet_model.dart';
+import 'package:bai_system/api/service/bai_be/wallet_service.dart';
+import 'package:bai_system/component/app_bar_component.dart';
+import 'package:bai_system/component/loading_component.dart';
+import 'package:bai_system/component/shadow_container.dart';
+import 'package:bai_system/core/helper/local_storage_helper.dart';
+import 'package:bai_system/representation/fundin_screen.dart';
+import 'package:bai_system/representation/navigation_bar.dart';
+import 'package:bai_system/representation/receipt.dart';
+import 'package:bai_system/representation/wallet_screen.dart';
 import 'package:logger/logger.dart';
 import 'package:transition/transition.dart';
 

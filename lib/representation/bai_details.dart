@@ -1,13 +1,12 @@
 // ignore_for_file: unnecessary_null_comparison
 
+import 'package:bai_system/api/model/bai_model/api_response.dart';
+import 'package:bai_system/api/service/bai_be/bai_service.dart';
+import 'package:bai_system/component/shadow_container.dart';
+import 'package:bai_system/core/const/frondend/message.dart';
+import 'package:bai_system/core/const/utilities/util_helper.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:fptu_bike_parking_system/api/model/bai_model/api_response.dart';
-import 'package:fptu_bike_parking_system/api/service/bai_be/bai_service.dart';
-import 'package:fptu_bike_parking_system/component/shadow_container.dart';
-import 'package:fptu_bike_parking_system/core/const/frondend/message.dart';
-import 'package:fptu_bike_parking_system/core/const/utilities/util_helper.dart';
-import 'package:hive_flutter/adapters.dart';
 import 'package:logger/logger.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -338,7 +337,7 @@ class _BaiDetailsState extends State<BaiDetails> {
                         ),
                       ),
                       hint: Text('Select option', style: contentTextStyle),
-                      items: [
+                      items: const [
                         DropdownMenuItem(
                             value: 'Option 1', child: Text('Option 1')),
                         DropdownMenuItem(

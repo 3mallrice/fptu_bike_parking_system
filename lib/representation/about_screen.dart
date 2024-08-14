@@ -1,6 +1,6 @@
+import 'package:bai_system/component/app_bar_component.dart';
+import 'package:bai_system/component/shadow_container.dart';
 import 'package:flutter/material.dart';
-import 'package:fptu_bike_parking_system/component/app_bar_component.dart';
-import 'package:fptu_bike_parking_system/component/shadow_container.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../core/helper/asset_helper.dart';
@@ -155,7 +155,7 @@ class _AboutUsState extends State<AboutUs> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // app name
-                          Text('App Name: ${_packageInfo.appName}',
+                          Text('App Name: ${_packageInfo.appName} App',
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyMedium!

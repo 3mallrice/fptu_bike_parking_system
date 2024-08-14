@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fptu_bike_parking_system/component/loading_component.dart';
+import 'package:bai_system/component/loading_component.dart';
 
 class LoadingOverlayHelper {
   static late OverlayEntry _overlayEntry;
