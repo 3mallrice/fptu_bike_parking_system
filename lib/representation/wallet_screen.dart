@@ -10,6 +10,7 @@ import 'package:logger/logger.dart';
 import 'package:transition/transition.dart';
 
 import '../component/app_bar_component.dart';
+import '../component/dialog.dart';
 import '../component/empty_box.dart';
 import '../component/shadow_container.dart';
 import '../core/const/frondend/message.dart';
@@ -275,11 +276,7 @@ class _MyWalletState extends State<MyWallet> {
                                     : Theme.of(context).colorScheme.secondary;
                                 return GestureDetector(
                                   onTap: () {
-                                    //Open receipt screen
-                                    Navigator.of(context).pushNamed(
-                                      ReceiptScreen.routeName,
-                                      arguments: transactions[index],
-                                    );
+                                    showReceiptDialog(transactions[index]);
                                   },
                                   child: Padding(
                                     padding: const EdgeInsets.only(bottom: 10),
@@ -356,6 +353,24 @@ class _MyWalletState extends State<MyWallet> {
           ),
         ),
       ),
+    );
+  }
+
+  // show receipt dialog
+  void showReceiptDialog(WalletModel transaction) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return OKDialog(
+          title: 'Receipt',
+          content: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.9,
+            height: MediaQuery.of(context).size.height * 0.3,
+            child: ReceiptScreen(transaction: transaction),
+          ),
+          onClick: () => Navigator.of(context).pop(),
+        );
+      },
     );
   }
 }

@@ -16,12 +16,19 @@ class OKDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
       title: Text(
         title,
         style: Theme.of(context).textTheme.titleLarge!.copyWith(
               fontWeight: FontWeight.w700,
             ),
         textAlign: TextAlign.center,
+      ),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 20.0,
+        vertical: 10.0,
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
       surfaceTintColor: Theme.of(context).colorScheme.surface,
@@ -61,6 +68,9 @@ class ConfirmDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
       title: Text(
         title,
         style: Theme.of(context).textTheme.titleLarge!.copyWith(
@@ -70,6 +80,10 @@ class ConfirmDialog extends StatelessWidget {
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
       surfaceTintColor: Theme.of(context).colorScheme.surface,
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 20.0,
+        vertical: 10.0,
+      ),
       content: content,
       actions: <Widget>[
         TextButton(

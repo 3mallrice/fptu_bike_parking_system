@@ -8,13 +8,14 @@ import 'package:fptu_bike_parking_system/api/service/bai_be/history_service.dart
 import 'package:fptu_bike_parking_system/component/dialog.dart';
 import 'package:fptu_bike_parking_system/core/const/utilities/util_helper.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
-import 'package:fptu_bike_parking_system/representation/feedback.dart';
 import 'package:logger/logger.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:widgets_to_image/widgets_to_image.dart';
 
 import '../api/model/bai_model/feedback_model.dart';
 import '../component/empty_box.dart';
 import '../component/loading_component.dart';
-import '../component/shadow_container.dart';
+import '../component/widget_to_image_template.dart';
 import '../core/const/frondend/message.dart';
 import '../core/helper/return_login_dialog.dart';
 
@@ -29,6 +30,7 @@ class HistoryScreen extends StatefulWidget {
 
 class _HistoryScreenState extends State<HistoryScreen> {
   final ScrollController _scrollController = ScrollController();
+  late final WidgetsToImageController _controller;
   int pageSize = 5;
   int pageIndex = 1;
   bool _hasNextPage = true;
@@ -36,16 +38,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   var log = Logger();
   CallHistoryAPI callHistoryAPI = CallHistoryAPI();
-  bool isLoading = true;
-
-  // APIResponse apiResponse = APIResponse();
+  bool isLoading = false;
 
   List<HistoryModel> histories = [];
 
   Future<void> getCustomerHistories() async {
-    setState(() {
-      pageIndex = 1; // Reset page index when refreshing
-    });
     try {
       final APIResponse<List<HistoryModel>> result =
           await callHistoryAPI.getCustomerHistories(pageSize, pageIndex);
@@ -62,6 +59,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       if (mounted) {
         setState(() {
           if (result.data != null) {
+            isLoading = false;
             histories = result.data ?? [];
             _hasNextPage = result.data!.length == pageSize;
           } else {
@@ -76,9 +74,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   @override
   void initState() {
+    _controller = WidgetsToImageController();
     super.initState();
     getCustomerHistories();
     _scrollController.addListener(_loadMore);
+    isLoading = true;
+    pageIndex = 1;
   }
 
   @override
@@ -125,11 +126,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
         onRefresh: () async {
           await getCustomerHistories();
         },
-        child: histories.isEmpty
+        child: isLoading
             ? const Center(
-                child: LoadingCircle(
-                  size: 30,
-                ),
+                child: LoadingCircle(),
               )
             : histories.isEmpty
                 ? EmptyBox(
@@ -153,199 +152,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                   log.i('Feedback already added');
                                 }
                               },
-                              child: ShadowContainer(
-                                border: Border.all(
-                                  color: Theme.of(context).colorScheme.outline,
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 20,
-                                  horizontal: 40,
-                                ),
-                                margin:
-                                    const EdgeInsets.symmetric(vertical: 10),
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      history.parkingArea,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium!
-                                          .copyWith(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                    ),
-                                    Container(
-                                      margin: const EdgeInsets.symmetric(
-                                          vertical: 10),
-                                      child: DottedLine(
-                                        direction: Axis.horizontal,
-                                        alignment: WrapAlignment.center,
-                                        lineLength: double.infinity,
-                                        lineThickness: 1.0,
-                                        dashColor: Theme.of(context)
-                                            .colorScheme
-                                            .outline,
-                                      ),
-                                    ),
-                                    Text(
-                                      history.plateNumber,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headlineMedium,
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Expanded(
-                                          flex: 1,
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              historyInfo(
-                                                'Time in',
-                                                UltilHelper.formatDateTime(
-                                                    history.timeIn),
-                                                isTime: true,
-                                              ),
-                                              const SizedBox(height: 10),
-                                              historyInfo(
-                                                'Time out',
-                                                history.timeOut != null
-                                                    ? UltilHelper
-                                                        .formatDateTime(
-                                                            history.timeOut!)
-                                                    : "",
-                                                isTime: true,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Expanded(
-                                          flex: 1,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              historyInfo(
-                                                'Gate in',
-                                                history.gateIn.toString(),
-                                              ),
-                                              const SizedBox(height: 10),
-                                              historyInfo(
-                                                'Gate out',
-                                                history.gateOut != null
-                                                    ? history.gateOut.toString()
-                                                    : "",
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Container(
-                                      margin: const EdgeInsets.symmetric(
-                                          vertical: 10),
-                                      child: DottedLine(
-                                        direction: Axis.horizontal,
-                                        alignment: WrapAlignment.center,
-                                        lineLength: double.infinity,
-                                        lineThickness: 1.0,
-                                        dashColor: Theme.of(context)
-                                            .colorScheme
-                                            .outline,
-                                      ),
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        IconButton(
-                                          onPressed: () {
-                                            //TODO: Share
-                                          },
-                                          icon: const Icon(Icons.share_rounded),
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .outline,
-                                        ),
-                                        (!history.isFeedback)
-                                            ? Icon(Icons.rate_review_rounded,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .outline)
-                                            : const SizedBox(),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Text(
-                                                history.paymentMethod != null
-                                                    ? history.paymentMethod
-                                                        .toString()
-                                                    : "",
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .bodyLarge!
-                                                    .copyWith(
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .outline,
-                                                    ),
-                                              ),
-                                              history.amount != null
-                                                  ? Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment.end,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        Image.asset(
-                                                          AssetHelper.bic,
-                                                          width: 25,
-                                                          fit: BoxFit.fitWidth,
-                                                        ),
-                                                        const SizedBox(
-                                                            width: 5),
-                                                        Text(
-                                                          history.amount != null
-                                                              ? '${UltilHelper.formatMoney(history.amount!)} bic'
-                                                              : '',
-                                                          style: Theme.of(
-                                                                  context)
-                                                              .textTheme
-                                                              .displayMedium,
-                                                        )
-                                                      ],
-                                                    )
-                                                  : Text(
-                                                      history.status,
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .titleMedium,
-                                                    ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ),
+                              child: historyCard(history),
                             );
                           } else if (_hasNextPage) {
                             return _isLoadMoreRunning
@@ -383,6 +190,162 @@ class _HistoryScreenState extends State<HistoryScreen> {
       ),
     );
   }
+
+  Widget historyCard(HistoryModel history) => Container(
+        padding: const EdgeInsets.symmetric(
+          vertical: 20,
+          horizontal: 40,
+        ),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outline,
+          ),
+        ),
+        margin: const EdgeInsets.symmetric(vertical: 10),
+        child: Column(
+          children: [
+            Text(
+              history.parkingArea,
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                  ),
+            ),
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 10),
+              child: DottedLine(
+                direction: Axis.horizontal,
+                alignment: WrapAlignment.center,
+                lineLength: double.infinity,
+                lineThickness: 1.0,
+                dashColor: Theme.of(context).colorScheme.outline,
+              ),
+            ),
+            Text(
+              history.plateNumber,
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      historyInfo(
+                        'Time in',
+                        UltilHelper.formatDateTime(history.timeIn),
+                        isTime: true,
+                      ),
+                      const SizedBox(height: 10),
+                      historyInfo(
+                        'Time out',
+                        history.timeOut != null
+                            ? UltilHelper.formatDateTime(history.timeOut!)
+                            : "",
+                        isTime: true,
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      historyInfo(
+                        'Gate in',
+                        history.gateIn.toString(),
+                      ),
+                      const SizedBox(height: 10),
+                      historyInfo(
+                        'Gate out',
+                        history.gateOut != null
+                            ? history.gateOut.toString()
+                            : "",
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 10),
+              child: DottedLine(
+                direction: Axis.horizontal,
+                alignment: WrapAlignment.center,
+                lineLength: double.infinity,
+                lineThickness: 1.0,
+                dashColor: Theme.of(context).colorScheme.outline,
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    //TODO: Share
+                    _showImageDialog(_controller, history);
+                  },
+                  icon: const Icon(Icons.share_rounded),
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+                (!history.isFeedback)
+                    ? Icon(Icons.rate_review_rounded,
+                        color: Theme.of(context).colorScheme.outline)
+                    : const SizedBox(),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        history.paymentMethod != null
+                            ? history.paymentMethod.toString()
+                            : "",
+                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                              color: Theme.of(context).colorScheme.outline,
+                            ),
+                      ),
+                      history.amount != null
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  AssetHelper.bic,
+                                  width: 25,
+                                  fit: BoxFit.fitWidth,
+                                ),
+                                const SizedBox(width: 5),
+                                Text(
+                                  history.amount != null
+                                      ? '${UltilHelper.formatMoney(history.amount!)} bic'
+                                      : '',
+                                  style:
+                                      Theme.of(context).textTheme.displayMedium,
+                                )
+                              ],
+                            )
+                          : Text(
+                              history.status,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                    ],
+                  ),
+                ),
+              ],
+            )
+          ],
+        ),
+      );
 
   Widget historyInfo(String title, String value, {bool isTime = false}) {
     return Column(
@@ -521,7 +484,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             await getCustomerHistories();
 
             //close dialog
-            gotoFeedbackScreen();
+            gotoScreen();
           },
           onCancel: () {
             log.i('Feedback canceled');
@@ -534,8 +497,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   // goto feedback screen
-  void gotoFeedbackScreen() {
-    Navigator.of(context).pushReplacementNamed(FeedbackScreen.routeName);
+  void gotoScreen({String? routeName}) {
+    routeName != null
+        ? Navigator.of(context).pushReplacementNamed(routeName)
+        : Navigator.of(context).pop();
   }
 
   // feedback item
@@ -565,6 +530,70 @@ class _HistoryScreenState extends State<HistoryScreen> {
           child: textField,
         )
       ],
+    );
+  }
+
+  // dialog widget to preview image
+  Widget toImageWidget(WidgetsToImageController controller,
+      HistoryModel history, BuildContext context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.9,
+      height: MediaQuery.of(context).size.height * 0.37,
+      child: WidgetsToImage(
+        controller: controller,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          color: Theme.of(context).colorScheme.surface,
+          alignment: Alignment.center,
+          child: WidgetToImageTemplate(
+            child: historyCard(history),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showImageDialog(
+      WidgetsToImageController controller, HistoryModel history) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ConfirmDialog(
+          title: 'Share your history',
+          content: toImageWidget(controller, history, context),
+          positiveLabel: LabelMessage.share,
+          onConfirm: () async {
+            var image = await controller.capture();
+
+            if (image != null) {
+              //convert Uint8List to XFile
+              XFile xFile = XFile.fromData(
+                image,
+                mimeType: 'image/png',
+                name: ImageName.imageName(prefix: 'History'),
+                lastModified: DateTime.now(),
+              );
+
+              //TODO: Share image
+              final result = await Share.shareXFiles(
+                [xFile],
+                text: 'Share your history with your friends',
+                subject: 'Share your history',
+              );
+
+              if (result.status == ShareResultStatus.success) {
+                log.i('Share success');
+              } else if (result.status == ShareResultStatus.dismissed) {
+                log.e('Share failed');
+              }
+            }
+          },
+          onCancel: () {
+            log.i('Share canceled');
+            Navigator.of(context).pop();
+          },
+        );
+      },
     );
   }
 }

@@ -342,8 +342,8 @@ class _PayOsScreenState extends State<PayOsScreen> {
         return ConfirmDialog(
           title: 'Save or Share',
           content: toImageWidget(controller, context),
-          positiveLabel: "Save",
-          negativeLabel: "Share",
+          positiveLabel: LabelMessage.save,
+          negativeLabel: LabelMessage.share,
           onConfirm: () async {
             var image = await controller.capture();
             await saveImage(ImageName.imageName(prefix: "BankingQrCode"), image)
@@ -408,30 +408,25 @@ class _PayOsScreenState extends State<PayOsScreen> {
   }
 
   // dialog widget to preview image
-  Column toImageWidget(
+  Widget toImageWidget(
       WidgetsToImageController controller, BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        WidgetsToImage(
-          controller: controller,
-          child: WidgetToImageTemplate(
-            widget: Center(
-              child: Container(
-                padding: const EdgeInsets.all(22),
-                child: PrettyQrView.data(
-                  data: 'lorem ipsum dolor sit amet',
-                  decoration: const PrettyQrDecoration(
-                    image: PrettyQrDecorationImage(
-                      image: AssetImage(AssetHelper.imgLogo),
-                    ),
-                  ),
+    return WidgetsToImage(
+      controller: controller,
+      child: WidgetToImageTemplate(
+        child: Center(
+          child: Container(
+            padding: const EdgeInsets.all(22),
+            child: PrettyQrView.data(
+              data: 'lorem ipsum dolor sit amet',
+              decoration: const PrettyQrDecoration(
+                image: PrettyQrDecorationImage(
+                  image: AssetImage(AssetHelper.imgLogo),
                 ),
               ),
             ),
           ),
         ),
-      ],
+      ),
     );
   }
 
