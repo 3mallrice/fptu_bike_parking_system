@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_import
+
 import 'package:flutter/material.dart';
 import 'package:fptu_bike_parking_system/component/how_did_you_park.dart';
 import 'package:fptu_bike_parking_system/component/how_did_you_pay.dart';

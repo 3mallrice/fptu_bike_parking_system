@@ -279,4 +279,46 @@ class CallBikeApi {
       return APIResponse(message: "${ErrorMessage.somethingWentWrong}: $e");
     }
   }
+
+  //GET: /vehicles/customer/{id}
+  // Get vehicle by id
+  Future<APIResponse<BaiModel>> getCustomerBaiById(String id) async {
+    try {
+      token = GetLocalHelper.getBearerToken() ?? "";
+      if (token == "") {
+        log.e('Token is empty');
+        return APIResponse(
+          message: ErrorMessage.tokenInvalid,
+          isTokenValid: false,
+        );
+      }
+
+      final response = await http.get(
+        Uri.parse('$api/customer/$id'),
+        headers: {
+          'Authorization': token,
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final responseJson = jsonDecode(response.body);
+        BaiModel baiModel =
+            BaiModel.fromJson(responseJson['data'] as Map<String, dynamic>);
+        return APIResponse<BaiModel>(
+          data: baiModel,
+          message: responseJson['message'] ?? 'Success',
+        );
+      } else {
+        log.e(
+            'Failed to get vehicle by ID: ${response.statusCode} ${response.body}');
+        return APIResponse(
+          message: "${ErrorMessage.somethingWentWrong}: ${response.statusCode}",
+        );
+      }
+    } catch (e) {
+      log.e('Error during get vehicle by ID: $e');
+      return APIResponse(message: "${ErrorMessage.somethingWentWrong}: $e");
+    }
+  }
 }

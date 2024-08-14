@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fptu_bike_parking_system/api/model/bai_model/wallet_model.dart';
@@ -61,9 +63,9 @@ final Map<String, WidgetBuilder> routes = {
     );
   },
   BaiDetails.routeName: (context) {
-    final args = ModalRoute.of(context)!.settings.arguments as BaiModel;
+    final args = ModalRoute.of(context)!.settings.arguments as String;
     return BaiDetails(
-      baiModel: args,
+      id: args,
     );
   },
   InsightScreen.routeName: (context) => const InsightScreen(),

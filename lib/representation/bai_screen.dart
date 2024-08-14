@@ -171,7 +171,7 @@ class _BaiScreenState extends State<BaiScreen> {
             onTap: () {
               Navigator.of(context).pushNamed(
                 BaiDetails.routeName,
-                arguments: bai,
+                arguments: bai.id,
               );
             },
             child: ShadowContainer(
