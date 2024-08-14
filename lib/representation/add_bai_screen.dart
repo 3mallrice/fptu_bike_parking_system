@@ -1,11 +1,11 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:bai_system/api/model/bai_model/bai_model.dart';
 import 'package:bai_system/api/service/bai_be/bai_service.dart';
 import 'package:bai_system/component/shadow_container.dart';
 import 'package:bai_system/core/helper/return_login_dialog.dart';
 import 'package:bai_system/representation/navigation_bar.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 
@@ -202,7 +202,7 @@ class _AddBaiState extends State<AddBai> {
 
       if (mounted) {
         setState(() {
-          _vehicleType = vehicleType ?? [];
+          _vehicleType = vehicleType;
           isLoaded = true;
         });
       }

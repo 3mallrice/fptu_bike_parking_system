@@ -1,11 +1,12 @@
-import 'package:flutter/material.dart';
 import 'package:bai_system/core/const/frondend/message.dart';
+import 'package:flutter/material.dart';
 
 //OKDialog
 class OKDialog extends StatelessWidget {
   final String title;
   final Widget? content;
   final Function? onClick;
+
   const OKDialog({
     super.key,
     required this.title,
@@ -55,6 +56,8 @@ class ConfirmDialog extends StatelessWidget {
   final Function? onCancel;
   final String? positiveLabel;
   final String? negativeLabel;
+  final EdgeInsetsGeometry? contentPadding;
+
   const ConfirmDialog({
     super.key,
     required this.title,
@@ -63,6 +66,7 @@ class ConfirmDialog extends StatelessWidget {
     this.onCancel,
     this.positiveLabel,
     this.negativeLabel,
+    this.contentPadding,
   });
 
   @override
@@ -80,10 +84,11 @@ class ConfirmDialog extends StatelessWidget {
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
       surfaceTintColor: Theme.of(context).colorScheme.surface,
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: 20.0,
-        vertical: 10.0,
-      ),
+      contentPadding: contentPadding ??
+          const EdgeInsets.symmetric(
+            horizontal: 20.0,
+            vertical: 10.0,
+          ),
       content: content,
       actions: <Widget>[
         TextButton(

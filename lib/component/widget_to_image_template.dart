@@ -1,12 +1,13 @@
-import 'package:flutter/material.dart';
 import 'package:bai_system/api/model/bai_model/login_model.dart';
 import 'package:bai_system/core/const/utilities/util_helper.dart';
 import 'package:bai_system/core/helper/local_storage_helper.dart';
+import 'package:flutter/material.dart';
 
 import '../core/helper/asset_helper.dart';
 
 class WidgetToImageTemplate extends StatelessWidget {
   final Widget child;
+
   const WidgetToImageTemplate({
     super.key,
     required this.child,
@@ -25,7 +26,7 @@ class WidgetToImageTemplate extends StatelessWidget {
           // Logo
           const Image(
             image: AssetImage(AssetHelper.baiLogo),
-            height: 30,
+            height: 20,
             fit: BoxFit.contain,
           ),
 

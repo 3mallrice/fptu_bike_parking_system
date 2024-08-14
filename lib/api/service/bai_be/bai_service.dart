@@ -85,7 +85,7 @@ class CallBikeApi {
     }
   }
 
-  Future<List<VehicleTypeModel>?> getVehicleType() async {
+  Future<List<VehicleTypeModel>> getVehicleType() async {
     try {
       final response = await http.get(
         Uri.parse('$api/type'),
@@ -103,16 +103,16 @@ class CallBikeApi {
               .toList();
         } else {
           log.e('Unexpected JSON format: $jsonResponse');
-          return null;
+          return [];
         }
       } else {
         log.e('Failed to get vehicle types: ${response.statusCode}');
-        return null;
+        return [];
       }
     } catch (e) {
       log.e('Error during get vehicle type: $e');
     }
-    return null;
+    return [];
   }
 
   Future<APIResponse<List<BaiModel>>> getBai() async {

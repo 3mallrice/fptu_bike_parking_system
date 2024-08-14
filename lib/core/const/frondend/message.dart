@@ -2,6 +2,7 @@ class Message {
   static String saveImageSuccessfully = "Image saved successfully!";
   static String saveImageUnSuccessfully = "Saved unsuccessfully!";
   static String permissionDeny = "Permission denied";
+
   static String permissionDenyMessage({required String message}) =>
       "Permission denied! Only $message with an active status can perform this action";
   static String loginSuccess = "Login success, welcome back!";
@@ -10,12 +11,22 @@ class Message {
   static String enableLocationService =
       "Enable location permission\nto get weather information!";
   static String copyToClipboard = "Copied to clipboard!";
+
   static String deleteConfirmation({String? message}) =>
       "Are you sure you want to delete $message?";
   static String confirmTitle = "Are you sure?";
 
+  static String editConfirmation({String? message}) =>
+      "Are you sure you want to edit $message?";
+
   static deleteSuccess({required String message}) =>
       "Delete $message successfully!";
+
+  static editSuccess({required String message}) =>
+      "Edit $message successfully!";
+
+  static editUnSuccess({required String message}) => "Edit $message failed!";
+
   static deleteUnSuccess({required String message}) =>
       "Delete $message failed!";
 
@@ -70,6 +81,7 @@ class ErrorMessage {
   static String underDevelopment = "This feature is under development!";
   static String tokenInvalid = "Token is invalid!";
   static String paymentMethod = "Please select a payment method!";
+
   static String notFound({String? message}) =>
       "$message not found! Please contact the administrator.";
   static String tokenIsExpired =

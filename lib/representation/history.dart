@@ -1,6 +1,3 @@
-import 'package:dotted_line/dotted_line.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:bai_system/api/model/bai_model/api_response.dart';
 import 'package:bai_system/api/model/bai_model/history_model.dart';
 import 'package:bai_system/api/service/bai_be/feedback_service.dart';
@@ -8,6 +5,9 @@ import 'package:bai_system/api/service/bai_be/history_service.dart';
 import 'package:bai_system/component/dialog.dart';
 import 'package:bai_system/core/const/utilities/util_helper.dart';
 import 'package:bai_system/core/helper/asset_helper.dart';
+import 'package:dotted_line/dotted_line.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:widgets_to_image/widgets_to_image.dart';
@@ -191,10 +191,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-  Widget historyCard(HistoryModel history) => Container(
-        padding: const EdgeInsets.symmetric(
+  Widget historyCard(HistoryModel history, {double? horinzontal, margin}) =>
+      Container(
+        padding: EdgeInsets.symmetric(
           vertical: 20,
-          horizontal: 40,
+          horizontal: horinzontal ?? 40,
         ),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
@@ -203,7 +204,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             color: Theme.of(context).colorScheme.outline,
           ),
         ),
-        margin: const EdgeInsets.symmetric(vertical: 10),
+        margin: EdgeInsets.symmetric(vertical: margin ?? 10),
         child: Column(
           children: [
             Text(
@@ -537,8 +538,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Widget toImageWidget(WidgetsToImageController controller,
       HistoryModel history, BuildContext context) {
     return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.46,
       width: MediaQuery.of(context).size.width * 0.9,
-      height: MediaQuery.of(context).size.height * 0.37,
       child: WidgetsToImage(
         controller: controller,
         child: Container(
@@ -546,7 +547,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           color: Theme.of(context).colorScheme.surface,
           alignment: Alignment.center,
           child: WidgetToImageTemplate(
-            child: historyCard(history),
+            child: historyCard(history, horinzontal: 20, margin: 0.0),
           ),
         ),
       ),
@@ -561,6 +562,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
         return ConfirmDialog(
           title: 'Share your history',
           content: toImageWidget(controller, history, context),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           positiveLabel: LabelMessage.share,
           onConfirm: () async {
             var image = await controller.capture();
