@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:fptu_bike_parking_system/component/how_did_you_park.dart';
 import 'package:fptu_bike_parking_system/component/how_did_you_pay.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
@@ -183,12 +184,21 @@ class _InsightScreenState extends State<InsightScreen> {
                         size: 20,
                       ),
                       const SizedBox(width: 10),
-                      Text(
-                        'Paying by wallet will be faster and more convenient',
-                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                              color: Theme.of(context).colorScheme.onSecondary,
-                            ),
-                        textAlign: TextAlign.center,
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.5,
+                        child: Text(
+                          'Paying by wallet will be faster and more convenient',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall!
+                              .copyWith(
+                                color:
+                                    Theme.of(context).colorScheme.onSecondary,
+                              ),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ],
                   ),

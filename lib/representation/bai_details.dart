@@ -1,17 +1,20 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
+import 'package:fptu_bike_parking_system/api/model/bai_model/api_response.dart';
 import 'package:fptu_bike_parking_system/api/service/bai_be/bai_service.dart';
+import 'package:fptu_bike_parking_system/component/snackbar.dart';
 import 'package:fptu_bike_parking_system/core/const/frondend/message.dart';
+import 'package:fptu_bike_parking_system/core/const/utilities/regex.dart';
 import 'package:fptu_bike_parking_system/core/const/utilities/util_helper.dart';
+import 'package:fptu_bike_parking_system/core/helper/loading_overlay_helper.dart';
 import 'package:logger/logger.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../api/model/bai_model/bai_model.dart';
 import '../component/app_bar_component.dart';
 import '../component/image_not_found_component.dart';
+import '../core/helper/return_login_dialog.dart';
 
 class BaiDetails extends StatefulWidget {
   final BaiModel baiModel;
@@ -47,6 +50,7 @@ class _BaiDetailsState extends State<BaiDetails> {
   void initState() {
     super.initState();
     _fetchVehicleType();
+    _selectedVehicleTypeId = bai.vehicleType;
   }
 
   @override
@@ -76,6 +80,7 @@ class _BaiDetailsState extends State<BaiDetails> {
                   log.d('Edit button clicked');
                   setState(() {
                     isEdit = !isEdit;
+                    log.d('Edit status: $isEdit');
                   });
                 },
                 child: Icon(
@@ -242,8 +247,8 @@ class _BaiDetailsState extends State<BaiDetails> {
                 ],
               ),
             ),
-            Offstage(
-              offstage: isEdit,
+            Visibility(
+              visible: isEdit,
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
@@ -251,7 +256,7 @@ class _BaiDetailsState extends State<BaiDetails> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    editIteam(
+                    _editIteam(
                       label: ListName.plateNumber,
                       widget: TextField(
                         controller: plController,
@@ -259,15 +264,18 @@ class _BaiDetailsState extends State<BaiDetails> {
                         inputFormatters: [
                           LengthLimitingTextInputFormatter(10),
                         ],
-                        maxLength: 10,
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: '29MĐ123456',
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 10,
-                            vertical: 5,
+                            vertical: 7.5,
                           ),
-                          counter: const Offstage(),
+                          isDense: true,
+                          counter: const Visibility(
+                            visible: false,
+                            child: SizedBox(),
+                          ),
                           hintStyle: Theme.of(context)
                               .textTheme
                               .bodyMedium!
@@ -280,12 +288,12 @@ class _BaiDetailsState extends State<BaiDetails> {
                       ),
                     ),
                     const SizedBox(
-                      height: 15,
+                      height: 10,
                     ),
 
                     // Vehicle Type
-                    editIteam(
-                      label: 'Vehicle Type',
+                    _editIteam(
+                      label: ListName.vehicleType,
                       widget: SizedBox(
                         width: MediaQuery.of(context).size.width * 0.9,
                         child: DropdownButton<String>(
@@ -295,25 +303,28 @@ class _BaiDetailsState extends State<BaiDetails> {
                           ),
                           padding: const EdgeInsets.symmetric(
                             horizontal: 10,
-                            vertical: 5,
                           ),
                           icon: const Offstage(),
                           underline: const Offstage(),
-                          value: _selectedVehicleTypeId.isNotEmpty
+                          value: _vehicleType
+                                  .map((vehicleType) => vehicleType.id)
+                                  .contains(_selectedVehicleTypeId)
                               ? _selectedVehicleTypeId
                               : null,
-                          items:
-                              _vehicleType.map((VehicleTypeModel vehicleType) {
-                            return DropdownMenuItem<String>(
-                              value: vehicleType.id,
-                              child: Text(
-                                bai.vehicleType == vehicleType.name
-                                    ? '${vehicleType.name} (Current)'
-                                    : vehicleType.name,
-                                style: contentTextStyle,
-                              ),
-                            );
-                          }).toList(),
+                          items: _vehicleType
+                              .map((VehicleTypeModel vehicleType) {
+                                return DropdownMenuItem<String>(
+                                  value: vehicleType.id,
+                                  child: Text(
+                                    bai.vehicleType == vehicleType.name
+                                        ? '${vehicleType.name} (Current)'
+                                        : vehicleType.name,
+                                    style: contentTextStyle,
+                                  ),
+                                );
+                              })
+                              .toSet()
+                              .toList(),
                           onChanged: (newValue) {
                             setState(() {
                               _selectedVehicleTypeId = newValue!;
@@ -332,8 +343,7 @@ class _BaiDetailsState extends State<BaiDetails> {
                     // Save button
                     GestureDetector(
                       onTap: () {
-                        log.d('Save button clicked');
-                        //TODO: Implement Edit function
+                        _handleSave();
                       },
                       child: Center(
                         child: Container(
@@ -367,8 +377,72 @@ class _BaiDetailsState extends State<BaiDetails> {
     );
   }
 
+  void _handleSave() {
+    LoadingOverlayHelper.show(context);
+    log.d('Save button clicked');
+
+    String plateNumber = plController.text;
+    String vehicleTypeId = _selectedVehicleTypeId;
+
+    if (_isInputInvalid(plateNumber, vehicleTypeId)) {
+      LoadingOverlayHelper.hide();
+      return;
+    }
+
+    _editBai(
+      UpdateBaiModel(
+        vehicleId: bai.id,
+        plateNumber: plateNumber,
+        vehicleTypeId: vehicleTypeId,
+      ),
+    );
+
+    LoadingOverlayHelper.hide();
+  }
+
+  bool _isInputInvalid(String plateNumber, String vehicleTypeId) {
+    if (plateNumber.isEmpty || !Regex.plateRegExp.hasMatch(plateNumber)) {
+      log.e('Plate number is empty or invalid');
+      //TODO: Show error message
+      _showSnackBar(
+          ErrorMessage.inputInvalid(message: ListName.plateNumber), false);
+      LoadingOverlayHelper.hide();
+      return true;
+    }
+    if (vehicleTypeId.isEmpty || vehicleTypeId == bai.vehicleType) {
+      log.e('Vehicle type is empty or unchanged');
+      //TODO: Show error message
+      _showSnackBar(
+          ErrorMessage.inputInvalid(message: ListName.vehicleType), false);
+      LoadingOverlayHelper.hide();
+      return true;
+    }
+    return false;
+  }
+
+  // show SnackBar
+  void _showSnackBar(String message, bool isSuccess) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: MySnackBar(
+          prefix: Icon(
+            isSuccess ? Icons.check_circle_rounded : Icons.error_rounded,
+            color: Theme.of(context).colorScheme.surface,
+          ),
+          message: message,
+          backgroundColor: isSuccess
+              ? Theme.of(context).colorScheme.onError
+              : Theme.of(context).colorScheme.error,
+        ),
+        backgroundColor: Colors.transparent,
+        padding: const EdgeInsets.all(10),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   // edit item
-  Widget editIteam({required String label, required Widget widget}) {
+  Widget _editIteam({required String label, required Widget widget}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -395,6 +469,64 @@ class _BaiDetailsState extends State<BaiDetails> {
         )
       ],
     );
+  }
+
+  // Update bai
+  Future<void> _editBai(UpdateBaiModel updateBaiModel) async {
+    try {
+      APIResponse<int> response =
+          await callVehicleApi.updateBai(updateBaiModel);
+
+      if (response.isTokenValid == false &&
+          response.message == ErrorMessage.tokenInvalid) {
+        log.e('Token is invalid');
+
+        if (!mounted) return;
+        ReturnLoginDialog.returnLogin(context);
+        return;
+      }
+
+      switch (response.data) {
+        case 200:
+          log.d('Update bai success');
+          setState(() {
+            isEdit = false;
+          });
+          break;
+        default:
+          log.e('Update bai failed: ${response.message}');
+          break;
+      }
+    } catch (e) {
+      log.e('Error during update bai: $e');
+    }
+  }
+
+  // Delete bai
+  Future<void> _deleteBai(String id) async {
+    try {
+      APIResponse<int> response = await callVehicleApi.deleteBai(id);
+
+      if (response.isTokenValid == false &&
+          response.message == ErrorMessage.tokenInvalid) {
+        log.e('Token is invalid');
+
+        if (!mounted) return;
+        ReturnLoginDialog.returnLogin(context);
+        return;
+      }
+
+      switch (response.data) {
+        case 200:
+          log.d('Delete bai success');
+          break;
+        default:
+          log.e('Delete bai failed: ${response.message}');
+          break;
+      }
+    } catch (e) {
+      log.e('Error during delete bai: $e');
+    }
   }
 
   // Get vehicle type

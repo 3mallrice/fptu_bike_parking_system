@@ -231,7 +231,49 @@ class CallBikeApi {
         data: response.statusCode,
         message: errorMessage,
       );
+    } catch (e) {
+      log.e('Error during delete bai: $e');
+      return APIResponse(message: "${ErrorMessage.somethingWentWrong}: $e");
+    }
+  }
 
+  // PUT: /vehicles/customer
+  // Update vehicle
+  Future<APIResponse<int>> updateBai(UpdateBaiModel updateBaiModel) async {
+    try {
+      token = GetLocalHelper.getBearerToken() ?? "";
+      if (token == "") {
+        log.e('Token is empty');
+        return APIResponse(
+          message: ErrorMessage.tokenInvalid,
+          isTokenValid: false,
+        );
+      }
+      final response = await http.put(
+        Uri.parse('$api/customer'),
+        headers: {
+          'Authorization': token,
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(updateBaiModel.toJson()),
+      );
+
+      if (response.statusCode == 200) {
+        return APIResponse(
+          data: response.statusCode,
+          message: Message.deleteSuccess(message: ListName.vehicle),
+        );
+      }
+
+      final errorMessage = response.statusCode == 404
+          ? ErrorMessage.notFound(message: ListName.vehicle)
+          : "${ErrorMessage.somethingWentWrong}: ${response.statusCode}";
+
+      log.e('Failed to delete vehicle: ${response.statusCode}');
+      return APIResponse(
+        data: response.statusCode,
+        message: errorMessage,
+      );
     } catch (e) {
       log.e('Error during delete bai: $e');
       return APIResponse(message: "${ErrorMessage.somethingWentWrong}: $e");

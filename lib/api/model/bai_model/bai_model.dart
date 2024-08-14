@@ -101,3 +101,24 @@ class VehicleTypeModel {
     );
   }
 }
+
+class UpdateBaiModel {
+  final String vehicleId;
+  final String plateNumber;
+  final String vehicleTypeId;
+
+  UpdateBaiModel({
+    required this.vehicleId,
+    required this.plateNumber,
+    required this.vehicleTypeId,
+  });
+
+  // toJson
+  Map<String, dynamic> toJson() {
+    return {
+      'vehicleId': vehicleId,
+      'plateNumber': plateNumber,
+      'vehicleTypeId': vehicleTypeId,
+    };
+  }
+}

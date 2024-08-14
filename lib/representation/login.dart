@@ -233,6 +233,7 @@ class _LoginScreenState extends State<LoginScreen> {
         behavior: SnackBarBehavior.floating,
         backgroundColor: Colors.transparent,
         elevation: 0,
+        padding: const EdgeInsets.all(10),
       ),
     );
   }
