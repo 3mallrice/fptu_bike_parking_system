@@ -67,6 +67,7 @@ dependencies:
   mime: ^1.0.5
   fl_chart: ^0.68.0
   shimmer: ^3.0.0
+  giffy_dialog: ^2.1.0
 
 dev_dependencies:
   flutter_test:
