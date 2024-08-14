@@ -7,6 +7,7 @@ import 'package:fptu_bike_parking_system/component/shadow_container.dart';
 import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
 import 'package:fptu_bike_parking_system/representation/fundin_screen.dart';
 import 'package:fptu_bike_parking_system/representation/navigation_bar.dart';
+import 'package:fptu_bike_parking_system/representation/receipt.dart';
 import 'package:fptu_bike_parking_system/representation/wallet_screen.dart';
 import 'package:logger/logger.dart';
 import 'package:transition/transition.dart';
@@ -323,70 +324,75 @@ class _WalletExtraScreenState extends State<WalletExtraScreen> {
                                 Color itemBackgroundColor = index % 2 == 0
                                     ? Colors.white
                                     : Theme.of(context).colorScheme.secondary;
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 10),
-                                  child: Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.9,
-                                    color: itemBackgroundColor,
-                                    child: ListTile(
-                                      leading: CircleAvatar(
-                                        backgroundColor:
-                                            transactions[index].type == 'IN'
-                                                ? Theme.of(context)
-                                                    .colorScheme
-                                                    .primary
-                                                : Theme.of(context)
-                                                    .colorScheme
-                                                    .outline,
-                                        child: Icon(
-                                          transactions[index].type == 'IN'
-                                              ? Icons.attach_money_rounded
-                                              : Icons.local_parking_rounded,
-                                        ),
-                                      ),
-                                      title: Text(
-                                        transactions[index].type == 'IN'
-                                            ? 'Deposit'
-                                            : 'Parking Fee',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleSmall,
-                                      ),
-                                      subtitle: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            transactions[index].description ??
-                                                '',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyLarge,
-                                          ),
-                                          Text(
-                                            UltilHelper.formatDate(
-                                                transactions[index].date),
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodySmall!
-                                                .copyWith(
-                                                  color: Theme.of(context)
+                                return GestureDetector(
+                                  onTap: () {
+                                    showReceiptDialog(transactions[index]);
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(bottom: 10),
+                                    child: Container(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.9,
+                                      color: itemBackgroundColor,
+                                      child: ListTile(
+                                        leading: CircleAvatar(
+                                          backgroundColor:
+                                              transactions[index].type == 'IN'
+                                                  ? Theme.of(context)
                                                       .colorScheme
-                                                      .onSecondary,
-                                                ),
-                                          )
-                                        ],
-                                      ),
-                                      trailing: Text(
-                                        (transactions[index].type == 'IN'
-                                                ? '+'
-                                                : '-') +
-                                            UltilHelper.formatMoney(
-                                                transactions[index].amount),
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium,
+                                                      .primary
+                                                  : Theme.of(context)
+                                                      .colorScheme
+                                                      .outline,
+                                          child: Icon(
+                                            transactions[index].type == 'IN'
+                                                ? Icons.attach_money_rounded
+                                                : Icons.local_parking_rounded,
+                                          ),
+                                        ),
+                                        title: Text(
+                                          transactions[index].type == 'IN'
+                                              ? 'Deposit'
+                                              : 'Parking Fee',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleSmall,
+                                        ),
+                                        subtitle: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              transactions[index].description ??
+                                                  '',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyLarge,
+                                            ),
+                                            Text(
+                                              UltilHelper.formatDate(
+                                                  transactions[index].date),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodySmall!
+                                                  .copyWith(
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .onSecondary,
+                                                  ),
+                                            )
+                                          ],
+                                        ),
+                                        trailing: Text(
+                                          (transactions[index].type == 'IN'
+                                                  ? '+'
+                                                  : '-') +
+                                              UltilHelper.formatMoney(
+                                                  transactions[index].amount),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -397,6 +403,24 @@ class _WalletExtraScreenState extends State<WalletExtraScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  // show receipt dialog
+  void showReceiptDialog(WalletModel transaction) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return OKDialog(
+          title: 'Receipt',
+          content: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.9,
+            height: MediaQuery.of(context).size.height * 0.3,
+            child: ReceiptScreen(transaction: transaction),
+          ),
+          onClick: () => Navigator.of(context).pop(),
+        );
+      },
     );
   }
 }

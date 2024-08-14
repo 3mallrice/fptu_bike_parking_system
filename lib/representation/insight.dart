@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:fptu_bike_parking_system/component/how_did_you_park.dart';
 import 'package:fptu_bike_parking_system/component/how_did_you_pay.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';

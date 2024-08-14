@@ -39,6 +39,7 @@ class LabelMessage {
   static String add({String? message}) =>
       "Add ${message != null ? message.toLowerCase() : ""}";
   static String save = "Save";
+  static String share = "Share";
   static String cancel = "Cancel";
   static String confirm = "Confirm";
   static String delete = "Delete";

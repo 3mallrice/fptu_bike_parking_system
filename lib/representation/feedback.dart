@@ -29,9 +29,6 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   // There is next page or not
   bool _hasNextPage = true;
 
-  // Used to display loading indicators when _firstLoad function is running
-  bool _isFirstLoadRunning = false;
-
   // Used to display loading indicators when _loadMore function is running
   bool _isLoadMoreRunning = false;
 
@@ -45,6 +42,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   void initState() {
     super.initState();
     getFeedbacks();
+    isLoading = true;
+    pageIndex = 1;
     _scrollController = ScrollController()..addListener(_loadMore);
   }
 
@@ -61,130 +60,134 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         leading: true,
         appBarText: 'Feedback',
       ),
-      body: feedbacks.isEmpty
+      body: isLoading
           ? const Center(child: LoadingCircle())
-          : RefreshIndicator(
-              onRefresh: getFeedbacks,
-              child: feedbacks.isEmpty
-                  ? EmptyBox(
-                      message:
-                          EmptyBoxMessage.emptyList(label: ListName.feedback))
-                  : ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      controller: _scrollController,
-                      itemCount: feedbacks.length + 1,
-                      itemBuilder: (context, index) {
-                        if (index < feedbacks.length) {
-                          final feedback = feedbacks[index];
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: ShadowContainer(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    feedback.title,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineMedium,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
+          : feedbacks.isEmpty
+              ? EmptyBox(
+                  message: EmptyBoxMessage.emptyList(label: ListName.feedback))
+              : RefreshIndicator(
+                  onRefresh: getFeedbacks,
+                  child: feedbacks.isEmpty
+                      ? EmptyBox(
+                          message: EmptyBoxMessage.emptyList(
+                              label: ListName.feedback))
+                      : ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          controller: _scrollController,
+                          itemCount: feedbacks.length + 1,
+                          itemBuilder: (context, index) {
+                            if (index < feedbacks.length) {
+                              final feedback = feedbacks[index];
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                child: ShadowContainer(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: [
-                                      Icon(
-                                        Icons.local_parking_rounded,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSecondary,
-                                      ),
-                                      const SizedBox(width: 10),
                                       Text(
-                                        feedback.parkingAreaName,
+                                        feedback.title,
                                         style: Theme.of(context)
                                             .textTheme
-                                            .bodyMedium,
-                                      )
-                                    ],
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.calendar_month_rounded,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSecondary,
+                                            .headlineMedium,
+                                        textAlign: TextAlign.center,
                                       ),
-                                      const SizedBox(width: 10),
-                                      Text(
-                                        UltilHelper.formatDateMMMddyyyy(
-                                            feedback.createdDate),
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyMedium,
-                                      )
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.local_parking_rounded,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSecondary,
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Text(
+                                            feedback.parkingAreaName,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium,
+                                          )
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.calendar_month_rounded,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSecondary,
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Text(
+                                            UltilHelper.formatDateMMMddyyyy(
+                                                feedback.createdDate),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium,
+                                          )
+                                        ],
+                                      ),
+                                      Container(
+                                        alignment: Alignment.centerLeft,
+                                        padding: const EdgeInsets.only(left: 3),
+                                        child: Text(
+                                          feedback.description,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium,
+                                          textAlign: TextAlign.justify,
+                                        ),
+                                      ),
                                     ],
                                   ),
-                                  Container(
-                                    alignment: Alignment.centerLeft,
-                                    padding: const EdgeInsets.only(left: 3),
-                                    child: Text(
-                                      feedback.description,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium,
-                                      textAlign: TextAlign.justify,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        } else if (_hasNextPage) {
-                          return _isLoadMoreRunning
-                              ? const Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Align(
-                                      alignment: Alignment.bottomCenter,
-                                      child: LoadingCircle(
-                                        size: 30,
-                                        isHeight: false,
-                                      )),
-                                )
-                              : const SizedBox();
-                        } else if (_hasNextPage == false) {
-                          return Container(
-                            padding: const EdgeInsets.all(8.0),
-                            margin: const EdgeInsets.only(bottom: 10),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Theme.of(context).colorScheme.secondary,
-                            ),
-                            child: Text(
-                              Message.noMore(message: ListName.feedback),
-                              style: Theme.of(context).textTheme.bodyMedium,
-                              textAlign: TextAlign.center,
-                            ),
-                          );
-                        }
-                        return null;
-                      },
-                    ),
-            ),
+                                ),
+                              );
+                            } else if (_hasNextPage) {
+                              return _isLoadMoreRunning
+                                  ? const Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Align(
+                                          alignment: Alignment.bottomCenter,
+                                          child: LoadingCircle(
+                                            size: 30,
+                                            isHeight: false,
+                                          )),
+                                    )
+                                  : const SizedBox();
+                            } else if (_hasNextPage == false) {
+                              return Container(
+                                padding: const EdgeInsets.all(8.0),
+                                margin: const EdgeInsets.only(bottom: 10),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
+                                ),
+                                child: Text(
+                                  Message.noMore(message: ListName.feedback),
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                  textAlign: TextAlign.center,
+                                ),
+                              );
+                            }
+                            return null;
+                          },
+                        ),
+                ),
     );
   }
 
   Future<void> getFeedbacks() async {
-    setState(() {
-      _isFirstLoadRunning = true;
-      pageIndex = 1; // Reset page index when refreshing
-    });
     try {
       final response = await callFeedbackApi.getFeedbacks(pageIndex, pageSize);
       if (response.isTokenValid) {
@@ -208,13 +211,12 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       log.e('Error during get feedbacks: $e');
     }
     setState(() {
-      _isFirstLoadRunning = false;
+      isLoading = false;
     });
   }
 
   void _loadMore() async {
     if (_hasNextPage &&
-        !_isFirstLoadRunning &&
         !_isLoadMoreRunning &&
         _scrollController.position.extentAfter < 300) {
       setState(() {

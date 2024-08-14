@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:fptu_bike_parking_system/api/model/bai_model/login_model.dart';
+import 'package:fptu_bike_parking_system/core/const/utilities/util_helper.dart';
+import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
 
 import '../core/helper/asset_helper.dart';
 
 class WidgetToImageTemplate extends StatelessWidget {
-  final Widget widget;
+  final Widget child;
   const WidgetToImageTemplate({
     super.key,
-    required this.widget,
+    required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
-    String formatDateTime(DateTime datetime) =>
-        DateFormat('dd/MM/yyyy HH:mm:ss').format(datetime);
-
+    UserData? userData = GetLocalHelper.getUserData();
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+      // padding: const EdgeInsets.symmetric(vertical: 10),
       color: Theme.of(context).colorScheme.surface,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -31,8 +31,8 @@ class WidgetToImageTemplate extends StatelessWidget {
 
           // main widget
           Container(
-            padding: const EdgeInsets.only(top: 5, bottom: 10),
-            child: widget,
+            padding: const EdgeInsets.symmetric(vertical: 5),
+            child: child,
           ),
 
           // datetime with format dd/MM/yyyy
@@ -41,13 +41,13 @@ class WidgetToImageTemplate extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                formatDateTime(DateTime.now()),
+                UltilHelper.formatDTS(DateTime.now()),
                 style: Theme.of(context).textTheme.bodySmall!.copyWith(
                       fontSize: 9,
                     ),
               ),
               Text(
-                'Phuc Bui',
+                userData?.name ?? '',
                 style: Theme.of(context).textTheme.bodySmall!.copyWith(
                       fontSize: 9,
                     ),
