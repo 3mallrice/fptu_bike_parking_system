@@ -1,9 +1,9 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
 import 'package:bai_system/api/model/bai_model/api_response.dart';
 import 'package:bai_system/component/empty_box.dart';
 import 'package:bai_system/core/const/utilities/util_helper.dart';
 import 'package:bai_system/representation/bai_details.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 import 'package:logger/web.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -171,7 +171,7 @@ class _BaiScreenState extends State<BaiScreen> {
             onTap: () {
               Navigator.of(context).pushNamed(
                 BaiDetails.routeName,
-                arguments: bai.id,
+                arguments: bai,
               );
             },
             child: ShadowContainer(
@@ -271,17 +271,11 @@ class _BaiScreenState extends State<BaiScreen> {
   }
 
   Color _getStatusColor(String status, BuildContext context) {
-    switch (status) {
-      case 'ACTIVE':
-        return Theme.of(context).colorScheme.primary;
-      case 'INACTIVE':
-        return Theme.of(context).colorScheme.outline;
-      case 'PENDING':
-        return Theme.of(context).colorScheme.onSecondary;
-      case 'REJECTED':
-        return Theme.of(context).colorScheme.error;
-      default:
-        return Theme.of(context).colorScheme.outline;
-    }
+    return switch (status) {
+      'ACTIVE' => Theme.of(context).colorScheme.primary,
+      'PENDING' => Theme.of(context).colorScheme.onError,
+      'REJECTED' => Theme.of(context).colorScheme.error,
+      _ => Theme.of(context).colorScheme.outline,
+    };
   }
 }
