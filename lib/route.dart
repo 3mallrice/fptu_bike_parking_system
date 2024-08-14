@@ -1,7 +1,5 @@
 // ignore_for_file: unused_import
 
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:bai_system/api/model/bai_model/wallet_model.dart';
 import 'package:bai_system/representation/about_screen.dart';
 import 'package:bai_system/representation/add_bai_screen.dart';
@@ -21,6 +19,8 @@ import 'package:bai_system/representation/receipt.dart';
 import 'package:bai_system/representation/splash_screen.dart';
 import 'package:bai_system/representation/wallet_extra_screen.dart';
 import 'package:bai_system/representation/wallet_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import '../representation/bai_screen.dart';
 import 'api/model/bai_model/bai_model.dart';
@@ -63,9 +63,9 @@ final Map<String, WidgetBuilder> routes = {
     );
   },
   BaiDetails.routeName: (context) {
-    final args = ModalRoute.of(context)!.settings.arguments as String;
+    final args = ModalRoute.of(context)!.settings.arguments as BaiModel;
     return BaiDetails(
-      id: args,
+      baiModel: args,
     );
   },
   InsightScreen.routeName: (context) => const InsightScreen(),

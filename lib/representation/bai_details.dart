@@ -1,25 +1,25 @@
 // ignore_for_file: unnecessary_null_comparison
 
-import 'package:bai_system/api/model/bai_model/api_response.dart';
 import 'package:bai_system/api/service/bai_be/bai_service.dart';
 import 'package:bai_system/component/shadow_container.dart';
-import 'package:bai_system/core/const/frondend/message.dart';
 import 'package:bai_system/core/const/utilities/util_helper.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../api/model/bai_model/api_response.dart';
 import '../api/model/bai_model/bai_model.dart';
 import '../component/app_bar_component.dart';
 import '../component/image_not_found_component.dart';
+import '../core/const/frondend/message.dart';
 import '../core/helper/return_login_dialog.dart';
 
 class BaiDetails extends StatefulWidget {
-  final String id;
+  final BaiModel baiModel;
   const BaiDetails({
     super.key,
-    required this.id,
+    required this.baiModel,
   });
 
   static String routeName = '/bai_details';
@@ -29,8 +29,7 @@ class BaiDetails extends StatefulWidget {
 }
 
 class _BaiDetailsState extends State<BaiDetails> {
-  late final vehicleId = widget.id;
-  BaiModel? bai;
+  late BaiModel bai = widget.baiModel;
   final callVehicleApi = CallBikeApi();
 
   var log = Logger();
@@ -39,74 +38,45 @@ class _BaiDetailsState extends State<BaiDetails> {
 
   bool isEdit = false;
 
-  Future<void> fetchBaiDetail(String id) async {
-    try {
-      APIResponse<BaiModel> response =
-          await callVehicleApi.getCustomerBaiById(id);
+  late TextStyle titleTextStyle =
+      Theme.of(context).textTheme.displayLarge!.copyWith(
+            color: Theme.of(context).colorScheme.outline,
+            fontSize: 28,
+          );
 
-      if (response.isTokenValid == false &&
-          response.message == ErrorMessage.tokenInvalid) {
-        log.e('Token is invalid');
-        if (!mounted) return;
-        ReturnLoginDialog.returnLogin(context);
-        return;
-      }
+  late TextStyle contentTextStyle =
+      Theme.of(context).textTheme.bodyLarge!.copyWith(
+            color: Theme.of(context).colorScheme.outline,
+          );
 
-      if (response.data != null) {
-        setState(() {
-          bai = response.data!;
-        });
-      } else {
-        log.e('Failed to fetch Bai details: ${response.message}');
-      }
-    } catch (e) {
-      log.e('Error during fetch Bai details: $e');
-    }
-  }
+  late final color = switch (bai.status) {
+    'ACTIVE' => Theme.of(context).colorScheme.primary,
+    'PENDING' => Theme.of(context).colorScheme.onError,
+    'REJECTED' => Theme.of(context).colorScheme.error,
+    'INACTIVE' => Theme.of(context).colorScheme.outline,
+    _ => contentTextStyle.color,
+  };
 
   @override
   void initState() {
     super.initState();
-    fetchBaiDetail(vehicleId);
   }
 
   @override
   Widget build(BuildContext context) {
-    TextStyle titleTextStyle =
-        Theme.of(context).textTheme.displayLarge!.copyWith(
-              color: Theme.of(context).colorScheme.outline,
-              fontSize: 28,
-            );
-
-    TextStyle contentTextStyle =
-        Theme.of(context).textTheme.bodyLarge!.copyWith(
-              color: Theme.of(context).colorScheme.outline,
-            );
-
-    if (bai == null) {
-      return const Scaffold(
-        appBar: AppBarCom(
-          leading: true,
-        ),
-        body: Center(
-          child:
-              CircularProgressIndicator(), // Show a loading indicator while fetching data
-        ),
-      );
-    }
-
     return Scaffold(
       appBar: const AppBarCom(
+        appBarText: 'Bai Details',
         leading: true,
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            (bai?.plateImage == null)
+            (bai.plateImage == null)
                 ? const ImageNotFound()
                 : CachedNetworkImage(
                     width: double.infinity,
-                    imageUrl: bai!.plateImage,
+                    imageUrl: bai.plateImage,
                     fit: BoxFit.fill,
                     placeholder: (context, url) => Shimmer.fromColors(
                       baseColor: Theme.of(context).colorScheme.background,
@@ -114,7 +84,6 @@ class _BaiDetailsState extends State<BaiDetails> {
                           Theme.of(context).colorScheme.outlineVariant,
                       child: Container(color: Colors.grey),
                     ),
-                    errorWidget: (context, url, error) => const ImageNotFound(),
                   ),
             const SizedBox(height: 30),
             ShadowContainer(
@@ -125,7 +94,7 @@ class _BaiDetailsState extends State<BaiDetails> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    UltilHelper.formatPlateNumber(bai!.plateNumber),
+                    UltilHelper.formatPlateNumber(bai.plateNumber),
                     style: titleTextStyle,
                     textAlign: TextAlign.center,
                   ),
@@ -139,7 +108,7 @@ class _BaiDetailsState extends State<BaiDetails> {
                         textAlign: TextAlign.center,
                       ),
                       Text(
-                        UltilHelper.formatDateMMMddyyyy(bai!.createDate),
+                        UltilHelper.formatDateMMMddyyyy(bai.createDate),
                         style: contentTextStyle,
                         textAlign: TextAlign.center,
                       ),
@@ -155,7 +124,7 @@ class _BaiDetailsState extends State<BaiDetails> {
                         textAlign: TextAlign.center,
                       ),
                       Text(
-                        bai!.vehicleType,
+                        bai.vehicleType,
                         style: contentTextStyle,
                         textAlign: TextAlign.center,
                       ),
@@ -171,28 +140,8 @@ class _BaiDetailsState extends State<BaiDetails> {
                         textAlign: TextAlign.center,
                       ),
                       Text(
-                        bai!.status,
-                        style: (bai!.status == 'ACTIVE')
-                            ? contentTextStyle.copyWith(
-                                color: Theme.of(context).colorScheme.primary,
-                              )
-                            : (bai!.status == 'PENDING')
-                                ? contentTextStyle.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSecondary,
-                                  )
-                                : (bai!.status == 'REJECTED')
-                                    ? contentTextStyle.copyWith(
-                                        color:
-                                            Theme.of(context).colorScheme.error,
-                                      )
-                                    : (bai!.status == 'INACTIVE')
-                                        ? contentTextStyle.copyWith(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .outline)
-                                        : contentTextStyle, // Default style if none of the conditions are met
+                        bai.status,
+                        style: contentTextStyle.copyWith(color: color),
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -245,8 +194,8 @@ class _BaiDetailsState extends State<BaiDetails> {
                         ),
                       ),
                       Visibility(
-                        visible: bai!.status == 'PENDING' ||
-                            bai!.status == 'REJECTED',
+                        visible:
+                            bai.status == 'PENDING' || bai.status == 'REJECTED',
                         child: GestureDetector(
                           onTap: () {
                             setState(() {
@@ -357,5 +306,30 @@ class _BaiDetailsState extends State<BaiDetails> {
         ),
       ),
     );
+  }
+
+  Future<void> fetchBaiDetail(String id) async {
+    try {
+      APIResponse<BaiModel> response =
+          await callVehicleApi.getCustomerBaiById(id);
+
+      if (response.isTokenValid == false &&
+          response.message == ErrorMessage.tokenInvalid) {
+        log.e('Token is invalid');
+        if (!mounted) return;
+        ReturnLoginDialog.returnLogin(context);
+        return;
+      }
+
+      if (response.data != null) {
+        setState(() {
+          bai = response.data!;
+        });
+      } else {
+        log.e('Failed to fetch Bai details: ${response.message}');
+      }
+    } catch (e) {
+      log.e('Error during fetch Bai details: $e');
+    }
   }
 }
