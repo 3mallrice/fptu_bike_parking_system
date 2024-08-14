@@ -1,8 +1,11 @@
 // ignore_for_file: unnecessary_null_comparison
 
 import 'package:bai_system/api/service/bai_be/bai_service.dart';
+import 'package:bai_system/component/dialog.dart';
 import 'package:bai_system/component/shadow_container.dart';
+import 'package:bai_system/component/snackbar.dart';
 import 'package:bai_system/core/const/utilities/util_helper.dart';
+import 'package:bai_system/representation/navigation_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -141,7 +144,8 @@ class _BaiDetailsState extends State<BaiDetails> {
                       ),
                       Text(
                         bai.status,
-                        style: contentTextStyle.copyWith(color: color),
+                        style: contentTextStyle.copyWith(
+                            color: color, fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -152,34 +156,8 @@ class _BaiDetailsState extends State<BaiDetails> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: const Text('Confirm Delete'),
-                                backgroundColor:
-                                    Theme.of(context).colorScheme.surface,
-                                content: const Text(
-                                    'Are you sure you want to delete this bike?'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context)
-                                          .pop(); // Đóng popup mà không làm gì cả
-                                    },
-                                    child: const Text('Cancel'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context)
-                                          .pop(); // Đóng popup sau khi xóa
-                                    },
-                                    child: const Text('Delete'),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
+                          //Todo: Delete Bai
+                          deleteBaiDialog();
                         },
                         child: Container(
                           padding: const EdgeInsets.all(10),
@@ -308,6 +286,47 @@ class _BaiDetailsState extends State<BaiDetails> {
     );
   }
 
+  // Delete Bai
+  Future<void> deleteBai(String id) async {
+    try {
+      APIResponse<int> response = await callVehicleApi.deleteBai(bai.id);
+
+      if (response.isTokenValid == false &&
+          response.message == ErrorMessage.tokenInvalid) {
+        log.e('Token is invalid');
+        if (!mounted) return;
+        ReturnLoginDialog.returnLogin(context);
+        return;
+      }
+
+      switch (response.data.toString()) {
+        case '200':
+          log.d('Delete Bai successfully');
+          goToPage(routeName: MyNavigationBar.routeName, arguments: 1);
+          showSnackBar(
+              message: Message.deleteSuccess(message: ListName.bai),
+              isSuccessful: true);
+          break;
+        case '409':
+          log.d('Delete Bai failed: Not Authorized');
+          showSnackBar(message: Message.permissionDeny, isSuccessful: false);
+          break;
+        default:
+          log.e('Failed to delete Bai: ${response.message}');
+          showSnackBar(
+              message: Message.deleteUnSuccess(message: ListName.bai),
+              isSuccessful: false);
+          break;
+      }
+      return;
+    } catch (e) {
+      log.e('Error during delete Bai: $e');
+      showSnackBar(
+          message: Message.deleteUnSuccess(message: ListName.bai),
+          isSuccessful: false);
+    }
+  }
+
   Future<void> fetchBaiDetail(String id) async {
     try {
       APIResponse<BaiModel> response =
@@ -331,5 +350,61 @@ class _BaiDetailsState extends State<BaiDetails> {
     } catch (e) {
       log.e('Error during fetch Bai details: $e');
     }
+  }
+
+  //Delete Bai Dialog
+  Future<void> deleteBaiDialog() async {
+    showDialog(
+      context: context,
+      builder: (context) => ConfirmDialog(
+        title: Message.confirmTitle,
+        content: Text(Message.deleteConfirmation(message: ListName.bai),
+            style: contentTextStyle),
+        positiveLabel: LabelMessage.yes,
+        onConfirm: () => deleteBai(bai.id),
+        onCancel: () => Navigator.of(context).pop(),
+      ),
+    );
+  }
+
+  //Go to page
+  void goToPage({String? routeName, dynamic arguments}) {
+    if (routeName != null) {
+      Navigator.pushReplacementNamed(
+        context,
+        routeName,
+        arguments: arguments,
+      );
+    } else {
+      Navigator.of(context).pop();
+    }
+  }
+
+  //Show SnackBar
+  void showSnackBar({required String message, required bool isSuccessful}) {
+    Color background = Theme.of(context).colorScheme.surface;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: MySnackBar(
+          prefix: isSuccessful
+              ? Icon(
+                  Icons.check_circle_rounded,
+                  color: background,
+                )
+              : Icon(
+                  Icons.cancel_rounded,
+                  color: background,
+                ),
+          message: message,
+          backgroundColor: isSuccessful
+              ? Theme.of(context).colorScheme.onError
+              : Theme.of(context).colorScheme.error,
+        ),
+        backgroundColor: Colors.transparent,
+        behavior: SnackBarBehavior.floating,
+        elevation: 0,
+        padding: const EdgeInsets.all(10),
+      ),
+    );
   }
 }
