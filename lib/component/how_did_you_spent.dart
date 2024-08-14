@@ -90,6 +90,7 @@ class HowDidYouSpend extends StatelessWidget {
                 sideTitles: SideTitles(
                   showTitles: true,
                   reservedSize: 40,
+                  interval: 9,
                   getTitlesWidget: (value, meta) {
                     String day = '';
                     DateTime date =

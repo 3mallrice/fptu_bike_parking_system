@@ -38,14 +38,14 @@ class HowDidYouPay extends StatelessWidget {
                 ),
                 showTitle: true,
                 titlePositionPercentageOffset: 0.45,
-                radius: 65,
+                radius: 55,
               );
             }).toList(),
             borderData: FlBorderData(
               show: false,
             ),
             sectionsSpace: 2,
-            centerSpaceRadius: 50,
+            centerSpaceRadius: 40,
             centerSpaceColor: Theme.of(context).colorScheme.surface,
             startDegreeOffset: 180,
           ),

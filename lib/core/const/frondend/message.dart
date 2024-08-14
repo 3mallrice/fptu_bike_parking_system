@@ -61,10 +61,10 @@ class ErrorMessage {
   static String imageNotFound = "Image not found";
 
   static String inputRequired({String? message}) =>
-      "Action Failed! Please input all fields for $message";
+      "Action Failed! Please input all fields for ${message?.toLowerCase()}";
 
   static String inputInvalid({String? message}) =>
-      "Action Failed! Please input valid fields for $message";
+      "Action Failed! Please input valid fields for ${message?.toLowerCase()}";
 
   static String underDevelopment = "This feature is under development!";
   static String tokenInvalid = "Token is invalid!";

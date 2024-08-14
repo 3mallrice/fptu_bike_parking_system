@@ -5,10 +5,10 @@ import 'package:fptu_bike_parking_system/component/dialog.dart';
 import 'package:fptu_bike_parking_system/component/shadow_button.dart';
 import 'package:fptu_bike_parking_system/component/shadow_container.dart';
 import 'package:fptu_bike_parking_system/component/snackbar.dart';
-import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
 import 'package:fptu_bike_parking_system/core/helper/save_image.dart';
 import 'package:fptu_bike_parking_system/representation/receipt.dart';
+import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:widgets_to_image/widgets_to_image.dart';
 
@@ -402,6 +402,7 @@ class _PayOsScreenState extends State<PayOsScreen> {
         behavior: SnackBarBehavior.floating,
         backgroundColor: Colors.transparent,
         elevation: 0,
+        padding: const EdgeInsets.all(10),
       ),
     );
   }
