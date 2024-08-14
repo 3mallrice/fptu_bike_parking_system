@@ -1,9 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:fptu_bike_parking_system/api/model/bai_model/api_response.dart';
-import 'package:fptu_bike_parking_system/component/empty_box.dart';
-import 'package:fptu_bike_parking_system/core/const/utilities/util_helper.dart';
-import 'package:fptu_bike_parking_system/representation/bai_details.dart';
+import 'package:bai_system/api/model/bai_model/api_response.dart';
+import 'package:bai_system/component/empty_box.dart';
+import 'package:bai_system/core/const/utilities/util_helper.dart';
+import 'package:bai_system/representation/bai_details.dart';
 import 'package:logger/web.dart';
 import 'package:shimmer/shimmer.dart';
 

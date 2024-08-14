@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fptu_bike_parking_system/representation/bai_screen.dart';
+import 'package:bai_system/representation/bai_screen.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
 
 import '../component/main_app_bar.dart';

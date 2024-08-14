@@ -1,10 +1,10 @@
 // ignore_for_file: unnecessary_import
 
 import 'package:flutter/material.dart';
-import 'package:fptu_bike_parking_system/component/how_did_you_park.dart';
-import 'package:fptu_bike_parking_system/component/how_did_you_pay.dart';
-import 'package:fptu_bike_parking_system/component/shadow_container.dart';
-import 'package:fptu_bike_parking_system/core/const/utilities/util_helper.dart';
+import 'package:bai_system/component/how_did_you_park.dart';
+import 'package:bai_system/component/how_did_you_pay.dart';
+import 'package:bai_system/component/shadow_container.dart';
+import 'package:bai_system/core/const/utilities/util_helper.dart';
 import 'package:logger/logger.dart';
 
 import '../api/model/bai_model/statistic.dart';

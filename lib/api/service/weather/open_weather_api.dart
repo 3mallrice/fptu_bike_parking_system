@@ -1,9 +1,7 @@
-// ignore_for_file: constant_identifier_names
-
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 
-import 'package:fptu_bike_parking_system/api/model/weather/weather.dart';
+import 'package:bai_system/api/model/weather/weather.dart';
+import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
 class OpenWeatherApi {

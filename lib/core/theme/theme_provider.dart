@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fptu_bike_parking_system/core/theme/theme.dart';
+import 'package:bai_system/core/theme/theme.dart';
 
 class ThemeProvider extends ChangeNotifier {
   ThemeData _themeData = lightMode;

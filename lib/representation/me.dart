@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:fptu_bike_parking_system/api/model/bai_model/login_model.dart';
-import 'package:fptu_bike_parking_system/component/shadow_container.dart';
-import 'package:fptu_bike_parking_system/core/helper/google_auth.dart';
-import 'package:fptu_bike_parking_system/core/helper/local_storage_helper.dart';
-import 'package:fptu_bike_parking_system/representation/about_screen.dart';
-import 'package:fptu_bike_parking_system/representation/profile.dart';
+import 'package:bai_system/api/model/bai_model/login_model.dart';
+import 'package:bai_system/component/shadow_container.dart';
+import 'package:bai_system/core/helper/google_auth.dart';
+import 'package:bai_system/core/helper/local_storage_helper.dart';
+import 'package:bai_system/representation/about_screen.dart';
+import 'package:bai_system/representation/profile.dart';
 import 'package:logger/logger.dart';
 
 import 'login.dart';

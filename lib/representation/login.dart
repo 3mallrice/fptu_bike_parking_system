@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:fptu_bike_parking_system/api/service/bai_be/auth_service.dart';
-import 'package:fptu_bike_parking_system/component/shadow_container.dart';
-import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
-import 'package:fptu_bike_parking_system/representation/navigation_bar.dart';
+import 'package:bai_system/api/service/bai_be/auth_service.dart';
+import 'package:bai_system/component/shadow_container.dart';
+import 'package:bai_system/core/helper/asset_helper.dart';
+import 'package:bai_system/representation/navigation_bar.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:logger/logger.dart';
 

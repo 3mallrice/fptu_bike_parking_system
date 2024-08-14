@@ -1,9 +1,9 @@
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fptu_bike_parking_system/component/shadow_container.dart';
-import 'package:fptu_bike_parking_system/core/const/utilities/util_helper.dart';
-import 'package:fptu_bike_parking_system/core/helper/asset_helper.dart';
+import 'package:bai_system/component/shadow_container.dart';
+import 'package:bai_system/core/const/utilities/util_helper.dart';
+import 'package:bai_system/core/helper/asset_helper.dart';
 import 'package:logger/logger.dart';
 
 import '../api/model/bai_model/wallet_model.dart';

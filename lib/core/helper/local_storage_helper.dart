@@ -1,4 +1,4 @@
-import 'package:fptu_bike_parking_system/api/model/bai_model/login_model.dart';
+import 'package:bai_system/api/model/bai_model/login_model.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:logger/logger.dart';
