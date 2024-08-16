@@ -1,4 +1,3 @@
-import 'package:bai_system/component/shadow_container.dart';
 import 'package:bai_system/core/const/utilities/util_helper.dart';
 import 'package:bai_system/core/helper/asset_helper.dart';
 import 'package:dotted_line/dotted_line.dart';
@@ -7,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
 
 import '../api/model/bai_model/wallet_model.dart';
+import '../component/shadow_container.dart';
 
 class ReceiptScreen extends StatefulWidget {
   final WalletModel transaction;

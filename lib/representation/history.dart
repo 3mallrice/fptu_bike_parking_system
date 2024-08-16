@@ -16,7 +16,7 @@ import '../api/model/bai_model/feedback_model.dart';
 import '../component/empty_box.dart';
 import '../component/loading_component.dart';
 import '../component/widget_to_image_template.dart';
-import '../core/const/frondend/message.dart';
+import '../core/const/frontend/message.dart';
 import '../core/helper/return_login_dialog.dart';
 
 class HistoryScreen extends StatefulWidget {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../core/const/frondend/message.dart';
+import '../core/const/frontend/message.dart';
 import '../representation/login.dart';
 import 'dialog.dart';
 

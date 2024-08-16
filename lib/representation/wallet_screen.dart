@@ -10,10 +10,11 @@ import 'package:logger/logger.dart';
 import 'package:transition/transition.dart';
 
 import '../component/app_bar_component.dart';
+import '../component/date_picker.dart';
 import '../component/dialog.dart';
 import '../component/empty_box.dart';
 import '../component/shadow_container.dart';
-import '../core/const/frondend/message.dart';
+import '../core/const/frontend/message.dart';
 import '../core/helper/local_storage_helper.dart';
 import '../core/helper/return_login_dialog.dart';
 import 'fundin_screen.dart';
@@ -36,6 +37,10 @@ class _MyWalletState extends State<MyWallet> {
   List<WalletModel> transactions = [];
   bool isLoading = true;
   String? errorMessage;
+
+  DateTime from =
+      DateTime.now().subtract(const Duration(days: 7)); // default from date
+  DateTime to = DateTime.now();
 
   Future<void> _loadHideBalance() async {
     bool? hideBalance =
@@ -90,7 +95,7 @@ class _MyWalletState extends State<MyWallet> {
 
     try {
       final APIResponse<List<WalletModel>> result =
-          await callWalletApi.getMainWalletTransactions();
+          await callWalletApi.getMainWalletTransactions(from, to);
 
       checkToken(result);
       if (!mounted) return;
@@ -221,34 +226,53 @@ class _MyWalletState extends State<MyWallet> {
               Container(
                 color: Theme.of(context).colorScheme.secondary,
                 padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 17),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'HISTORIES',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    Row(
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                child: GestureDetector(
+                  onTap: () {
+                    showDatePickerDialog();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'FILTER',
-                          style: Theme.of(context).textTheme.bodyLarge,
+                          'HISTORIES',
+                          style:
+                              Theme.of(context).textTheme.bodySmall!.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .outline
+                                        .withOpacity(0.5),
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
-                        const SizedBox(width: 5),
-                        GestureDetector(
-                          onTap: () {
-                            //TODO: Open filter dialog
-                          },
-                          child: Icon(
-                            Icons.filter_list_rounded,
-                            color: Theme.of(context).colorScheme.onSecondary,
-                            size: 20,
-                          ),
+                        Row(
+                          children: [
+                            Text(
+                              'FILTER',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .outline
+                                        .withOpacity(0.5),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                            const SizedBox(width: 5),
+                            Icon(
+                              Icons.filter_alt_outlined,
+                              color: Theme.of(context).colorScheme.onSecondary,
+                              size: 15,
+                            ),
+                          ],
                         )
                       ],
-                    )
-                  ],
+                    ),
+                  ),
                 ),
               ),
 
@@ -356,6 +380,33 @@ class _MyWalletState extends State<MyWallet> {
     );
   }
 
+  //Show date picker dialog
+  void showDatePickerDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return OKDialog(
+          title: 'Filter by period',
+          contentPadding: const EdgeInsets.all(0),
+          content: DatePicker(
+            fromDate: from,
+            toDate: to,
+            onDateSelected: (startDate, endDate) {
+              setState(() {
+                from = startDate;
+                to = endDate;
+              });
+            },
+          ),
+          onClick: () {
+            Navigator.of(context).pop();
+            getMainTransactions();
+          },
+        );
+      },
+    );
+  }
+
   // show receipt dialog
   void showReceiptDialog(WalletModel transaction) {
     showDialog(
@@ -365,7 +416,7 @@ class _MyWalletState extends State<MyWallet> {
           title: 'Receipt',
           content: SizedBox(
             width: MediaQuery.of(context).size.width * 0.9,
-            height: MediaQuery.of(context).size.height * 0.3,
+            height: MediaQuery.of(context).size.height * 0.35,
             child: ReceiptScreen(transaction: transaction),
           ),
           onClick: () => Navigator.of(context).pop(),

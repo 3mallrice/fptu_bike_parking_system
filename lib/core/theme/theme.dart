@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../const/frondend/color_const.dart';
+import '../const/frontend/color_const.dart';
 
 ThemeData lightMode = ThemeData(
   primarySwatch: Colors.blue,
@@ -44,6 +44,8 @@ ThemeData lightMode = ThemeData(
   dividerColor: ColorLightMode.primaryText,
   useMaterial3: true,
 
+  dialogBackgroundColor: ColorLightMode.background,
+
   //Display: H1
   //headline: H2
   //title: H3
@@ -77,7 +79,7 @@ ThemeData lightMode = ThemeData(
     //title
     titleMedium: TextStyle(
       color: ColorLightMode.primaryText,
-      fontSize: 16,
+      fontSize: 15,
       fontWeight: FontWeight.w700,
       fontFamily: GoogleFonts.roboto().fontFamily,
     ),
@@ -85,21 +87,21 @@ ThemeData lightMode = ThemeData(
     //body
     bodyLarge: TextStyle(
       color: ColorLightMode.secondaryText,
-      fontSize: 15,
+      fontSize: 13,
       fontWeight: FontWeight.w400,
       fontFamily: GoogleFonts.roboto().fontFamily,
     ),
 
     bodyMedium: TextStyle(
       color: ColorLightMode.primaryText,
-      fontSize: 14,
+      fontSize: 12,
       fontWeight: FontWeight.w400,
       fontFamily: GoogleFonts.roboto().fontFamily,
     ),
 
     bodySmall: TextStyle(
       color: ColorLightMode.primaryText,
-      fontSize: 13,
+      fontSize: 11,
       fontWeight: FontWeight.w400,
       fontFamily: GoogleFonts.roboto().fontFamily,
     ),
@@ -107,7 +109,7 @@ ThemeData lightMode = ThemeData(
     //label
     labelMedium: TextStyle(
       color: ColorLightMode.secondaryText,
-      fontSize: 16,
+      fontSize: 14,
       fontWeight: FontWeight.w400,
       fontFamily: GoogleFonts.roboto().fontFamily,
     ),

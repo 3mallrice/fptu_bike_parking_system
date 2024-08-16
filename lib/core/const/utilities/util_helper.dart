@@ -19,8 +19,10 @@ class UltilHelper {
   }
 
   // Function to format date
-  static String formatDate(DateTime date) {
-    if (_isToday(date)) {
+  static String formatDate(DateTime? date) {
+    if (date == null) {
+      return '';
+    } else if (_isToday(date)) {
       return 'Today, ${formatDTS(date)}';
     } else if (_isYesterday(date)) {
       return 'Yesterday, ${formatDTS(date)}';
@@ -46,7 +48,7 @@ class UltilHelper {
 
   // Function to format date: August 12, 2021
   static String formatDateMMMddyyyy(DateTime date) {
-    return DateFormat('MMMM dd, yyyy').format(date);
+    return DateFormat('MMM dd, yyyy').format(date);
   }
 
   // Function to format number

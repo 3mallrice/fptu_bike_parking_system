@@ -1,4 +1,4 @@
-import 'package:bai_system/core/const/frondend/message.dart';
+import 'package:bai_system/core/const/frontend/message.dart';
 import 'package:flutter/material.dart';
 
 //OKDialog
@@ -6,12 +6,14 @@ class OKDialog extends StatelessWidget {
   final String title;
   final Widget? content;
   final Function? onClick;
+  final EdgeInsetsGeometry? contentPadding;
 
   const OKDialog({
     super.key,
     required this.title,
     this.content,
     this.onClick,
+    this.contentPadding,
   });
 
   @override
@@ -24,13 +26,15 @@ class OKDialog extends StatelessWidget {
         title,
         style: Theme.of(context).textTheme.titleLarge!.copyWith(
               fontWeight: FontWeight.w700,
+              fontSize: 18,
             ),
         textAlign: TextAlign.center,
       ),
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: 20.0,
-        vertical: 10.0,
-      ),
+      contentPadding: contentPadding ??
+          const EdgeInsets.symmetric(
+            horizontal: 20.0,
+            vertical: 10.0,
+          ),
       backgroundColor: Theme.of(context).colorScheme.surface,
       surfaceTintColor: Theme.of(context).colorScheme.surface,
       content: content,

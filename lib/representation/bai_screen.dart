@@ -12,7 +12,7 @@ import '../api/service/bai_be/bai_service.dart';
 import '../component/image_not_found_component.dart';
 import '../component/loading_component.dart';
 import '../component/shadow_container.dart';
-import '../core/const/frondend/message.dart';
+import '../core/const/frontend/message.dart';
 import '../core/helper/asset_helper.dart';
 import '../core/helper/return_login_dialog.dart';
 import '../representation/add_bai_screen.dart';
