@@ -9,7 +9,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:logger/web.dart';
 import 'package:mime/mime.dart';
 
-import '../../../core/const/frondend/message.dart';
+import '../../../core/const/frontend/message.dart';
 import 'api_root.dart';
 
 class CallBikeApi {

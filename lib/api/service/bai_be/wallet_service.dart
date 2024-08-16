@@ -4,7 +4,7 @@ import 'package:bai_system/api/model/bai_model/api_response.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
-import '../../../core/const/frondend/message.dart';
+import '../../../core/const/frontend/message.dart';
 import '../../../core/helper/local_storage_helper.dart';
 import '../../model/bai_model/wallet_model.dart';
 import 'api_root.dart';
@@ -18,7 +18,8 @@ class CallWalletApi {
 
   // GET: /api/wallet/transaction/main
   // Get all transaction of user's main wallet
-  Future<APIResponse<List<WalletModel>>> getMainWalletTransactions() async {
+  Future<APIResponse<List<WalletModel>>> getMainWalletTransactions(
+      DateTime? startDate, DateTime? endDate) async {
     try {
       token = GetLocalHelper.getBearerToken() ?? "";
 
@@ -31,12 +32,14 @@ class CallWalletApi {
       }
 
       final response = await http.get(
-        Uri.parse('$api/transaction/main'),
+        Uri.parse(
+            '$api/transaction/main?StartDate=$startDate&EndDate=$endDate'),
         headers: {
           'Authorization': token,
           'Content-Type': 'application/json',
         },
       );
+      log.d('Request: ${response.request?.url}');
       if (response.statusCode == 200) {
         final responseJson = jsonDecode(response.body);
 
@@ -62,7 +65,8 @@ class CallWalletApi {
 
   // GET: /api/wallet/transaction/extra
   // Get all transaction of user's extra wallet
-  Future<APIResponse<List<WalletModel>>> getExtraWalletTransactions() async {
+  Future<APIResponse<List<WalletModel>>> getExtraWalletTransactions(
+      DateTime? startDate, DateTime? endDate) async {
     try {
       token = GetLocalHelper.getBearerToken() ?? "";
 
@@ -75,12 +79,14 @@ class CallWalletApi {
       }
 
       final response = await http.get(
-        Uri.parse('$api/transaction/extra'),
+        Uri.parse(
+            '$api/transaction/extra?StartDate=$startDate&EndDate=$endDate'),
         headers: {
           'Authorization': token,
           'Content-Type': 'application/json',
         },
       );
+      log.d('Request: ${response.request?.url}');
       if (response.statusCode == 200) {
         final responseJson = jsonDecode(response.body);
 

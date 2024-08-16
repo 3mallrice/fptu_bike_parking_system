@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:bai_system/component/app_bar_component.dart';
 import 'package:bai_system/component/dialog.dart';
 import 'package:bai_system/component/shadow_button.dart';
@@ -8,12 +6,14 @@ import 'package:bai_system/component/snackbar.dart';
 import 'package:bai_system/core/helper/asset_helper.dart';
 import 'package:bai_system/core/helper/save_image.dart';
 import 'package:bai_system/representation/receipt.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:widgets_to_image/widgets_to_image.dart';
 
 import '../component/widget_to_image_template.dart';
-import '../core/const/frondend/message.dart';
+import '../core/const/frontend/message.dart';
 
 class PayOsScreen extends StatefulWidget {
   const PayOsScreen({super.key});
