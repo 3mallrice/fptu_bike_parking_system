@@ -1,26 +1,23 @@
 class HowDidYouParkAndSpend {
-  final DateTime date;
-  final int numberOfParkings;
-  final int amount;
+  final int totalPaymentInThisMonth;
+  final int totalTimePakedInThisMonth;
 
   HowDidYouParkAndSpend({
-    required this.date,
-    required this.numberOfParkings,
-    required this.amount,
+    required this.totalPaymentInThisMonth,
+    required this.totalTimePakedInThisMonth,
   });
 
   factory HowDidYouParkAndSpend.fromJson(Map<String, dynamic> json) {
     return HowDidYouParkAndSpend(
-      date: DateTime.parse(json['date']),
-      numberOfParkings: json['totalPayment'],
-      amount: json['amount'],
+      totalPaymentInThisMonth: json['totalPaymentInThisMonth'],
+      totalTimePakedInThisMonth: json['totalTimePakedInThisMonth'],
     );
   }
 
   //toString method
   @override
   String toString() {
-    return 'HowDidYouParkAndSpend{date: $date, numberOfParkings: $numberOfParkings, amount: $amount}';
+    return 'HowDidYouParkAndSpend{numberOfParkings: $totalTimePakedInThisMonth, totalPayment: $totalPaymentInThisMonth}';
   }
 }
 

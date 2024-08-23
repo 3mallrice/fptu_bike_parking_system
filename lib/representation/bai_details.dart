@@ -488,8 +488,7 @@ class _BaiDetailsState extends State<BaiDetails> {
       context: context,
       builder: (context) => ConfirmDialog(
         title: Message.confirmTitle,
-        content: Text(Message.editConfirmation(message: ListName.bai),
-            style: contentTextStyle),
+        content: Text(Message.editConfirmation, style: contentTextStyle),
         positiveLabel: LabelMessage.yes,
         onConfirm: () => editBai(baiModel),
         onCancel: () => Navigator.of(context).pop(),

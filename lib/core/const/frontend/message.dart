@@ -16,8 +16,7 @@ class Message {
       "Are you sure you want to delete $message?";
   static String confirmTitle = "Are you sure?";
 
-  static String editConfirmation({String? message}) =>
-      "Are you sure you want to edit $message?";
+  static String editConfirmation = "Are you sure you want to save changes?";
 
   static deleteSuccess({required String message}) =>
       "Delete $message successfully!";
@@ -42,6 +41,7 @@ class ListName {
   static String transaction = "Transaction";
   static String history = "History";
   static String feedback = "Feedback";
+  static String profile = "Profile";
 }
 
 class LabelMessage {
