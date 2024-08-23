@@ -1,15 +1,11 @@
-// ignore_for_file: unnecessary_import
-
-import 'package:flutter/material.dart';
-import 'package:bai_system/component/how_did_you_park.dart';
 import 'package:bai_system/component/how_did_you_pay.dart';
 import 'package:bai_system/component/shadow_container.dart';
 import 'package:bai_system/core/const/utilities/util_helper.dart';
+import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
 import '../api/model/bai_model/statistic.dart';
 import '../api/service/bai_be/statistic_service.dart';
-import '../component/how_did_you_spent.dart';
 
 class InsightScreen extends StatefulWidget {
   const InsightScreen({super.key});
@@ -24,20 +20,7 @@ class _InsightScreenState extends State<InsightScreen> {
   final callStatisticApi = StatisticApi();
   var log = Logger();
 
-  //fake data for testing
-  // HowDidYouPark
-  List<HowDidYouParkAndSpend> howDidYouParkList = [
-    HowDidYouParkAndSpend(
-      date: DateTime.now(),
-      numberOfParkings: 0,
-      amount: 0,
-    ),
-    HowDidYouParkAndSpend(
-      date: DateTime.now().subtract(const Duration(days: 1)),
-      numberOfParkings: 0,
-      amount: 0,
-    ),
-  ];
+  late HowDidYouParkAndSpend? howDidYouParkAndSpend;
 
   // PaymentMethodUsage Wallet and Other/Cash
   late List<PaymentMethodUsage> paymentMethodUsageList = [
@@ -59,12 +42,10 @@ class _InsightScreenState extends State<InsightScreen> {
     if (howDidYouParkResponse.isTokenValid &&
         howDidYouPayResponse.isTokenValid) {
       setState(() {
-        howDidYouParkList = fillMissingDates(howDidYouParkResponse.data ?? []);
+        howDidYouParkAndSpend = howDidYouParkResponse.data;
         paymentMethodUsageList = howDidYouPayResponse.data ?? [];
       });
 
-      log.i(
-          'HowDidYouPark response: ${fillMissingDates(howDidYouParkResponse.data ?? [])}');
       log.i('HowDidYouPay response: ${howDidYouPayResponse.data}');
     } else {
       log.e('Token is invalid');
@@ -106,50 +87,36 @@ class _InsightScreenState extends State<InsightScreen> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: Text(
-                        'How did you spend this month?',
-                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              color: Theme.of(context).colorScheme.outline,
-                            ),
-                      ),
-                    ),
-                  ),
-
-                  // LineChart: Amount of money spent per day in this month
-                  chartContainer(
-                    howDidYouParkList: howDidYouParkList,
-                    HowDidYouSpend(
-                      howDidYouSpendList: howDidYouParkList,
-                    ),
-                  ),
-
-                  const SizedBox(height: 15),
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.9,
-                    alignment: Alignment.topLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: Text(
                         'How did you park this month?',
                         style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.outline,
                               fontSize: 18,
+                              color: Theme.of(context).colorScheme.outline,
                             ),
                       ),
                     ),
                   ),
 
-                  // BarChart: Number of parkings per day in this month
-                  chartContainer(
-                    howDidYouParkList: howDidYouParkList,
-                    HowDidYouPark(
-                      howDidYouParkList: howDidYouParkList,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      insightNumberContainer(
+                        'Total parking times',
+                        howDidYouParkAndSpend?.totalTimePakedInThisMonth ?? 0,
+                      ),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.06,
+                      ),
+                      insightNumberContainer(
+                        'Total spending',
+                        howDidYouParkAndSpend?.totalPaymentInThisMonth ?? 0,
+                        isMoney: true,
+                      ),
+                    ],
                   ),
 
-                  const SizedBox(height: 15),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+
                   Container(
                     width: MediaQuery.of(context).size.width * 0.9,
                     alignment: Alignment.topLeft,
@@ -167,7 +134,7 @@ class _InsightScreenState extends State<InsightScreen> {
                   ),
 
                   // PieChart: Payment method usage in this month
-                  chartContainer(
+                  insightContainer(
                     paymentMethodUsageList: paymentMethodUsageList,
                     HowDidYouPay(
                       paymentMethodUsageList: paymentMethodUsageList,
@@ -215,19 +182,16 @@ class _InsightScreenState extends State<InsightScreen> {
   }
 
   // Container for chart widget
-  Widget chartContainer(Widget chartWidget,
-      {List<HowDidYouParkAndSpend>? howDidYouParkList,
-      List<PaymentMethodUsage>? paymentMethodUsageList}) {
+  Widget insightContainer(Widget insightWidget,
+      {List<PaymentMethodUsage>? paymentMethodUsageList}) {
     return ShadowContainer(
       width: MediaQuery.of(context).size.width * 0.9,
       // height: MediaQuery.of(context).size.height * 0.30,
       padding: const EdgeInsets.only(top: 15, right: 15),
       child: Stack(
         children: [
-          chartWidget,
-          if (howDidYouParkList == null &&
-              // howDidYouParkList  &&
-              paymentMethodUsageList?[0].count == 0 &&
+          insightWidget,
+          if (paymentMethodUsageList?[0].count == 0 &&
               paymentMethodUsageList?[1].count == 0)
             Center(
               child: Container(
@@ -252,29 +216,45 @@ class _InsightScreenState extends State<InsightScreen> {
     );
   }
 
-  List<HowDidYouParkAndSpend> fillMissingDates(
-      List<HowDidYouParkAndSpend> data) {
-    List<HowDidYouParkAndSpend> filledData = [];
-    DateTime now = DateTime.now();
-    DateTime startDate = now.subtract(const Duration(days: 30));
-
-    for (int i = 0; i <= 30; i++) {
-      DateTime date = startDate.add(Duration(days: i));
-      String formattedDate = UltilHelper.formatDateOnly(date);
-
-      // Kiểm tra xem ngày này có trong data từ server hay không
-      HowDidYouParkAndSpend? entry = data.firstWhere(
-        (element) => UltilHelper.formatDateOnly(element.date) == formattedDate,
-        orElse: () => HowDidYouParkAndSpend(
-          date: date,
-          numberOfParkings: 0,
-          amount: 0,
+  Widget insightNumberContainer(String title, int number,
+          {bool isMoney = false}) =>
+      ShadowContainer(
+        width: MediaQuery.of(context).size.width * 0.42,
+        height: MediaQuery.of(context).size.width * 0.2,
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          children: [
+            Text(
+              title,
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.onSecondary,
+                  ),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  isMoney ? UltilHelper.formatMoney(number) : '$number',
+                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                  child: Text(
+                    isMoney ? 'VND' : 'times',
+                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                          fontSize: 12,
+                        ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       );
-
-      filledData.add(entry);
-    }
-
-    return filledData;
-  }
 }

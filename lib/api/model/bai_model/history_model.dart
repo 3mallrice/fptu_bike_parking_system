@@ -10,6 +10,7 @@ class HistoryModel {
   final String? paymentMethod;
   final String parkingArea;
   final bool isFeedback;
+  final int? moneyEstimated;
 
   HistoryModel({
     required this.id,
@@ -23,6 +24,7 @@ class HistoryModel {
     this.paymentMethod,
     required this.parkingArea,
     required this.isFeedback,
+    this.moneyEstimated,
   });
 
   factory HistoryModel.fromJson(Map<String, dynamic> json) {
@@ -38,6 +40,12 @@ class HistoryModel {
       paymentMethod: json['paymentMethod'],
       parkingArea: json['parkingArea'],
       isFeedback: json['isFeedback'],
+      moneyEstimated: json['moneyEstimated'],
     );
+  }
+
+  @override
+  String toString() {
+    return 'HistoryModel{id: $id, timeIn: $timeIn, timeOut: $timeOut, status: $status, plateNumber: $plateNumber, amount: $amount, gateIn: $gateIn, gateOut: $gateOut, paymentMethod: $paymentMethod, parkingArea: $parkingArea, isFeedback: $isFeedback, moneyEstimated: $moneyEstimated}';
   }
 }

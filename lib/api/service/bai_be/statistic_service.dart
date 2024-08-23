@@ -17,8 +17,8 @@ class StatisticApi {
   var log = Logger();
 
   // GET: /api/statistic/customer/park
-  // How did you park in last 30 days
-  Future<APIResponse<List<HowDidYouParkAndSpend>>> getHowDidYouPark() async {
+  // How did you park in this month
+  Future<APIResponse<HowDidYouParkAndSpend>> getHowDidYouPark() async {
     try {
       token = GetLocalHelper.getBearerToken() ?? "";
 
@@ -40,13 +40,10 @@ class StatisticApi {
       if (response.statusCode == 200) {
         final responseJson = jsonDecode(response.body);
 
-        APIResponse<List<HowDidYouParkAndSpend>> apiResponse =
-            APIResponse.fromJson(
+        APIResponse<HowDidYouParkAndSpend> apiResponse = APIResponse.fromJson(
           responseJson,
-          (json) => (json as List)
-              .map((item) =>
-                  HowDidYouParkAndSpend.fromJson(item as Map<String, dynamic>))
-              .toList(),
+          (json) =>
+              HowDidYouParkAndSpend.fromJson(json as Map<String, dynamic>),
         );
 
         return apiResponse;

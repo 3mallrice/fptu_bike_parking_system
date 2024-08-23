@@ -144,6 +144,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         itemBuilder: (context, index) {
                           if (index < histories.length) {
                             final history = histories[index];
+                            log.d('History: $history');
                             return GestureDetector(
                               onTap: () {
                                 if (!history.isFeedback) {
@@ -291,14 +292,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 IconButton(
-                  onPressed: () {
-                    //TODO: Share
-                    _showImageDialog(_controller, history);
-                  },
+                  onPressed: () => _showImageDialog(_controller, history),
                   icon: const Icon(Icons.share_rounded),
                   color: Theme.of(context).colorScheme.outline,
                 ),
-                (!history.isFeedback)
+                (!history.isFeedback && history.timeOut != null)
                     ? Icon(Icons.rate_review_rounded,
                         color: Theme.of(context).colorScheme.outline)
                     : const SizedBox(),
@@ -327,18 +325,44 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                 ),
                                 const SizedBox(width: 5),
                                 Text(
-                                  history.amount != null
-                                      ? '${UltilHelper.formatMoney(history.amount!)} bic'
-                                      : '',
+                                  '${UltilHelper.formatMoney(history.amount!)} bic',
                                   style:
                                       Theme.of(context).textTheme.displayMedium,
                                 )
                               ],
                             )
-                          : Text(
-                              history.status,
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
+                          : history.moneyEstimated != null
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Estimated: ',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium!
+                                          .copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .outline,
+                                          ),
+                                    ),
+                                    const SizedBox(width: 5),
+                                    Image.asset(
+                                      AssetHelper.bic,
+                                      width: 25,
+                                      fit: BoxFit.fitWidth,
+                                    ),
+                                    const SizedBox(width: 5),
+                                    Text(
+                                      '${UltilHelper.formatMoney(history.moneyEstimated!)} bic',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .displayMedium,
+                                    )
+                                  ],
+                                )
+                              : const SizedBox(),
                     ],
                   ),
                 ),

@@ -1,8 +1,8 @@
 class UserData {
-  final String? bearerToken;
-  final String? name;
-  final String? email;
-  final String? avatar;
+  String? bearerToken;
+  String? name;
+  String? email;
+  String? avatar;
 
   UserData({
     this.bearerToken,
