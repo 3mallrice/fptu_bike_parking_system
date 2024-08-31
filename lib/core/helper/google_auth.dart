@@ -14,7 +14,7 @@ class GoogleAuthApi {
     scopes: scope,
     serverClientId: webClientId,
     // forceCodeForRefreshToken: true,
-    hostedDomain: "fpt.edu.vn",
+    // hostedDomain: "fpt.edu.vn",
   );
 
   static Future<GoogleSignInAccount?> login() => _googleSignIn.signIn();
