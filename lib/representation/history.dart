@@ -249,7 +249,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         'Time out',
                         history.timeOut != null
                             ? UltilHelper.formatDateTime(history.timeOut!)
-                            : "",
+                            : "Parked",
                         isTime: true,
                       ),
                     ],
@@ -270,7 +270,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         'Gate out',
                         history.gateOut != null
                             ? history.gateOut.toString()
-                            : "",
+                            : "Parked",
                       ),
                     ],
                   ),

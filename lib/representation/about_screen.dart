@@ -107,7 +107,7 @@ class _AboutUsState extends State<AboutUs> {
               const SizedBox(height: 7),
               ShadowContainer(
                 width: MediaQuery.of(context).size.width * 0.9,
-                margin: const EdgeInsets.only(top: 20),
+                margin: const EdgeInsets.only(top: 20, bottom: 20),
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
