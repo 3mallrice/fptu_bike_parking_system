@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:bai_system/representation/bai_screen.dart';
+import 'package:flutter/material.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
 
 import '../component/main_app_bar.dart';
@@ -95,9 +95,9 @@ class _MyNavigationBarState extends State<MyNavigationBar> {
             selectedColor: Theme.of(context).colorScheme.primary,
           ),
           BottomBarItem(
-            icon: const Icon(Icons.person_rounded),
+            icon: const Icon(Icons.dehaze_rounded),
             title: Text(
-              'Me',
+              'Others',
               style: Theme.of(context).textTheme.labelSmall,
             ),
             selectedColor: Theme.of(context).colorScheme.primary,

@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:bai_system/api/model/bai_model/login_model.dart';
 import 'package:bai_system/core/helper/local_storage_helper.dart';
-import 'package:bai_system/representation/feedback.dart';
 import 'package:bai_system/representation/navigation_bar.dart';
+import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
 import '../core/helper/asset_helper.dart';
@@ -79,11 +78,12 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
                 IconButton(
                   onPressed: () {
-                    Navigator.of(context).pushNamed(FeedbackScreen.routeName);
+                    //
                   },
                   icon: Icon(
-                    Icons.headset_mic_rounded,
+                    Icons.notifications,
                     color: Theme.of(context).colorScheme.primary,
+                    size: 25,
                   ),
                 ),
               ],

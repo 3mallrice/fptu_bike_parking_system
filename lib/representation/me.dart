@@ -1,10 +1,11 @@
-import 'package:flutter/material.dart';
 import 'package:bai_system/api/model/bai_model/login_model.dart';
 import 'package:bai_system/component/shadow_container.dart';
 import 'package:bai_system/core/helper/google_auth.dart';
 import 'package:bai_system/core/helper/local_storage_helper.dart';
 import 'package:bai_system/representation/about_screen.dart';
+import 'package:bai_system/representation/feedback.dart';
 import 'package:bai_system/representation/profile.dart';
+import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
 import 'login.dart';
@@ -177,21 +178,24 @@ class _MeScreenState extends State<MeScreen> {
                           color: Theme.of(context).colorScheme.outlineVariant,
                           thickness: 1,
                         ),
-                        // meItem(
-                        //     Icons.rule_rounded,
-                        //     Text(
-                        //       'Parking Rules',
-                        //       style: Theme.of(context)
-                        //           .textTheme
-                        //           .titleMedium!
-                        //           .copyWith(fontSize: 18),
-                        //     ), () {
-                        //   // TODO: Navigate to Parking Rules
-                        // }),
-                        // Divider(
-                        //   color: Theme.of(context).colorScheme.outlineVariant,
-                        //   thickness: 1,
-                        // ),
+                        meItem(
+                          Icons.feedback_outlined,
+                          Text(
+                            'Feedbacks',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(fontSize: 18),
+                          ),
+                          () {
+                            Navigator.of(context)
+                                .pushNamed(FeedbackScreen.routeName);
+                          },
+                        ),
+                        Divider(
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                          thickness: 1,
+                        ),
                         meItem(
                             Icons.info_outlined,
                             Text(

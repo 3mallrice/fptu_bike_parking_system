@@ -144,30 +144,19 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const Image(
-                            image: AssetImage(AssetHelper.baiLogo),
-                            height: 30,
-                            fit: BoxFit.contain,
-                          ),
-                          Text(
-                            'ID: Copy',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium!
-                                .copyWith(
-                                  fontWeight: FontWeight.w500,
-                                ),
-                          ),
-                        ],
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        width: MediaQuery.of(context).size.width * 0.8,
+                        child: const Image(
+                          image: AssetImage(AssetHelper.baiLogo),
+                          height: 30,
+                          fit: BoxFit.contain,
+                        ),
                       ),
                       ShadowContainer(
                         width: MediaQuery.of(context).size.width * 0.8,
                         padding: const EdgeInsets.all(0),
-                        margin: const EdgeInsets.only(top: 20),
+                        margin: const EdgeInsets.only(top: 16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -230,18 +219,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                           fontSize: 20,
                                         ),
                                   ),
-                                  const SizedBox(height: 5),
-                                  Text(
-                                    UltilHelper.formatDTS(DateTime.now()),
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .labelSmall!
-                                        .copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSecondary,
-                                        ),
-                                  ),
                                   const SizedBox(height: 15),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -254,20 +231,19 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                             .displayMedium!
                                             .copyWith(
                                               fontWeight: FontWeight.w900,
-                                              fontSize: 20,
                                               color: Theme.of(context)
                                                   .colorScheme
                                                   .primary,
                                             ),
                                       ),
-                                      const SizedBox(width: 2),
+                                      const SizedBox(width: 5),
                                       Text(
-                                        'VND',
+                                        '₫',
                                         style: Theme.of(context)
                                             .textTheme
-                                            .bodyMedium!
+                                            .displayMedium!
                                             .copyWith(
-                                              fontWeight: FontWeight.w900,
+                                              fontWeight: FontWeight.normal,
                                               color: Theme.of(context)
                                                   .colorScheme
                                                   .primary,
