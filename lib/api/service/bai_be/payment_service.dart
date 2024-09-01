@@ -33,7 +33,7 @@ class CallPaymentApi {
       }
 
       final response = await http.post(
-        Uri.parse('$baseUrl/deposit/$packageId'),
+        Uri.parse('$baseUrl/deposit/zalopay/$packageId'),
         headers: {
           'Authorization': token,
           'Content-Type': 'application/json',
