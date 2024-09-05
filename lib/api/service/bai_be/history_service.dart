@@ -58,9 +58,9 @@ class CallHistoryAPI {
       }
     } catch (e) {
       log.e('Error during get customer histories: $e');
+      return APIResponse(
+        message: 'Error during get customer histories',
+      );
     }
-    return APIResponse(
-      message: 'Error during get customer histories',
-    );
   }
 }

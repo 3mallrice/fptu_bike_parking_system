@@ -12,6 +12,7 @@ import 'package:bai_system/representation/intro_screen.dart';
 import 'package:bai_system/representation/login.dart';
 import 'package:bai_system/representation/me.dart';
 import 'package:bai_system/representation/navigation_bar.dart';
+import 'package:bai_system/representation/notification_screen.dart';
 import 'package:bai_system/representation/payment.dart';
 import 'package:bai_system/representation/payos.dart';
 import 'package:bai_system/representation/profile.dart';
@@ -69,4 +70,5 @@ final Map<String, WidgetBuilder> routes = {
     );
   },
   InsightScreen.routeName: (context) => const InsightScreen(),
+  NotificationScreen.routeName: (context) => const NotificationScreen(),
 };

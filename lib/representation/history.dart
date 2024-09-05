@@ -150,7 +150,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                 if (!history.isFeedback) {
                                   addFeedbackDialog(history.id);
                                 } else {
-                                  log.i('Feedback already added');
+                                  viewFeedbackDialog(
+                                      history.title, history.description);
                                 }
                               },
                               child: historyCard(history),
@@ -249,7 +250,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         'Time out',
                         history.timeOut != null
                             ? UltilHelper.formatDateTime(history.timeOut!)
-                            : "Parked",
+                            : "",
                         isTime: true,
                       ),
                     ],
@@ -270,7 +271,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         'Gate out',
                         history.gateOut != null
                             ? history.gateOut.toString()
-                            : "Parked",
+                            : "",
                       ),
                     ],
                   ),
@@ -297,9 +298,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   color: Theme.of(context).colorScheme.outline,
                 ),
                 (!history.isFeedback && history.timeOut != null)
-                    ? Icon(Icons.rate_review_rounded,
+                    ? Icon(Icons.rate_review_outlined,
                         color: Theme.of(context).colorScheme.outline)
-                    : const SizedBox(),
+                    : Icon(Icons.rate_review_rounded,
+                        color: Theme.of(context).colorScheme.outline),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -424,67 +426,62 @@ class _HistoryScreenState extends State<HistoryScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Align(
+                Container(
+                  padding: const EdgeInsets.only(top: 25),
+                  width: MediaQuery.of(context).size.width * 0.9,
                   alignment: Alignment.center,
-                  child: Container(
-                    padding: const EdgeInsets.only(top: 25),
-                    width: MediaQuery.of(context).size.width * 0.9,
-                    // height: MediaQuery.of(context).size.height * 0.4,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        feedbackItem(
-                          'Title',
-                          TextField(
-                            controller: titleController,
-                            maxLength: 50,
-                            maxLengthEnforcement: MaxLengthEnforcement.none,
-                            inputFormatters: [
-                              LengthLimitingTextInputFormatter(50),
-                            ],
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Enter your title here',
-                              hintStyle: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium!
-                                  .copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSecondary,
-                                  ),
-                            ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      feedbackItem(
+                        'Title',
+                        TextField(
+                          controller: titleController,
+                          maxLength: 50,
+                          maxLengthEnforcement: MaxLengthEnforcement.none,
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(50),
+                          ],
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: 'Enter your title here',
+                            hintStyle: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.onSecondary,
+                                ),
                           ),
                         ),
-                        SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.02),
-                        feedbackItem(
-                          'Description',
-                          TextField(
-                            keyboardType: TextInputType.multiline,
-                            inputFormatters: [
-                              LengthLimitingTextInputFormatter(100),
-                            ],
-                            maxLines: 6,
-                            minLines: 6,
-                            maxLength: 100,
-                            controller: descriptionController,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Enter your feedback here',
-                              hintStyle: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium!
-                                  .copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSecondary,
-                                  ),
-                            ),
+                      ),
+                      SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.02),
+                      feedbackItem(
+                        'Description',
+                        TextField(
+                          keyboardType: TextInputType.multiline,
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(100),
+                          ],
+                          maxLines: 6,
+                          minLines: 6,
+                          maxLength: 100,
+                          controller: descriptionController,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: 'Enter your feedback here',
+                            hintStyle: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.onSecondary,
+                                ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -516,6 +513,74 @@ class _HistoryScreenState extends State<HistoryScreen> {
             Navigator.of(context).pop();
           },
           positiveLabel: 'Submit',
+        );
+      },
+    );
+  }
+
+  void viewFeedbackDialog(String? title, String? description) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Theme.of(context).colorScheme.background,
+          surfaceTintColor: Theme.of(context).colorScheme.background,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return Container(
+                constraints: BoxConstraints(
+                  maxHeight: constraints.maxHeight * 0.8,
+                  minWidth: constraints.minWidth * 0.9,
+                ),
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(25),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          alignment: Alignment.center,
+                          child: Text(
+                            'Feedback',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(
+                                  fontSize: 20,
+                                ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          'Title: $title',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge!
+                              .copyWith(
+                                color: Theme.of(context).colorScheme.outline,
+                                fontSize: 14,
+                              ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          'Description: $description',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge!
+                              .copyWith(
+                                color: Theme.of(context).colorScheme.outline,
+                                fontSize: 14,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
         );
       },
     );
