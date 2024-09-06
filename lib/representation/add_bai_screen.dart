@@ -149,6 +149,21 @@ class _AddBaiState extends State<AddBai> {
         return;
       }
 
+      if (result.data == null || result.message != null) {
+        log.e('Failed to save vehicle registration');
+        showCustomSnackBar(
+          MySnackBar(
+            prefix: Icon(
+              Icons.cancel_rounded,
+              color: backgroundColor,
+            ),
+            message: result.message ?? ErrorMessage.somethingWentWrong,
+            backgroundColor: onUnsuccessful,
+          ),
+        );
+        return;
+      }
+
       if (result.data != null) {
         log.i('Vehicle registration saved successfully');
         showCustomSnackBar(

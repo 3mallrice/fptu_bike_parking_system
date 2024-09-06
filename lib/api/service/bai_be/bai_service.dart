@@ -66,12 +66,16 @@ class CallBikeApi {
       request.files.add(multipartFile);
 
       var response = await http.Response.fromStream(await request.send());
+      final responseJson = jsonDecode(response.body);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final responseJson = jsonDecode(response.body);
         return APIResponse.fromJson(
           responseJson,
           (json) => AddBaiRespModel.fromJson(json as Map<String, dynamic>),
+        );
+      } else if (response.statusCode == 409) {
+        return APIResponse(
+          message: responseJson['message'],
         );
       } else {
         log.e('Failed to create bai: ${response.statusCode}');

@@ -86,15 +86,23 @@ class _BaiDetailsState extends State<BaiDetails> {
             children: [
               (bai.plateImage == null)
                   ? const ImageNotFound()
-                  : CachedNetworkImage(
-                      width: double.infinity,
-                      imageUrl: bai.plateImage,
-                      fit: BoxFit.fill,
-                      placeholder: (context, url) => Shimmer.fromColors(
-                        baseColor: Theme.of(context).colorScheme.background,
-                        highlightColor:
-                            Theme.of(context).colorScheme.outlineVariant,
-                        child: Container(color: Colors.grey),
+                  : ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxHeight: 300,
+                        minHeight: 200,
+                      ),
+                      child: CachedNetworkImage(
+                        width: double.infinity,
+                        imageUrl: bai.plateImage,
+                        fit: BoxFit.fill,
+                        placeholder: (context, url) => Shimmer.fromColors(
+                          baseColor: Theme.of(context).colorScheme.background,
+                          highlightColor:
+                              Theme.of(context).colorScheme.outlineVariant,
+                          child: Container(color: Colors.grey),
+                        ),
+                        errorWidget: (context, url, error) =>
+                            const ImageNotFound(),
                       ),
                     ),
               const SizedBox(height: 30),
