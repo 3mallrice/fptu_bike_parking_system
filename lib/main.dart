@@ -1,13 +1,18 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
+import 'package:bai_system/api/service/bai_be/firebase_api.dart';
 import 'package:bai_system/core/helper/local_storage_helper.dart';
+import 'package:bai_system/firebase_options.dart';
 import 'package:bai_system/representation/splash_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
 
 import 'core/theme/theme_provider.dart';
 import 'route.dart';
+
+final navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   //flutter init
@@ -17,15 +22,21 @@ void main() async {
   await Hive.initFlutter();
   await LocalStorageHelper.initLocalStorageHelper();
 
+  //firebase init
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await FirebaseApi().initNotifications();
+
   //flutter init
   WidgetsFlutterBinding.ensureInitialized();
 
-  /*This should be used while in development mode, 
-  do NOT do this when you want to release to production, 
-  the aim of this answer is to make the development 
-  a bit easier for you, 
-  for production, you need to fix your certificate issue 
-  and use it properly, look at the other answers for this 
+  /*This should be used while in development mode,
+  do NOT do this when you want to release to production,
+  the aim of this answer is to make the development
+  a bit easier for you,
+  for production, you need to fix your certificate issue
+  and use it properly, look at the other answers for this
   as it might be helpful for your case.
   */
   HttpOverrides.global = MyHttpOverrides();
@@ -57,6 +68,7 @@ class MyApp extends StatelessWidget {
       ),
       // initialRoute: HomeScreen.routeName,
       routes: routes,
+      navigatorKey: navigatorKey,
     );
   }
 }

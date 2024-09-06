@@ -7,6 +7,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:logger/logger.dart';
 
 import '../api/model/bai_model/login_model.dart';
+import '../api/service/bai_be/firebase_api.dart';
 import '../component/snackbar.dart';
 import '../core/const/frontend/message.dart';
 import '../core/helper/google_auth.dart';
@@ -43,6 +44,8 @@ class _LoginScreenState extends State<LoginScreen> {
         // hide loading
         LoadingOverlayHelper.hide();
 
+        // initialize notification
+        FirebaseApi().initNotifications();
         goToPageHelper(routeName: MyNavigationBar.routeName);
         return true;
       }
