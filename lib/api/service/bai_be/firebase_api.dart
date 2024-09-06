@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:bai_system/api/model/bai_model/api_response.dart';
 import 'package:bai_system/core/helper/local_storage_helper.dart';
@@ -59,7 +60,7 @@ class FirebaseApi {
   // function to initialize local notifications
   Future<void> _initLocalNotifications() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('@drawable/bai');
     const InitializationSettings initializationSettings =
         InitializationSettings(android: initializationSettingsAndroid);
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
@@ -119,6 +120,7 @@ class FirebaseApi {
               channel.name,
               channelDescription: channel.description,
               icon: android.smallIcon,
+              color: const Color(0xFFF37021),
             ),
           ),
         );
