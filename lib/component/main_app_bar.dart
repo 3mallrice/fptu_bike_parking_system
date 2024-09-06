@@ -1,6 +1,7 @@
 import 'package:bai_system/api/model/bai_model/login_model.dart';
 import 'package:bai_system/core/helper/local_storage_helper.dart';
 import 'package:bai_system/representation/navigation_bar.dart';
+import 'package:bai_system/representation/notification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
@@ -78,7 +79,8 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
                 IconButton(
                   onPressed: () {
-                    //
+                    Navigator.of(context)
+                        .pushNamed(NotificationScreen.routeName);
                   },
                   icon: Icon(
                     Icons.notifications,

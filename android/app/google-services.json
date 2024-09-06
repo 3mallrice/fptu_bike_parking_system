@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "504771400915",
-    "project_id": "bai-system",
-    "storage_bucket": "bai-system.appspot.com"
+    "project_number": "974742751479",
+    "project_id": "bai-parking",
+    "storage_bucket": "bai-parking.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:504771400915:android:4556043ab0ef8397bdf026",
+        "mobilesdk_app_id": "1:974742751479:android:776403ba468a76b4876bf2",
         "android_client_info": {
           "package_name": "com.example.fptu_bike_parking_system"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAm0HLw9mz9btzjsdekvCh_oy3ErNuwekw"
+          "current_key": "AIzaSyChlSVaOsxag73m-gW6BjorwU-h6wHZL-Q"
         }
       ],
       "services": {
