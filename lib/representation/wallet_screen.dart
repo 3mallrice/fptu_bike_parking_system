@@ -407,19 +407,22 @@ class _MyWalletState extends State<MyWallet> {
     );
   }
 
-  // show receipt dialog
+  // Show receipt dialog
   void showReceiptDialog(WalletModel transaction) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return OKDialog(
           title: 'Receipt',
-          content: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.9,
-            height: MediaQuery.of(context).size.height * 0.35,
+          content: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.9,
+              maxHeight: MediaQuery.of(context).size.height * 0.9,
+            ),
             child: ReceiptScreen(transaction: transaction),
           ),
           onClick: () => Navigator.of(context).pop(),
+          contentPadding: const EdgeInsets.all(20),
         );
       },
     );

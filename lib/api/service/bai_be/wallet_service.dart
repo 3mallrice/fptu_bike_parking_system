@@ -39,7 +39,6 @@ class CallWalletApi {
           'Content-Type': 'application/json',
         },
       );
-      log.d('Request: ${response.request?.url}');
       if (response.statusCode == 200) {
         final responseJson = jsonDecode(response.body);
 

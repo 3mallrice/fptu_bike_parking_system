@@ -14,10 +14,12 @@ import 'package:logger/logger.dart';
 import '../../../core/const/frontend/message.dart';
 import 'api_root.dart';
 
+var log = Logger();
+
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  print("Handling a background message: ${message.messageId}");
+  log.d("Handling a background message: ${message.messageId}");
 }
 
 class FirebaseApi {

@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:bai_system/api/service/bai_be/firebase_api.dart';
 import 'package:bai_system/core/helper/local_storage_helper.dart';
 import 'package:bai_system/firebase_options.dart';
 import 'package:bai_system/representation/splash_screen.dart';
@@ -26,7 +25,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await FirebaseApi().initNotifications();
+  // await FirebaseApi().initNotifications();
 
   //flutter init
   WidgetsFlutterBinding.ensureInitialized();
@@ -62,7 +61,7 @@ class MyApp extends StatelessWidget {
       theme: Provider.of<ThemeProvider>(context).themeData,
 
       home: const AspectRatio(
-        aspectRatio: 1,
+        aspectRatio: 16 / 9,
         //child: MyNavigationBar(),
         child: SplashScreen(),
       ),

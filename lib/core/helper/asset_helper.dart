@@ -17,4 +17,6 @@ class AssetHelper {
   static const String googleLogo = 'assets/imgs/Google.png';
   static const String zaloLogo = 'assets/imgs/zalopay.png';
   static const String emptyBox = 'assets/imgs/emptyBox.png';
+  static const String vnpayQR = 'assets/imgs/vnpay_qr.svg';
+  static const String vnpay = 'assets/imgs/vnpay_wallet.svg';
 }

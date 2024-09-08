@@ -515,6 +515,7 @@ class _BaiDetailsState extends State<BaiDetails> {
         positiveLabel: LabelMessage.yes,
         onConfirm: () => deleteBai(bai.id),
         onCancel: () => Navigator.of(context).pop(),
+        maxHeight: MediaQuery.of(context).size.height * 0.7,
       ),
     );
   }

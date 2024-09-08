@@ -18,6 +18,7 @@ import 'package:bai_system/representation/payos.dart';
 import 'package:bai_system/representation/profile.dart';
 import 'package:bai_system/representation/receipt.dart';
 import 'package:bai_system/representation/splash_screen.dart';
+import 'package:bai_system/representation/vnpay_webview.dart';
 import 'package:bai_system/representation/wallet_extra_screen.dart';
 import 'package:bai_system/representation/wallet_screen.dart';
 import 'package:flutter/material.dart';
@@ -71,4 +72,13 @@ final Map<String, WidgetBuilder> routes = {
   },
   InsightScreen.routeName: (context) => const InsightScreen(),
   NotificationScreen.routeName: (context) => const NotificationScreen(),
+  VnPayWebView.routeName: (context) {
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    return VnPayWebView(
+      vnpBankCode: args['vnpBankCode'],
+      packageId: args['packageId'],
+      onPaymentCompleted: args['onPaymentCompleted'],
+    );
+  },
 };
