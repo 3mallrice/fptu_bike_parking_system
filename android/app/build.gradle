@@ -5,7 +5,7 @@ plugins {
     // END: FlutterFire Configuration
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
-    id "com.google.firebase.crashlytics"
+//    id "com.google.firebase.crashlytics"
 }
 
 def localProperties = new Properties()
@@ -103,5 +103,7 @@ dependencies {
     implementation "androidx.multidex:multidex:2.0.1"
 }
 
-apply plugin: 'com.google.firebase.crashlytics'
+//apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.android.application'
+

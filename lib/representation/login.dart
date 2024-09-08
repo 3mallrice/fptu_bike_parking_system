@@ -46,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
         LoadingOverlayHelper.hide();
 
         // initialize notification
-        FirebaseApi().initNotifications();
+        await FirebaseApi().initNotifications();
 
         // check permission
         final permission = await Geolocator.checkPermission();

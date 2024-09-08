@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:bai_system/api/model/bai_model/api_response.dart';
+import 'package:bai_system/api/model/bai_model/notification_model.dart';
+import 'package:bai_system/api/service/bai_be/notification_service.dart';
 import 'package:bai_system/core/helper/local_storage_helper.dart';
 import 'package:bai_system/main.dart';
 import 'package:bai_system/representation/notification_screen.dart';
@@ -20,6 +22,15 @@ var log = Logger();
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   log.d("Handling a background message: ${message.messageId}");
+
+  // Save the notification
+  final notificationManager = NotificationManager();
+  await notificationManager.saveNotification(Notification(
+    id: message.messageId ?? DateTime.now().toIso8601String(),
+    title: message.notification?.title ?? '',
+    body: message.notification?.body ?? '',
+    timestamp: DateTime.now(),
+  ));
 }
 
 class FirebaseApi {
@@ -87,11 +98,11 @@ class FirebaseApi {
     // if the message is null, do nothing
     if (message == null) return;
 
-    // navigate to new screen when message is received and user taps notification
-    navigatorKey.currentState?.pushNamed(
-      NotificationScreen.routeName,
-      arguments: message,
-    );
+    // // navigate to new screen when message is received and user taps notification
+    // navigatorKey.currentState?.pushNamed(
+    //   NotificationScreen.routeName,
+    //   arguments: message,
+    // );
   }
 
   Future<void> _initBackgroundHandler() async {
@@ -107,7 +118,7 @@ class FirebaseApi {
     FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
 
     // handle notification when the app is in the foreground
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
 
@@ -127,10 +138,16 @@ class FirebaseApi {
           ),
         );
       }
-    });
-  }
 
-  // ToDo: function to handle background messages
+      final notificationManager = NotificationManager();
+      await notificationManager.saveNotification(Notification(
+        id: message.messageId ?? DateTime.now().toIso8601String(),
+        title: notification?.title ?? '',
+        body: notification?.body ?? '',
+        timestamp: DateTime.now(),
+      ));
+    },);
+  }
 
   // send FCM token to server
   Future<APIResponse<dynamic>> sendTokenToServer(String fcmToken) async {

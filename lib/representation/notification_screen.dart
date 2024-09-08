@@ -1,3 +1,4 @@
+import 'package:bai_system/api/service/bai_be/notification_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
@@ -13,7 +14,8 @@ class NotificationScreen extends StatefulWidget {
 class _NotificationScreenState extends State<NotificationScreen> {
   @override
   Widget build(BuildContext context) {
-    final message = ModalRoute.of(context)!.settings.arguments as RemoteMessage;
+    //final message = ModalRoute.of(context)!.settings.arguments as RemoteMessage;
+    final notificationManager = NotificationManager();
 
     return Scaffold(
       appBar: AppBar(
@@ -26,27 +28,34 @@ class _NotificationScreenState extends State<NotificationScreen> {
         automaticallyImplyLeading: true,
         elevation: 0,
       ),
-      body: Column(
-        children: [
-          Text(
-            message.notification!.title!,
-            style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                  fontSize: 20,
+      body: Builder(
+        builder: (context) {
+          final notifications = notificationManager.getRecentNotifications();
+          if (notifications.isEmpty) {
+            return const Center(child: Text('No recent notifications'));
+          }
+          return ListView.separated(
+            itemCount: notifications.length,
+            itemBuilder: (context, index) {
+              final notification = notifications[index];
+              return ListTile(
+                title: Text(notification.title),
+                subtitle: Text(notification.body),
+                trailing: Text(
+                  '${notification.timestamp.day}/${notification.timestamp.month}',
                 ),
-          ),
-          Text(
-            message.notification!.body!,
-            style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                  fontSize: 16,
-                ),
-          ),
-          Text(
-            message.data.toString(),
-            style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                  fontSize: 16,
-                ),
-          ),
-        ],
+              );
+            },
+            separatorBuilder: (context, index) {
+              return const Divider(
+                height: 0,
+                thickness: 1,
+                indent: 16.0,
+                endIndent: 16.0,
+              );
+            },
+          );
+        },
       ),
     );
   }
