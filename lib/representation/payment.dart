@@ -6,12 +6,16 @@ import 'package:bai_system/component/my_radio_button.dart';
 import 'package:bai_system/component/shadow_container.dart';
 import 'package:bai_system/core/const/frontend/message.dart';
 import 'package:bai_system/representation/receipt.dart';
+import 'package:bai_system/representation/wallet_screen.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_zalopay_sdk/flutter_zalopay_sdk.dart';
 import 'package:logger/logger.dart';
+import 'package:vnpay_client/vnpay_client.dart';
 
-import '../api/model/bai_model/zalopay_model.dart';
+import '../api/model/bai_model/payment_model.dart';
+import '../component/dialog.dart';
 import '../component/snackbar.dart';
 import '../core/const/utilities/util_helper.dart';
 import '../core/helper/asset_helper.dart';
@@ -39,13 +43,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
   var log = Logger();
 
   bool isLoading = true;
-  final CallPaymentApi _paymentApi = CallPaymentApi();
+  final CallPaymentApi paymentApi = CallPaymentApi();
   late ZaloPayModel zaloPayModel;
   String payResult = "";
   int type = 0;
-  late Color btnColor = Theme.of(context).colorScheme.primary;
-  late String txtPay = LabelMessage.pay.toUpperCase();
   bool isOverload = false;
+
+  String paymentUrl = '';
 
   @override
   initState() {
@@ -54,13 +58,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   // BUY NOW
   Future<void> buyNow(String packageId) async {
+    if (!mounted) return;
     setState(() {
       isLoading = true; // Đặt isLoading thành true khi bắt đầu
     });
 
     try {
       final APIResponse<ZaloPayModel> zaloPayMd =
-          await _paymentApi.depositCoin(packageId);
+          await paymentApi.depositCoinZaloPay(packageId);
 
       if (zaloPayMd.isTokenValid == false &&
           zaloPayMd.message == ErrorMessage.tokenInvalid) {
@@ -72,13 +77,19 @@ class _PaymentScreenState extends State<PaymentScreen> {
         return;
       }
 
-      if (zaloPayMd.data != null) {
+      // check if message contain Error message
+      if (zaloPayMd.data == null ||
+          zaloPayMd.message == ErrorMessage.somethingWentWrong) {
+        showSnackBar(ErrorMessage.somethingWentWrong);
+      } else {
         setState(() {
           zaloPayModel = zaloPayMd.data!;
+          isLoading = false;
         });
       }
     } catch (e) {
       log.e('Error during buy now: $e');
+      if (!mounted) return;
       setState(() {
         isLoading = false;
       });
@@ -127,8 +138,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       ),
       body: PopScope(
         onPopInvoked: (didPop) {
-          dispose();
-          //check if loading overlay is showing, hide it
+          if (!mounted) return;
           if (isOverload) {
             LoadingOverlayHelper.hide();
           }
@@ -144,19 +154,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Container(
-                        alignment: Alignment.centerLeft,
-                        width: MediaQuery.of(context).size.width * 0.8,
-                        child: const Image(
-                          image: AssetImage(AssetHelper.baiLogo),
-                          height: 30,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
                       ShadowContainer(
                         width: MediaQuery.of(context).size.width * 0.8,
                         padding: const EdgeInsets.all(0),
-                        margin: const EdgeInsets.only(top: 16),
+                        margin: const EdgeInsets.only(top: 20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -350,52 +351,190 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           fit: BoxFit.contain,
                         ),
                         contentWidget: Text(
-                          'ZaloPay',
+                          'ZaloPay E-Wallet',
                           style:
                               Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                    fontSize: 17,
+                                    fontSize: 15,
                                   ),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                         ),
                         isSelected: selectedPaymentOption == 1,
                         onTap: () {
-                          setState(() {
-                            selectedPaymentOption = 1;
-                            btnColor =
-                                Theme.of(context).colorScheme.primaryContainer;
-                            txtPay = ZaloPayMessage.openApp;
-                          });
+                          if (mounted) {
+                            setState(() {
+                              selectedPaymentOption = 1;
+                            });
+                          }
                         },
                       ),
 
-                      // Internet Banking
                       const SizedBox(height: 15),
                       RadioButtonCustom(
                         //bank icon
                         prefixWidget: Icon(
-                          Icons.account_balance,
+                          Icons.account_balance_rounded,
                           size: 25,
                           color: Theme.of(context).colorScheme.outline,
                         ),
-                        contentWidget: Text(
-                          'Internet Banking',
-                          style:
-                              Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                    fontSize: 17,
+                        contentWidget: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Domestic Bank',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                    fontSize: 15,
                                   ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                            Text(
+                              'ATM, Internet Banking, ...',
+                              style: Theme.of(context).textTheme.bodySmall,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                            ),
+                          ],
                         ),
                         isSelected: selectedPaymentOption == 2,
                         onTap: () {
                           setState(() {
                             selectedPaymentOption = 2;
-                            btnColor = Theme.of(context).colorScheme.primary;
-                            txtPay = LabelMessage.pay.toUpperCase();
                           });
                         },
                       ),
+
+                      const SizedBox(height: 15),
+                      RadioButtonCustom(
+                        //bank icon
+                        prefixWidget: Icon(
+                          Icons.credit_card_rounded,
+                          size: 25,
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                        contentWidget: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'International Card',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                    fontSize: 15,
+                                  ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                            Text(
+                              'Visa, MasterCard, ...',
+                              style: Theme.of(context).textTheme.bodySmall,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                            ),
+                          ],
+                        ),
+                        isSelected: selectedPaymentOption == 3,
+                        onTap: () {
+                          setState(() {
+                            selectedPaymentOption = 3;
+                          });
+                        },
+                      ),
+
+                      const SizedBox(height: 15),
+                      RadioButtonCustom(
+                        color: Theme.of(context).colorScheme.outlineVariant,
+                        //bank icon
+                        prefixWidget: SvgPicture.asset(
+                          AssetHelper.vnpay,
+                          height: 30,
+                          fit: BoxFit.fitHeight,
+                        ),
+                        contentWidget: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'VNPAY E-Wallet',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                    fontSize: 15,
+                                  ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                            Text(
+                              // not supported yet
+                              'Not supported yet',
+                              style: Theme.of(context).textTheme.bodySmall,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                            ),
+                          ],
+                        ),
+                        // isSelected: selectedPaymentOption == 4,
+                        isSelected: false,
+                        onTap: () {
+                          if (!mounted) return;
+                          setState(() {
+                            // selectedPaymentOption = 4;
+                            selectedPaymentOption = selectedPaymentOption;
+                          });
+                        },
+                      ),
+
+                      const SizedBox(height: 15),
+                      RadioButtonCustom(
+                        color: Theme.of(context).colorScheme.outlineVariant,
+                        //bank icon
+                        prefixWidget: SvgPicture.asset(
+                          AssetHelper.vnpayQR,
+                          height: 30,
+                          fit: BoxFit.fitHeight,
+                        ),
+                        contentWidget: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'VNPAY QR',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                    fontSize: 15,
+                                  ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                            Text(
+                              'Not supported yet',
+                              style: Theme.of(context).textTheme.bodySmall,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                            ),
+                          ],
+                        ),
+                        // isSelected: selectedPaymentOption == 5,
+                        isSelected: false,
+                        onTap: () {
+                          if (!mounted) return;
+                          setState(() {
+                            // selectedPaymentOption = 5;
+                            selectedPaymentOption = selectedPaymentOption;
+                          });
+                        },
+                      ),
+
+                      const SizedBox(height: 15),
                     ],
                   ),
                 ),
@@ -404,6 +543,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             Container(
               alignment: Alignment.bottomCenter,
               padding: const EdgeInsets.symmetric(vertical: 10),
+              // margin: const EdgeInsets.only(top: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -434,13 +574,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       width: MediaQuery.of(context).size.width * 0.4,
                       height: MediaQuery.of(context).size.height * 0.05,
                       decoration: BoxDecoration(
-                        color: btnColor,
+                        color: Theme.of(context).colorScheme.primary,
                         shape: BoxShape.rectangle,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Center(
                         child: Text(
-                          txtPay,
+                          LabelMessage.pay,
                           style: Theme.of(context)
                               .textTheme
                               .displayMedium!
@@ -464,13 +604,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   void btnPay(BuildContext context) {
+    LoadingOverlayHelper.show(context);
+    if (mounted) {
+      setState(() {
+        isOverload = true;
+      });
+    }
     if (selectedPaymentOption == 1) {
-      LoadingOverlayHelper.show(context);
-      if (mounted) {
-        setState(() {
-          isOverload = true;
-        });
-      }
       //open ZaloPay app
       openZaloPayApp(_package).then((_) {
         LoadingOverlayHelper.hide();
@@ -483,9 +623,57 @@ class _PaymentScreenState extends State<PaymentScreen> {
         }
       });
     } else {
-      //show snackbar if user select internet banking: development
-      showSnackBar(ErrorMessage.underDevelopment);
+      // call payment api to get payment url
+      String vnpBankCode = 'VNBANK';
+
+      if (selectedPaymentOption == 3) {
+        vnpBankCode = 'INTCARD';
+      }
+
+      getPaymentUrl(_package.id, vnpBankCode);
+      LoadingOverlayHelper.hide();
+
+      if (paymentUrl.isNotEmpty && paymentUrl != '') {
+        showVNPayScreen(
+          context,
+          paymentUrl: paymentUrl,
+          onPaymentSuccess: (value) {
+            log.i('Payment success: $value');
+            showReceiptDialog(context, true, _package, selectedPaymentOption);
+          },
+          onPaymentError: (error) {
+            log.e('Payment error: $error');
+            showReceiptDialog(context, false, _package, selectedPaymentOption);
+          },
+        );
+      }
     }
+  }
+
+  void showReceiptDialog(BuildContext context, bool isSuccess,
+      CoinPackage package, int selectedPaymentOption) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return OKDialog(
+          title: 'Payment ${isSuccess ? 'Success' : 'Failure'}',
+          content: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.9,
+              maxHeight: MediaQuery.of(context).size.height * 0.9,
+            ),
+            child: dialogContent(
+                context, isSuccess, package, selectedPaymentOption),
+          ),
+          onClick: () {
+            isSuccess
+                ? Navigator.of(context).pushReplacementNamed(MyWallet.routeName)
+                : Navigator.of(context).pop();
+          },
+          contentPadding: const EdgeInsets.all(20),
+        );
+      },
+    );
   }
 
   // show snackbar
@@ -519,4 +707,101 @@ class _PaymentScreenState extends State<PaymentScreen> {
       ),
     );
   }
+
+  // #region VnPay
+  // Call API to get payment url
+  void getPaymentUrl(String packageId, String bankCode) async {
+    if (!mounted) return;
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final APIResponse<VnPayResponse> paymentMd =
+          await paymentApi.depositCoinVnPay(packageId, bankCode);
+
+      if (paymentMd.isTokenValid == false &&
+          paymentMd.message == ErrorMessage.tokenInvalid) {
+        log.e('Token is invalid');
+
+        if (!mounted) return;
+        // Hiển thị dialog login
+        ReturnLoginDialog.returnLogin(context);
+        return;
+      }
+
+      // Kiểm tra nếu có lỗi
+      if (paymentMd.message == ErrorMessage.somethingWentWrong) {
+        showSnackBar(ErrorMessage.somethingWentWrong);
+        return;
+      }
+
+      if (paymentMd.data != null) {
+        setState(() {
+          paymentUrl = paymentMd.data!.paymentUrl;
+        });
+      }
+    } catch (e) {
+      log.e('Error during get payment url: $e');
+      if (!mounted) return;
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  // Show receipt dialog
+  Widget dialogContent(BuildContext context, bool isSuccess,
+      CoinPackage package, int selectedPaymentOption) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          isSuccess ? Icons.check_circle : Icons.cancel,
+          color: isSuccess
+              ? Theme.of(context).colorScheme.onError
+              : Theme.of(context).colorScheme.error,
+          size: 50,
+        ),
+        const SizedBox(height: 15),
+        Text(
+          isSuccess
+              ? 'Your payment was successful!'
+              : 'Payment failed. Please try again.',
+          style: Theme.of(context).textTheme.titleMedium,
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 15),
+        Text(
+          'Package: ${package.packageName}',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        const SizedBox(height: 5),
+        Text(
+          'Amount: ${package.amount} coins',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        const SizedBox(height: 5),
+        Text(
+          'Extra: ${package.extraCoin} coins',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        const SizedBox(height: 5),
+        Text(
+          'EXP Date: ${package.extraEXP} days',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        const SizedBox(height: 15),
+        DottedLine(
+          dashColor: Theme.of(context).colorScheme.outline,
+        ),
+        const SizedBox(height: 15),
+        Text(
+          'Payment Method: ${selectedPaymentOption == 1 ? 'ZaloPay' : 'VNPAY Gateway'}',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+      ],
+    );
+  }
+  // #endregion
 }

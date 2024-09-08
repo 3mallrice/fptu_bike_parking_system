@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:bai_system/core/helper/asset_helper.dart';
 import 'package:bai_system/core/helper/local_storage_helper.dart';
 import 'package:bai_system/representation/intro_screen.dart';
 import 'package:bai_system/representation/login.dart';
+import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -38,7 +38,6 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future.delayed(const Duration(milliseconds: 2000));
 
     if (ignoreIntroScreen != null && ignoreIntroScreen) {
-      //redirectTo(Login.routeName);
       redirectTo(LoginScreen.routeName);
     } else {
       LocalStorageHelper.setValue(LocalStorageKey.ignoreIntroScreen, true);

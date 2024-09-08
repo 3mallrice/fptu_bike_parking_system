@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
 
 import '../api/model/bai_model/wallet_model.dart';
-import '../component/shadow_container.dart';
 
 class ReceiptScreen extends StatefulWidget {
   final WalletModel transaction;
@@ -57,212 +56,219 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
         break;
     }
 
-    return Scaffold(
-      body: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Image(
-                image: AssetImage(AssetHelper.baiLogo),
-                height: 30,
-                fit: BoxFit.contain,
-              ),
-              GestureDetector(
-                onTap: () {
-                  //save to clipboard
-                  Clipboard.setData(
-                    ClipboardData(text: transaction.id),
-                  );
-
-                  setState(() {
-                    isCopied = true;
-                  });
-                },
-                child: Container(
-                  width: 100,
-                  alignment: Alignment.center,
-                  child: Text(
-                    'ID: ${isCopied ? 'Copied' : 'Copy'}',
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          fontWeight: FontWeight.w500,
-                        ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          ShadowContainer(
-            width: MediaQuery.of(context).size.width * 0.8,
-            padding: const EdgeInsets.all(0),
-            margin: const EdgeInsets.only(top: 20),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          child: IntrinsicHeight(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: statusColor,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(10),
-                      topRight: Radius.circular(10),
-                    ),
-                  ),
-                  padding: const EdgeInsets.all(10),
+                // Header row
+                GestureDetector(
+                  onTap: () {
+                    Clipboard.setData(ClipboardData(text: transaction.id));
+                    setState(() {
+                      isCopied = true;
+                    });
+                  },
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Icon(
-                        statusIcon,
-                        color: Theme.of(context).colorScheme.surface,
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        statusText ?? "N/A",
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium!
-                            .copyWith(
-                              color: Theme.of(context).colorScheme.background,
-                              fontWeight: FontWeight.normal,
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.symmetric(vertical: 10),
-                  alignment: Alignment.center,
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(10),
-                      bottomRight: Radius.circular(10),
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Transaction Details',
-                        style:
-                            Theme.of(context).textTheme.displayMedium!.copyWith(
-                                  fontWeight: FontWeight.w900,
-                                  fontSize: 20,
-                                ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        UltilHelper.formatDateTime(transaction.date),
-                        style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                              color: Theme.of(context).colorScheme.onSecondary,
-                            ),
-                      ),
-                      const SizedBox(height: 15),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            // if transactionType == 'IN' then '+' else '-' before amount
-                            transaction.type == 'IN'
-                                ? '+ ${UltilHelper.formatMoney(transaction.amount)}'
-                                : '- ${UltilHelper.formatMoney(transaction.amount)}',
-                            style: Theme.of(context)
-                                .textTheme
-                                .displayMedium!
-                                .copyWith(
-                                  fontWeight: FontWeight.w900,
-                                  fontSize: 20,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                          ),
-                          const SizedBox(width: 2),
-                          Text(
-                            'bic',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(
-                                  fontWeight: FontWeight.w900,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                          ),
-                        ],
+                      const Image(
+                        image: AssetImage(AssetHelper.baiLogo),
+                        height: 20,
+                        fit: BoxFit.contain,
                       ),
                       Container(
-                        margin: const EdgeInsets.symmetric(vertical: 15),
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: DottedLine(
-                          direction: Axis.horizontal,
-                          alignment: WrapAlignment.center,
-                          lineLength: double.infinity,
-                          lineThickness: 1.0,
-                          dashColor: Theme.of(context).colorScheme.outline,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                        child: Table(
-                          columnWidths: const {
-                            0: FractionColumnWidth(0.25)
-                            // Cột đầu tiên
-                          },
-                          children: [
-                            TableRow(
-                              children: [
-                                Text(
-                                  'Type',
-                                  style: Theme.of(context).textTheme.bodyLarge,
-                                ),
-                                Text(
-                                  transaction.type == 'IN'
-                                      ? 'Deposit'
-                                      : 'Parking Fee',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge!
-                                      .copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .outline,
-                                      ),
-                                ),
-                              ],
-                            ),
-                            TableRow(
-                              children: [
-                                Text(
-                                  'Message',
-                                  style: Theme.of(context).textTheme.bodyLarge,
-                                ),
-                                Text(
-                                  transaction.description ?? "N/A",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge!
-                                      .copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .outline,
-                                      ),
-                                ),
-                              ],
-                            ),
-                          ],
+                        alignment: Alignment.center,
+                        child: Text(
+                          'ID: ${isCopied ? 'Copied' : 'Copy'}',
+                          style:
+                              Theme.of(context).textTheme.bodyMedium!.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                  ),
                         ),
                       ),
                     ],
+                  ),
+                ),
+                // Main content
+                Expanded(
+                  child: Container(
+                    margin: const EdgeInsets.only(top: 10),
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.outline,
+                        width: 0.5,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Status header
+                        Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: statusColor,
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(10),
+                              topRight: Radius.circular(10),
+                            ),
+                          ),
+                          padding: const EdgeInsets.all(6),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Icon(
+                                statusIcon,
+                                color: Theme.of(context).colorScheme.surface,
+                                size: 13,
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                statusText ?? "N/A",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .background,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Transaction details
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Transaction Details',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .displayMedium!
+                                      .copyWith(
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 20,
+                                      ),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  UltilHelper.formatDateTime(transaction.date),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondary,
+                                      ),
+                                ),
+                                const SizedBox(height: 15),
+                                // Amount display
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      transaction.type == 'IN'
+                                          ? '+ ${UltilHelper.formatMoney(transaction.amount)}'
+                                          : '- ${UltilHelper.formatMoney(transaction.amount)}',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .displayMedium!
+                                          .copyWith(
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 20,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
+                                          ),
+                                    ),
+                                    const SizedBox(width: 2),
+                                    Text(
+                                      'bic',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium!
+                                          .copyWith(
+                                            fontWeight: FontWeight.w900,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                                // Dotted line
+                                Container(
+                                  margin:
+                                      const EdgeInsets.symmetric(vertical: 15),
+                                  child: DottedLine(
+                                    direction: Axis.horizontal,
+                                    lineLength: double.infinity,
+                                    lineThickness: 0.5,
+                                    dashColor:
+                                        Theme.of(context).colorScheme.outline,
+                                  ),
+                                ),
+                                // Transaction details table
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _buildInfoRow(
+                                        'Type',
+                                        transaction.type == 'IN'
+                                            ? 'Deposit'
+                                            : 'Parking Fee'),
+                                    _buildInfoRow('Message',
+                                        transaction.description ?? "N/A"),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-        ],
-      ),
+        );
+      },
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 80, // Fixed width for labels
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+          ),
+        ),
+      ],
     );
   }
 }

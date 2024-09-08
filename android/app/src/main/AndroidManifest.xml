@@ -15,6 +15,7 @@
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon"
         android:label="Bai"
+        android:usesCleartextTraffic="true"
         android:requestLegacyExternalStorage="true">
         <activity
             android:name=".MainActivity"

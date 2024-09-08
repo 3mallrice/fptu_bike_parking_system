@@ -7,6 +7,7 @@ class OKDialog extends StatelessWidget {
   final Widget? content;
   final Function? onClick;
   final EdgeInsetsGeometry? contentPadding;
+  final double? maxHeight;
 
   const OKDialog({
     super.key,
@@ -14,40 +15,82 @@ class OKDialog extends StatelessWidget {
     this.content,
     this.onClick,
     this.contentPadding,
+    this.maxHeight,
   });
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
+    return Dialog(
+      backgroundColor: Theme.of(context).colorScheme.background,
+      surfaceTintColor: Theme.of(context).colorScheme.background,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
       ),
-      title: Text(
-        title,
-        style: Theme.of(context).textTheme.titleLarge!.copyWith(
-              fontWeight: FontWeight.w700,
-              fontSize: 18,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Container(
+            constraints: BoxConstraints(
+              maxHeight: maxHeight ?? constraints.maxHeight * 0.8,
+              minWidth: constraints.maxWidth * 0.9,
             ),
-        textAlign: TextAlign.center,
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: contentPadding ??
+                    const EdgeInsets.symmetric(
+                      horizontal: 20.0,
+                      vertical: 10.0,
+                    ),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: constraints.maxHeight * 0.8,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        alignment: Alignment.center,
+                        child: Text(
+                          title,
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium!
+                              .copyWith(fontSize: 20),
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                      if (content != null) content!,
+                      const SizedBox(height: 15),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: GestureDetector(
+                          onTap: () {
+                            if (onClick != null) {
+                              onClick!();
+                            } else {
+                              Navigator.of(context).pop();
+                            }
+                          },
+                          child: Text(
+                            LabelMessage.ok,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
       ),
-      contentPadding: contentPadding ??
-          const EdgeInsets.symmetric(
-            horizontal: 20.0,
-            vertical: 10.0,
-          ),
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      surfaceTintColor: Theme.of(context).colorScheme.surface,
-      content: content,
-      actions: <Widget>[
-        TextButton(
-          onPressed: () {
-            if (onClick != null) {
-              onClick!();
-            }
-          },
-          child: Text(LabelMessage.ok),
-        ),
-      ],
     );
   }
 }
@@ -61,6 +104,7 @@ class ConfirmDialog extends StatelessWidget {
   final String? positiveLabel;
   final String? negativeLabel;
   final EdgeInsetsGeometry? contentPadding;
+  final double? maxHeight;
 
   const ConfirmDialog({
     super.key,
@@ -71,47 +115,96 @@ class ConfirmDialog extends StatelessWidget {
     this.positiveLabel,
     this.negativeLabel,
     this.contentPadding,
+    this.maxHeight,
   });
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
+    return Dialog(
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      surfaceTintColor: Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
       ),
-      title: Text(
-        title,
-        style: Theme.of(context).textTheme.titleLarge!.copyWith(
-              fontWeight: FontWeight.w700,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Container(
+            constraints: BoxConstraints(
+              maxHeight: maxHeight ?? constraints.maxHeight * 0.8,
+              minWidth: constraints.maxWidth * 0.9,
             ),
-        textAlign: TextAlign.center,
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: contentPadding ??
+                    const EdgeInsets.symmetric(
+                      horizontal: 20.0,
+                      vertical: 10.0,
+                    ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      alignment: Alignment.center,
+                      child: Text(
+                        title,
+                        style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 20,
+                            ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    if (content != null) content!,
+                    const SizedBox(height: 15),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            if (onCancel != null) {
+                              onCancel!();
+                            } else {
+                              Navigator.of(context).pop();
+                            }
+                          },
+                          child: Text(
+                            negativeLabel ?? LabelMessage.cancel,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            if (onConfirm != null) {
+                              onConfirm!();
+                            }
+                          },
+                          child: Text(
+                            positiveLabel ?? LabelMessage.save,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
       ),
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      surfaceTintColor: Theme.of(context).colorScheme.surface,
-      contentPadding: contentPadding ??
-          const EdgeInsets.symmetric(
-            horizontal: 20.0,
-            vertical: 10.0,
-          ),
-      content: content,
-      actions: <Widget>[
-        TextButton(
-          onPressed: () {
-            if (onCancel != null) {
-              onCancel!();
-            }
-          },
-          child: Text(negativeLabel ?? LabelMessage.cancel),
-        ),
-        TextButton(
-          onPressed: () {
-            if (onConfirm != null) {
-              onConfirm!();
-            }
-          },
-          child: Text(positiveLabel ?? LabelMessage.save),
-        ),
-      ],
     );
   }
 }

@@ -3,6 +3,7 @@ import 'package:bai_system/component/shadow_container.dart';
 import 'package:bai_system/core/helper/asset_helper.dart';
 import 'package:bai_system/representation/navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:logger/logger.dart';
 
@@ -46,6 +47,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // initialize notification
         FirebaseApi().initNotifications();
+
+        // check permission
+        final permission = await Geolocator.checkPermission();
+
+        if (permission == LocationPermission.denied) {
+          await Geolocator.requestPermission();
+        }
+
         goToPageHelper(routeName: MyNavigationBar.routeName);
         return true;
       }
