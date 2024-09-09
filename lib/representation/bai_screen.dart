@@ -3,7 +3,9 @@ import 'package:bai_system/component/empty_box.dart';
 import 'package:bai_system/core/const/utilities/util_helper.dart';
 import 'package:bai_system/representation/bai_details.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:logger/web.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -202,12 +204,7 @@ class _BaiScreenState extends State<BaiScreen> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(
-                      top: 10,
-                      left: 10,
-                      right: 10,
-                      bottom: 0,
-                    ),
+                    padding: const EdgeInsets.all(10),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
@@ -225,7 +222,7 @@ class _BaiScreenState extends State<BaiScreen> {
                   ),
                   Padding(
                     padding:
-                        const EdgeInsets.only(bottom: 10, left: 10, top: 5),
+                        const EdgeInsets.only(bottom: 10, left: 10),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -261,6 +258,32 @@ class _BaiScreenState extends State<BaiScreen> {
                       ],
                     ),
                   ),
+                  if(bai.status == 'REJECTED')
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 10),
+                      child: Text(
+                        'Reason: Wrong information. Please check again.',
+                        style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        textAlign: TextAlign.justify,
+                      ),
+                    ),
+                  if(bai.status == 'PENDING')
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 10),
+                      child: Text(
+                        'Note: Please park your vehicle in our facility for the first time to activate it.',
+                        style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        textAlign: TextAlign.justify,
+                      ),
+                    ),
                 ],
               ),
             ),

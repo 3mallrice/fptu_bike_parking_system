@@ -167,13 +167,37 @@ class _BaiDetailsState extends State<BaiDetails> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 5),
+                    if(bai.status == 'REJECTED')
+                      SizedBox(
+                        child: Text(
+                          'Reason: Wrong information. Please check again.',
+                          style: contentTextStyle.copyWith(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                          textAlign: TextAlign.justify,
+                        ),
+                      ),
+                    if(bai.status == 'PENDING')
+                      SizedBox(
+                        child: Text(
+                          'Note: Please park your vehicle in our facility for the first time to activate it.',
+                          style: contentTextStyle.copyWith(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                          textAlign: TextAlign.justify,
+                        ),
+                      ),
                     const SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         GestureDetector(
                           onTap: () {
-                            //Todo: Delete Bai
                             deleteBaiDialog();
                           },
                           child: Container(
