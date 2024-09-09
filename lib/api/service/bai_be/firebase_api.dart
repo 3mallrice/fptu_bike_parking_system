@@ -5,8 +5,6 @@ import 'package:bai_system/api/model/bai_model/api_response.dart';
 import 'package:bai_system/api/model/bai_model/notification_model.dart';
 import 'package:bai_system/api/service/bai_be/notification_service.dart';
 import 'package:bai_system/core/helper/local_storage_helper.dart';
-import 'package:bai_system/main.dart';
-import 'package:bai_system/representation/notification_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';

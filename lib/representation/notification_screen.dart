@@ -1,5 +1,4 @@
 import 'package:bai_system/api/service/bai_be/notification_service.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 class NotificationScreen extends StatefulWidget {
