@@ -74,6 +74,7 @@ dependencies:
   webview_flutter: ^4.8.0
   flutter_svg: ^2.0.10+1
   vnpay_client: ^0.0.3
+  pull_to_refresh: ^2.0.0
 
 dev_dependencies:
   flutter_test:

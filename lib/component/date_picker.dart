@@ -89,11 +89,6 @@ class _DatePickerState extends State<DatePicker> {
           ListTile(
             title:
                 const Text('The date range you want to view, maximum 30 days.'),
-            leading: Icon(
-              Icons.info_outline_rounded,
-              color: Theme.of(context).colorScheme.onSecondary,
-              size: 15,
-            ),
             horizontalTitleGap: 5,
             titleTextStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
                   color: Theme.of(context).colorScheme.onSecondary,

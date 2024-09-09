@@ -18,6 +18,7 @@ import 'package:bai_system/representation/payos.dart';
 import 'package:bai_system/representation/profile.dart';
 import 'package:bai_system/representation/receipt.dart';
 import 'package:bai_system/representation/splash_screen.dart';
+import 'package:bai_system/representation/wallet.dart';
 import 'package:bai_system/representation/wallet_extra_screen.dart';
 import 'package:bai_system/representation/wallet_screen.dart';
 import 'package:flutter/material.dart';
@@ -71,4 +72,5 @@ final Map<String, WidgetBuilder> routes = {
   },
   InsightScreen.routeName: (context) => const InsightScreen(),
   NotificationScreen.routeName: (context) => const NotificationScreen(),
+  WalletScreen.routeName: (context) => const WalletScreen(),
 };

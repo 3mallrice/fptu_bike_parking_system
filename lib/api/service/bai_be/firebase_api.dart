@@ -116,35 +116,37 @@ class FirebaseApi {
     FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
 
     // handle notification when the app is in the foreground
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      RemoteNotification? notification = message.notification;
-      AndroidNotification? android = message.notification?.android;
+    FirebaseMessaging.onMessage.listen(
+      (RemoteMessage message) async {
+        RemoteNotification? notification = message.notification;
+        AndroidNotification? android = message.notification?.android;
 
-      if (notification != null && android != null) {
-        flutterLocalNotificationsPlugin.show(
-          notification.hashCode,
-          notification.title,
-          notification.body,
-          NotificationDetails(
-            android: AndroidNotificationDetails(
-              channel.id,
-              channel.name,
-              channelDescription: channel.description,
-              icon: android.smallIcon,
-              color: const Color(0xFFF37021),
+        if (notification != null && android != null) {
+          flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                channel.id,
+                channel.name,
+                channelDescription: channel.description,
+                icon: android.smallIcon,
+                color: const Color(0xFFF37021),
+              ),
             ),
-          ),
-        );
-      }
+          );
+        }
 
-      final notificationManager = NotificationManager();
-      await notificationManager.saveNotification(Notification(
-        id: message.messageId ?? DateTime.now().toIso8601String(),
-        title: notification?.title ?? '',
-        body: notification?.body ?? '',
-        timestamp: DateTime.now(),
-      ));
-    },);
+        final notificationManager = NotificationManager();
+        await notificationManager.saveNotification(Notification(
+          id: message.messageId ?? DateTime.now().toIso8601String(),
+          title: notification?.title ?? '',
+          body: notification?.body ?? '',
+          timestamp: DateTime.now(),
+        ));
+      },
+    );
   }
 
   // send FCM token to server

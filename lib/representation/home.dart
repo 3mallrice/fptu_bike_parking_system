@@ -3,26 +3,25 @@ import 'package:bai_system/api/service/bai_be/wallet_service.dart';
 import 'package:bai_system/core/const/utilities/util_helper.dart';
 import 'package:bai_system/representation/insight.dart';
 import 'package:bai_system/representation/navigation_bar.dart';
+import 'package:bai_system/representation/wallet.dart';
 import 'package:bai_system/representation/wallet_extra_screen.dart';
 import 'package:bai_system/representation/wallet_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_image_slideshow/flutter_image_slideshow.dart'
-    show ImageSlideshow;
-import 'package:font_awesome_flutter/font_awesome_flutter.dart'
-    show FontAwesomeIcons;
+import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:intl/intl.dart' show DateFormat;
-import 'package:logger/logger.dart' show Logger;
+import 'package:intl/intl.dart';
+import 'package:logger/logger.dart';
 
 import '../api/model/bai_model/api_response.dart';
-import '../api/model/weather/weather.dart' show WeatherData;
-import '../api/service/weather/open_weather_api.dart' show OpenWeatherApi;
-import '../component/shadow_container.dart' show ShadowContainer;
+import '../api/model/weather/weather.dart';
+import '../api/service/weather/open_weather_api.dart';
+import '../component/shadow_container.dart';
 import '../core/const/frontend/message.dart';
-import '../core/helper/asset_helper.dart' show AssetHelper;
+import '../core/helper/asset_helper.dart';
 import '../core/helper/local_storage_helper.dart';
 import '../core/helper/return_login_dialog.dart';
-import 'fundin_screen.dart' show FundinScreen;
+import 'fundin_screen.dart';
 
 class HomeAppScreen extends StatefulWidget {
   const HomeAppScreen({super.key});
@@ -731,7 +730,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
               ),
               homeMainItem(
                 context,
-                () => Navigator.of(context).pushNamed(MyWallet.routeName),
+                () => Navigator.of(context).pushNamed(WalletScreen.routeName),
                 Icons.wallet,
                 'Wallet',
               ),
