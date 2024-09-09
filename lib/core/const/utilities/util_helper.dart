@@ -18,6 +18,24 @@ class UltilHelper {
         date.day == yesterday.day;
   }
 
+  static String formatVnPayDate(String? dateString) {
+    if (dateString == null || dateString.length != 14) return 'N/A';
+    try {
+      final dateTime = DateTime(
+        int.parse(dateString.substring(0, 4)), // Year
+        int.parse(dateString.substring(4, 6)), // Month
+        int.parse(dateString.substring(6, 8)), // Day
+        int.parse(dateString.substring(8, 10)), // Hour
+        int.parse(dateString.substring(10, 12)), // Minute
+        int.parse(dateString.substring(12, 14)), // Second
+      );
+      return DateFormat('dd/MM/yyyy HH:mm:ss').format(dateTime);
+    } catch (e) {
+      print('Error parsing date: $e');
+      return 'N/A';
+    }
+  }
+
   // Function to format date
   static String formatDate(DateTime? date) {
     if (date == null) {

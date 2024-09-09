@@ -7,7 +7,7 @@ class RadioButtonCustom extends StatefulWidget {
   final Widget contentWidget;
   final bool isSelected;
   final Color? color;
-  final Function() onTap;
+  final Function()? onTap;
 
   const RadioButtonCustom({
     super.key,
@@ -15,7 +15,7 @@ class RadioButtonCustom extends StatefulWidget {
     this.color,
     required this.contentWidget,
     required this.isSelected,
-    required this.onTap,
+    this.onTap,
   });
 
   @override
@@ -28,7 +28,7 @@ class _RadioButtonCustomState extends State<RadioButtonCustom> {
     return GestureDetector(
       onTap: widget.onTap,
       child: ShadowContainer(
-        width: MediaQuery.of(context).size.width * 0.8,
+        width: MediaQuery.of(context).size.width * 0.9,
         color: widget.color,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
