@@ -95,7 +95,7 @@ class _MyWalletState extends State<MyWallet> {
 
     try {
       final APIResponse<List<WalletModel>> result =
-          await callWalletApi.getMainWalletTransactions(from, to);
+          await callWalletApi.getMainWalletTransactions(1, 10, from, to);
 
       checkToken(result);
       if (!mounted) return;

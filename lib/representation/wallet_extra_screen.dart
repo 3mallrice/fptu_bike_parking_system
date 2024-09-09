@@ -123,7 +123,7 @@ class _WalletExtraScreenState extends State<WalletExtraScreen> {
 
     try {
       final APIResponse<List<WalletModel>> result =
-          await _walletApi.getExtraWalletTransactions(from, to);
+          await _walletApi.getExtraWalletTransactions(1, 10, from, to);
 
       checkToken(result);
       if (!mounted) return;

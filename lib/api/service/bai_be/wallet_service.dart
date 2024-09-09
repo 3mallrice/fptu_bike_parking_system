@@ -19,7 +19,10 @@ class CallWalletApi {
   // GET: /api/wallet/transaction/main
   // Get all transaction of user's main wallet
   Future<APIResponse<List<WalletModel>>> getMainWalletTransactions(
-      DateTime? startDate, DateTime? endDate) async {
+      int pageIndex,
+      int pageSize,
+      DateTime? startDate,
+      DateTime? endDate) async {
     try {
       token = GetLocalHelper.getBearerToken() ?? "";
 
@@ -33,7 +36,7 @@ class CallWalletApi {
 
       final response = await http.get(
         Uri.parse(
-            '$api/transaction/main?StartDate=$startDate&EndDate=$endDate'),
+            '$api/transaction/main?pageIndex=$pageIndex&pageSize=$pageSize&StartDate=$startDate&EndDate=$endDate'),
         headers: {
           'Authorization': token,
           'Content-Type': 'application/json',
@@ -65,7 +68,10 @@ class CallWalletApi {
   // GET: /api/wallet/transaction/extra
   // Get all transaction of user's extra wallet
   Future<APIResponse<List<WalletModel>>> getExtraWalletTransactions(
-      DateTime? startDate, DateTime? endDate) async {
+      int pageIndex,
+      int pageSize,
+      DateTime? startDate,
+      DateTime? endDate) async {
     try {
       token = GetLocalHelper.getBearerToken() ?? "";
 
@@ -79,7 +85,7 @@ class CallWalletApi {
 
       final response = await http.get(
         Uri.parse(
-            '$api/transaction/extra?StartDate=$startDate&EndDate=$endDate'),
+            '$api/transaction/extra?pageIndex=$pageIndex&pageSize=$pageSize&StartDate=$startDate&EndDate=$endDate'),
         headers: {
           'Authorization': token,
           'Content-Type': 'application/json',
