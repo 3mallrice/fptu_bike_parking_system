@@ -7,7 +7,6 @@ import 'package:bai_system/component/shadow_container.dart';
 import 'package:bai_system/core/const/frontend/message.dart';
 import 'package:bai_system/representation/receipt.dart';
 import 'package:bai_system/representation/wallet_screen.dart';
-import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_zalopay_sdk/flutter_zalopay_sdk.dart';
@@ -37,97 +36,16 @@ class PaymentScreen extends StatefulWidget {
 }
 
 class _PaymentScreenState extends State<PaymentScreen> {
-  // State variable to track the selected payment option
   int selectedPaymentOption = 0;
   late final CoinPackage _package = widget.package;
-  var log = Logger();
-
-  bool isLoading = true;
+  final log = Logger();
   final CallPaymentApi paymentApi = CallPaymentApi();
   late ZaloPayModel zaloPayModel;
   String payResult = "";
   int type = 0;
   bool isOverload = false;
-
   String paymentUrl = '';
-
-  @override
-  initState() {
-    super.initState();
-  }
-
-  // BUY NOW
-  Future<void> buyNow(String packageId) async {
-    if (!mounted) return;
-    setState(() {
-      isLoading = true; // Đặt isLoading thành true khi bắt đầu
-    });
-
-    try {
-      final APIResponse<ZaloPayModel> zaloPayMd =
-          await paymentApi.depositCoinZaloPay(packageId);
-
-      if (zaloPayMd.isTokenValid == false &&
-          zaloPayMd.message == ErrorMessage.tokenInvalid) {
-        log.e('Token is invalid');
-
-        if (!mounted) return;
-        //show login dialog
-        ReturnLoginDialog.returnLogin(context);
-        return;
-      }
-
-      // check if message contain Error message
-      if (zaloPayMd.data == null ||
-          zaloPayMd.message == ErrorMessage.somethingWentWrong) {
-        showSnackBar(ErrorMessage.somethingWentWrong);
-      } else {
-        setState(() {
-          zaloPayModel = zaloPayMd.data!;
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      log.e('Error during buy now: $e');
-      if (!mounted) return;
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
-  Future<void> openZaloPayApp(CoinPackage package) async {
-    await buyNow(package.id);
-
-    await FlutterZaloPaySdk.payOrder(zpToken: zaloPayModel.zpTransToken)
-        .then((event) {
-      setState(() {
-        switch (event) {
-          case FlutterZaloPayStatus.processing:
-            payResult = ZaloPayMessage.processing;
-            type = 0;
-            break;
-          case FlutterZaloPayStatus.cancelled:
-            payResult = ZaloPayMessage.cancelled;
-            type = 0;
-            break;
-          case FlutterZaloPayStatus.success:
-            payResult = ZaloPayMessage.success;
-            type = 1;
-            break;
-          case FlutterZaloPayStatus.failed:
-            payResult = ZaloPayMessage.failed;
-            type = 2;
-            break;
-          default:
-            payResult = ZaloPayMessage.failed;
-            type = 2;
-            break;
-        }
-        log.i('Pay result: $payResult');
-      });
-    });
-  }
+  bool isCanPop = true;
 
   @override
   Widget build(BuildContext context) {
@@ -138,520 +56,434 @@ class _PaymentScreenState extends State<PaymentScreen> {
       ),
       body: PopScope(
         onPopInvoked: (didPop) {
-          if (!mounted) return;
           if (isOverload) {
             LoadingOverlayHelper.hide();
           }
+          if (!isCanPop) {
+            return;
+          }
         },
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
               child: SingleChildScrollView(
-                child: Align(
-                  alignment: Alignment.topCenter,
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ShadowContainer(
-                        width: MediaQuery.of(context).size.width * 0.8,
-                        padding: const EdgeInsets.all(0),
-                        margin: const EdgeInsets.only(top: 20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.outline,
-                                borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(10),
-                                  topRight: Radius.circular(10),
-                                ),
-                              ),
-                              padding: const EdgeInsets.all(10),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.pending,
-                                    color:
-                                        Theme.of(context).colorScheme.surface,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    'Transaction Details',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium!
-                                        .copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .background,
-                                          fontWeight: FontWeight.normal,
-                                        ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              margin: const EdgeInsets.symmetric(vertical: 10),
-                              alignment: Alignment.center,
-                              decoration: const BoxDecoration(
-                                borderRadius: BorderRadius.only(
-                                  bottomLeft: Radius.circular(10),
-                                  bottomRight: Radius.circular(10),
-                                ),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'Move Money',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .displayMedium!
-                                        .copyWith(
-                                          fontWeight: FontWeight.w900,
-                                          fontSize: 20,
-                                        ),
-                                  ),
-                                  const SizedBox(height: 15),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        UltilHelper.formatMoney(_package.price),
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .displayMedium!
-                                            .copyWith(
-                                              fontWeight: FontWeight.w900,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary,
-                                            ),
-                                      ),
-                                      const SizedBox(width: 5),
-                                      Text(
-                                        '₫',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .displayMedium!
-                                            .copyWith(
-                                              fontWeight: FontWeight.normal,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary,
-                                            ),
-                                      ),
-                                    ],
-                                  ),
-                                  Container(
-                                    margin: const EdgeInsets.symmetric(
-                                        vertical: 15),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 20),
-                                    child: DottedLine(
-                                      direction: Axis.horizontal,
-                                      alignment: WrapAlignment.center,
-                                      lineLength: double.infinity,
-                                      lineThickness: 1.0,
-                                      dashColor:
-                                          Theme.of(context).colorScheme.outline,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 20.0),
-                                    child: Table(
-                                      columnWidths: const {
-                                        0: FractionColumnWidth(0.25)
-                                      },
-                                      children: [
-                                        TableRow(
-                                          children: [
-                                            Text(
-                                              'Type',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyLarge,
-                                            ),
-                                            Text(
-                                              'Deposit',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyLarge!
-                                                  .copyWith(
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .outline,
-                                                  ),
-                                            ),
-                                          ],
-                                        ),
-                                        TableRow(
-                                          children: [
-                                            Text(
-                                              'Message',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyLarge,
-                                            ),
-                                            Text(
-                                              // Message show that buy package name
-                                              'Buy ${_package.packageName} to get ${UltilHelper.formatMoney(int.parse(_package.amount))} bic coins',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyLarge!
-                                                  .copyWith(
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .outline,
-                                                  ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
+                      _buildTransactionDetails(),
+                      const SizedBox(height: 30),
+                      Text(
+                        'Select your payment options',
+                        style: Theme.of(context).textTheme.titleSmall,
                       ),
-                      const SizedBox(height: 50),
-                      Container(
-                        width: MediaQuery.of(context).size.width * 0.8,
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Select your payment options',
-                          style:
-                              Theme.of(context).textTheme.titleMedium!.copyWith(
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                        ),
-                      ),
-
-                      SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.01),
-
-                      // ZaloPay
-                      RadioButtonCustom(
-                        //bank icon
-                        prefixWidget: Image.asset(
-                          AssetHelper.zaloLogo,
-                          height: 30,
-                          fit: BoxFit.contain,
-                        ),
-                        contentWidget: Text(
-                          'ZaloPay E-Wallet',
-                          style:
-                              Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                    fontSize: 15,
-                                  ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                        isSelected: selectedPaymentOption == 1,
-                        onTap: () {
-                          if (mounted) {
-                            setState(() {
-                              selectedPaymentOption = 1;
-                            });
-                          }
-                        },
-                      ),
-
-                      const SizedBox(height: 15),
-                      RadioButtonCustom(
-                        //bank icon
-                        prefixWidget: Icon(
-                          Icons.account_balance_rounded,
-                          size: 25,
-                          color: Theme.of(context).colorScheme.outline,
-                        ),
-                        contentWidget: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Domestic Bank',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium!
-                                  .copyWith(
-                                    fontSize: 15,
-                                  ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                            ),
-                            Text(
-                              'ATM, Internet Banking, ...',
-                              style: Theme.of(context).textTheme.bodySmall,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
-                            ),
-                          ],
-                        ),
-                        isSelected: selectedPaymentOption == 2,
-                        onTap: () {
-                          setState(() {
-                            selectedPaymentOption = 2;
-                          });
-                        },
-                      ),
-
-                      const SizedBox(height: 15),
-                      RadioButtonCustom(
-                        //bank icon
-                        prefixWidget: Icon(
-                          Icons.credit_card_rounded,
-                          size: 25,
-                          color: Theme.of(context).colorScheme.outline,
-                        ),
-                        contentWidget: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'International Card',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium!
-                                  .copyWith(
-                                    fontSize: 15,
-                                  ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                            ),
-                            Text(
-                              'Visa, MasterCard, ...',
-                              style: Theme.of(context).textTheme.bodySmall,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
-                            ),
-                          ],
-                        ),
-                        isSelected: selectedPaymentOption == 3,
-                        onTap: () {
-                          setState(() {
-                            selectedPaymentOption = 3;
-                          });
-                        },
-                      ),
-
-                      const SizedBox(height: 15),
-                      RadioButtonCustom(
-                        color: Theme.of(context).colorScheme.outlineVariant,
-                        //bank icon
-                        prefixWidget: SvgPicture.asset(
-                          AssetHelper.vnpay,
-                          height: 30,
-                          fit: BoxFit.fitHeight,
-                        ),
-                        contentWidget: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'VNPAY E-Wallet',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium!
-                                  .copyWith(
-                                    fontSize: 15,
-                                  ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                            ),
-                            Text(
-                              // not supported yet
-                              'Not supported yet',
-                              style: Theme.of(context).textTheme.bodySmall,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
-                            ),
-                          ],
-                        ),
-                        // isSelected: selectedPaymentOption == 4,
-                        isSelected: false,
-                        onTap: () {
-                          if (!mounted) return;
-                          setState(() {
-                            // selectedPaymentOption = 4;
-                            selectedPaymentOption = selectedPaymentOption;
-                          });
-                        },
-                      ),
-
-                      const SizedBox(height: 15),
-                      RadioButtonCustom(
-                        color: Theme.of(context).colorScheme.outlineVariant,
-                        //bank icon
-                        prefixWidget: SvgPicture.asset(
-                          AssetHelper.vnpayQR,
-                          height: 30,
-                          fit: BoxFit.fitHeight,
-                        ),
-                        contentWidget: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'VNPAY QR',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium!
-                                  .copyWith(
-                                    fontSize: 15,
-                                  ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                            ),
-                            Text(
-                              'Not supported yet',
-                              style: Theme.of(context).textTheme.bodySmall,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
-                            ),
-                          ],
-                        ),
-                        // isSelected: selectedPaymentOption == 5,
-                        isSelected: false,
-                        onTap: () {
-                          if (!mounted) return;
-                          setState(() {
-                            // selectedPaymentOption = 5;
-                            selectedPaymentOption = selectedPaymentOption;
-                          });
-                        },
-                      ),
-
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 10),
+                      _buildPaymentOptions(),
                     ],
                   ),
                 ),
               ),
             ),
-            Container(
-              alignment: Alignment.bottomCenter,
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              // margin: const EdgeInsets.only(top: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      //close payment screen
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(
-                      LabelMessage.close,
-                      style:
-                          Theme.of(context).textTheme.displayMedium!.copyWith(
-                                fontSize: 20,
-                                color: Theme.of(context).colorScheme.primary,
-                                fontWeight: FontWeight.w900,
-                              ),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      if (selectedPaymentOption == 0) {
-                        showSnackBar(ErrorMessage.paymentMethod);
-                        return;
-                      }
-                      btnPay(context);
-                    },
-                    child: Container(
-                      width: MediaQuery.of(context).size.width * 0.4,
-                      height: MediaQuery.of(context).size.height * 0.05,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary,
-                        shape: BoxShape.rectangle,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Center(
-                        child: Text(
-                          LabelMessage.pay,
-                          style: Theme.of(context)
-                              .textTheme
-                              .displayMedium!
-                              .copyWith(
-                                  fontSize: 20,
-                                  color: Theme.of(context).colorScheme.surface,
-                                  fontWeight: FontWeight.w900),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-            SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+            _buildBottomButtons(),
           ],
         ),
       ),
     );
   }
 
-  void btnPay(BuildContext context) {
-    LoadingOverlayHelper.show(context);
-    if (mounted) {
-      setState(() {
-        isOverload = true;
-      });
-    }
-    if (selectedPaymentOption == 1) {
-      //open ZaloPay app
-      openZaloPayApp(_package).then((_) {
-        LoadingOverlayHelper.hide();
-        showSnackBar(payResult, type: type);
+  Widget _buildTransactionDetails() {
+    return ShadowContainer(
+      width: double.infinity,
+      padding: const EdgeInsets.all(0),
+      child: Column(
+        children: [
+          Container(
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.outline,
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(10)),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.pending,
+                    color: Theme.of(context).colorScheme.surface),
+                const SizedBox(width: 10),
+                Text(
+                  'Transaction Details',
+                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                        color: Theme.of(context).colorScheme.background,
+                      ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Column(
+              children: [
+                Text(
+                  'Move Money',
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineSmall!
+                      .copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 15),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      UltilHelper.formatMoney(_package.price),
+                      style:
+                          Theme.of(context).textTheme.headlineMedium!.copyWith(
+                                fontWeight: FontWeight.w900,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                    ),
+                    Text(
+                      ' ₫',
+                      style:
+                          Theme.of(context).textTheme.headlineMedium!.copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontSize: 16,
+                              ),
+                    ),
+                  ],
+                ),
+                Divider(
+                  height: 30,
+                  indent: MediaQuery.of(context).size.width * 0.05,
+                  endIndent: MediaQuery.of(context).size.width * 0.05,
+                ),
+                _buildTransactionInfo(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-        //redirect to home screen if payment success
-        if (type == 1) {
-          //close payment screen
-          Navigator.of(context).pushReplacementNamed(ReceiptScreen.routeName);
-        }
-      });
+  Widget _buildTransactionInfo() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Table(
+        columnWidths: const {0: FractionColumnWidth(0.25)},
+        children: [
+          _buildTableRow('Type', 'Deposit'),
+          _buildTableRow('Message', 'Buy ${_package.packageName}'),
+        ],
+      ),
+    );
+  }
+
+  TableRow _buildTableRow(String label, String value) {
+    return TableRow(
+      children: [
+        Text(label, style: Theme.of(context).textTheme.bodyLarge),
+        Text(
+          value,
+          style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                color: Theme.of(context).colorScheme.outline,
+              ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPaymentOptions() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _buildRadioButton(
+          1,
+          AssetHelper.zaloLogo,
+          'ZaloPay E-Wallet',
+          isImage: true,
+        ),
+        _buildRadioButton(
+          2,
+          Icons.account_balance_rounded,
+          'Domestic Bank',
+          subtitle: 'ATM, Internet Banking',
+        ),
+        _buildRadioButton(
+          3,
+          Icons.credit_card_rounded,
+          'International Card',
+          subtitle: 'Visa, MasterCard, ...',
+        ),
+        _buildRadioButton(
+          4,
+          AssetHelper.vnpay,
+          'VNPAY E-Wallet',
+          subtitle: 'Not supported yet',
+          isSvg: true,
+          isDisabled: true,
+        ),
+        _buildRadioButton(
+          5,
+          AssetHelper.vnpayQR,
+          'VNPAY QR',
+          subtitle: 'Not supported yet',
+          isSvg: true,
+          isDisabled: true,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRadioButton(
+    int value,
+    dynamic icon,
+    String title, {
+    String? subtitle,
+    bool isImage = false,
+    bool isSvg = false,
+    bool isDisabled = false,
+  }) {
+    Widget prefixWidget;
+    if (isImage) {
+      prefixWidget = Image.asset(icon, height: 30, fit: BoxFit.contain);
+    } else if (isSvg) {
+      prefixWidget = SvgPicture.asset(icon, height: 30, fit: BoxFit.fitHeight);
     } else {
-      // call payment api to get payment url
-      String vnpBankCode = 'VNBANK';
+      prefixWidget =
+          Icon(icon, size: 25, color: Theme.of(context).colorScheme.outline);
+    }
 
-      if (selectedPaymentOption == 3) {
-        vnpBankCode = 'INTCARD';
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 15),
+      child: RadioButtonCustom(
+        color: isDisabled ? Theme.of(context).colorScheme.outlineVariant : null,
+        prefixWidget: prefixWidget,
+        contentWidget: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium!
+                  .copyWith(fontSize: 15),
+            ),
+            if (subtitle != null)
+              Text(
+                subtitle,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+          ],
+        ),
+        isSelected: selectedPaymentOption == value,
+        onTap: isDisabled
+            ? null
+            : () {
+                setState(() => selectedPaymentOption = value);
+              },
+      ),
+    );
+  }
+
+  Widget _buildBottomButtons() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              LabelMessage.close,
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => btnPay(context),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+              padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 10),
+            ),
+            child: Text(
+              LabelMessage.pay,
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.surface,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void btnPay(BuildContext context) async {
+    if (selectedPaymentOption == 0) {
+      showSnackBar(ErrorMessage.paymentMethod);
+      return;
+    }
+
+    LoadingOverlayHelper.show(context);
+    setState(() => isOverload = true);
+
+    try {
+      if (selectedPaymentOption == 1) {
+        await _handleZaloPayPayment();
+      } else {
+        await _handleVNPayPayment();
       }
-
-      getPaymentUrl(_package.id, vnpBankCode);
-      LoadingOverlayHelper.hide();
-
-      if (paymentUrl.isNotEmpty && paymentUrl != '') {
-        showVNPayScreen(
-          context,
-          paymentUrl: paymentUrl,
-          onPaymentSuccess: (value) {
-            log.i('Payment success: $value');
-            showReceiptDialog(context, true, _package, selectedPaymentOption);
-          },
-          onPaymentError: (error) {
-            log.e('Payment error: $error');
-            showReceiptDialog(context, false, _package, selectedPaymentOption);
-          },
-        );
+    } catch (e) {
+      log.e('Error during payment: $e');
+      showSnackBar('An error occurred during payment. Please try again.');
+    } finally {
+      if (isOverload) {
+        LoadingOverlayHelper.hide();
+        setState(() => isOverload = false);
       }
     }
   }
 
-  void showReceiptDialog(BuildContext context, bool isSuccess,
-      CoinPackage package, int selectedPaymentOption) {
+  Future<void> _handleZaloPayPayment() async {
+    await openZaloPayApp(_package);
+    showSnackBar(payResult, type: type);
+    if (type == 1) {
+      Navigator.of(context).pushReplacementNamed(ReceiptScreen.routeName);
+    }
+  }
+
+  Future<void> _handleVNPayPayment() async {
+    String vnpBankCode = selectedPaymentOption == 3 ? 'INTCARD' : 'VNBANK';
+    await getPaymentUrl(_package.id, vnpBankCode);
+
+    if (isOverload) {
+      LoadingOverlayHelper.hide();
+      setState(() => isOverload = false);
+    }
+
+    bool? isPaymentSuccess;
+    var vnPayData;
+
+    if (paymentUrl.isNotEmpty) {
+      if (!mounted) return;
+      await showVNPayScreen(
+        context,
+        paymentUrl: paymentUrl,
+        onPaymentSuccess: (value) {
+          log.i('Payment success: $value');
+          isPaymentSuccess = true;
+          vnPayData = value;
+        },
+        onPaymentError: (error) {
+          log.e('Payment error: $error');
+          isPaymentSuccess = false;
+          vnPayData = error;
+        },
+      );
+
+      _handlePaymentResult(isPaymentSuccess!, vnpayData: vnPayData);
+      showSnackBar(isPaymentSuccess! ? 'Payment success!' : 'Payment failed!',
+          type: isPaymentSuccess! ? 1 : 2);
+    }
+  }
+
+  void _handlePaymentResult(bool result, {Map<String, dynamic>? vnpayData}) =>
+      showReceiptDialog(
+        context,
+        result,
+        _package,
+        selectedPaymentOption,
+        vnpayData: vnpayData,
+      );
+
+  Future<void> openZaloPayApp(CoinPackage package) async {
+    await buyNow(package.id);
+    final event =
+        await FlutterZaloPaySdk.payOrder(zpToken: zaloPayModel.zpTransToken);
+    setState(() {
+      switch (event) {
+        case FlutterZaloPayStatus.success:
+          payResult = ZaloPayMessage.success;
+          type = 1;
+          break;
+        case FlutterZaloPayStatus.failed:
+          payResult = ZaloPayMessage.failed;
+          type = 2;
+          break;
+        case FlutterZaloPayStatus.cancelled:
+          payResult = ZaloPayMessage.cancelled;
+          type = 0;
+          break;
+        default:
+          payResult = ZaloPayMessage.failed;
+          type = 2;
+      }
+    });
+  }
+
+  Future<void> buyNow(String packageId) async {
+    try {
+      final APIResponse<ZaloPayModel> response =
+          await paymentApi.depositCoinZaloPay(packageId);
+
+      if (!response.isTokenValid &&
+          response.message == ErrorMessage.tokenInvalid) {
+        ReturnLoginDialog.returnLogin(context);
+        return;
+      }
+
+      if (response.data == null ||
+          response.message == ErrorMessage.somethingWentWrong) {
+        showSnackBar(ErrorMessage.somethingWentWrong);
+      } else {
+        setState(() => zaloPayModel = response.data!);
+      }
+    } catch (e) {
+      log.e('Error during buy now: $e');
+      showSnackBar('An error occurred. Please try again.');
+    }
+  }
+
+  Future<void> getPaymentUrl(String packageId, String bankCode) async {
+    try {
+      final APIResponse<VnPayResponse> response =
+          await paymentApi.depositCoinVnPay(packageId, bankCode);
+
+      if (!response.isTokenValid &&
+          response.message == ErrorMessage.tokenInvalid) {
+        ReturnLoginDialog.returnLogin(context);
+        return;
+      }
+
+      if (response.message == ErrorMessage.somethingWentWrong) {
+        showSnackBar(ErrorMessage.somethingWentWrong);
+        return;
+      }
+
+      if (response.data != null) {
+        setState(() => paymentUrl = response.data!.paymentUrl);
+      }
+    } catch (e) {
+      log.e('Error during get payment url: $e');
+      showSnackBar('An error occurred. Please try again.');
+    }
+  }
+
+  void showReceiptDialog(
+    BuildContext context,
+    bool isSuccess,
+    CoinPackage package,
+    int selectedPaymentOption, {
+    Map<String, dynamic>? vnpayData,
+  }) {
+    log.i('Payment ${isSuccess ? 'success' : 'failure'}');
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -662,8 +494,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
               maxWidth: MediaQuery.of(context).size.width * 0.9,
               maxHeight: MediaQuery.of(context).size.height * 0.9,
             ),
-            child: dialogContent(
-                context, isSuccess, package, selectedPaymentOption),
+            child: _buildReceiptContent(
+                context, isSuccess, package, selectedPaymentOption,
+                vnpayData: vnpayData),
           ),
           onClick: () {
             isSuccess
@@ -676,30 +509,120 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
-  // show snackbar
+  Widget _buildReceiptContent(BuildContext context, bool isSuccess,
+      CoinPackage package, int selectedPaymentOption,
+      {Map<String, dynamic>? vnpayData}) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Icon(
+            isSuccess ? Icons.check_circle : Icons.cancel,
+            color: isSuccess
+                ? Theme.of(context).colorScheme.onError
+                : Theme.of(context).colorScheme.error,
+            size: 50,
+          ),
+        ),
+        const SizedBox(height: 15),
+        Text(
+          isSuccess
+              ? 'Your payment was successful!'
+              : 'Payment failed. Please try again.',
+          style: Theme.of(context).textTheme.titleSmall,
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 15),
+        ExpansionTile(
+          title: const Text('Package Information'),
+          tilePadding: const EdgeInsets.all(0),
+          visualDensity: VisualDensity.comfortable,
+          childrenPadding: const EdgeInsets.only(bottom: 10),
+          children: [
+            _buildReceiptInfoRow('Package', package.packageName),
+            _buildReceiptInfoRow('Amount',
+                '${UltilHelper.formatMoney(int.parse(package.amount))} coins'),
+            _buildReceiptInfoRow(
+              'Extra',
+              package.extraCoin != null
+                  ? '${UltilHelper.formatMoney(package.extraCoin ?? 0)} coins'
+                  : null,
+            ),
+            _buildReceiptInfoRow('EXP Date', '${package.extraEXP} days'),
+          ],
+        ),
+        const SizedBox(height: 5),
+        const Divider(),
+        const SizedBox(height: 5),
+        _buildReceiptInfoRow('Payment Method',
+            selectedPaymentOption == 1 ? 'ZaloPay' : 'VNPAY Gateway'),
+        _buildReceiptInfoRow('Transaction Date',
+            UltilHelper.formatVnPayDate(vnpayData?['vnp_PayDate'])),
+        _buildReceiptInfoRow(
+            'Transaction No', vnpayData?['vnp_TransactionNo'] ?? ''),
+        _buildReceiptInfoRow('Bank', vnpayData?['vnp_BankCode'] ?? ''),
+        _buildReceiptInfoRow(
+            'Order Info', Uri.decodeFull(vnpayData?['vnp_OrderInfo'] ?? '')),
+      ],
+    );
+  }
+
+  Widget _buildReceiptInfoRow(String label, String? value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: Theme.of(context).textTheme.bodyMedium),
+          Expanded(
+            child: Tooltip(
+              message: value ?? '-',
+              margin: EdgeInsets.only(
+                  right: MediaQuery.of(context).size.width * 0.1,
+                  left: MediaQuery.of(context).size.width * 0.1),
+              textStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.surface,
+                  ),
+              triggerMode: TooltipTriggerMode.tap,
+              waitDuration: const Duration(milliseconds: 500),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 20),
+                child: Text(
+                  value ?? '-',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.right,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void showSnackBar(String message, {int type = 0}) {
     Color backgroundColor = type == 0
         ? Theme.of(context).colorScheme.outline
         : (type == 1
             ? Theme.of(context).colorScheme.onError
             : Theme.of(context).colorScheme.error);
-    showCustomSnackBar(
-      MySnackBar(
-        message: message,
-        prefix: Icon(
-          Icons.info,
-          color: Theme.of(context).colorScheme.surface,
-        ),
-        backgroundColor: backgroundColor,
-      ),
-    );
-  }
 
-  // show custom snackbar
-  void showCustomSnackBar(MySnackBar snackBar) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: snackBar,
+        content: MySnackBar(
+          message: message,
+          prefix: Icon(
+            Icons.info,
+            color: Theme.of(context).colorScheme.surface,
+          ),
+          backgroundColor: backgroundColor,
+        ),
         behavior: SnackBarBehavior.floating,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -707,101 +630,4 @@ class _PaymentScreenState extends State<PaymentScreen> {
       ),
     );
   }
-
-  // #region VnPay
-  // Call API to get payment url
-  void getPaymentUrl(String packageId, String bankCode) async {
-    if (!mounted) return;
-    setState(() {
-      isLoading = true;
-    });
-
-    try {
-      final APIResponse<VnPayResponse> paymentMd =
-          await paymentApi.depositCoinVnPay(packageId, bankCode);
-
-      if (paymentMd.isTokenValid == false &&
-          paymentMd.message == ErrorMessage.tokenInvalid) {
-        log.e('Token is invalid');
-
-        if (!mounted) return;
-        // Hiển thị dialog login
-        ReturnLoginDialog.returnLogin(context);
-        return;
-      }
-
-      // Kiểm tra nếu có lỗi
-      if (paymentMd.message == ErrorMessage.somethingWentWrong) {
-        showSnackBar(ErrorMessage.somethingWentWrong);
-        return;
-      }
-
-      if (paymentMd.data != null) {
-        setState(() {
-          paymentUrl = paymentMd.data!.paymentUrl;
-        });
-      }
-    } catch (e) {
-      log.e('Error during get payment url: $e');
-      if (!mounted) return;
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
-  // Show receipt dialog
-  Widget dialogContent(BuildContext context, bool isSuccess,
-      CoinPackage package, int selectedPaymentOption) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          isSuccess ? Icons.check_circle : Icons.cancel,
-          color: isSuccess
-              ? Theme.of(context).colorScheme.onError
-              : Theme.of(context).colorScheme.error,
-          size: 50,
-        ),
-        const SizedBox(height: 15),
-        Text(
-          isSuccess
-              ? 'Your payment was successful!'
-              : 'Payment failed. Please try again.',
-          style: Theme.of(context).textTheme.titleMedium,
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 15),
-        Text(
-          'Package: ${package.packageName}',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
-        const SizedBox(height: 5),
-        Text(
-          'Amount: ${package.amount} coins',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
-        const SizedBox(height: 5),
-        Text(
-          'Extra: ${package.extraCoin} coins',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
-        const SizedBox(height: 5),
-        Text(
-          'EXP Date: ${package.extraEXP} days',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
-        const SizedBox(height: 15),
-        DottedLine(
-          dashColor: Theme.of(context).colorScheme.outline,
-        ),
-        const SizedBox(height: 15),
-        Text(
-          'Payment Method: ${selectedPaymentOption == 1 ? 'ZaloPay' : 'VNPAY Gateway'}',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
-      ],
-    );
-  }
-  // #endregion
 }
