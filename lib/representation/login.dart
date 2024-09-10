@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:bai_system/api/service/bai_be/auth_service.dart';
 import 'package:bai_system/component/shadow_container.dart';
 import 'package:bai_system/core/helper/asset_helper.dart';
@@ -28,42 +31,52 @@ class _LoginScreenState extends State<LoginScreen> {
   final _authApi = CallAuthApi();
 
   Future<bool> signIn() async {
-    // show loading
-    LoadingOverlayHelper.show(context);
+    try {
+      // show loading
+      LoadingOverlayHelper.show(context);
 
-    // logout before login
-    GoogleAuthApi.signOut();
+      // logout before login
+      await GoogleAuthApi.signOut();
 
-    var currentUser = await GoogleAuthApi.login();
-    GoogleSignInAuthentication? auth = await currentUser?.authentication;
+      var currentUser = await GoogleAuthApi.login();
+      GoogleSignInAuthentication? auth = await currentUser?.authentication;
 
-    log.i("currentUser: $currentUser" "\nidToken: ${auth?.idToken}");
+      log.i("currentUser: $currentUser" "\nidToken: ${auth?.idToken}");
 
-    if (currentUser != null && auth != null && auth.idToken != null) {
-      UserData? userData = await _authApi.loginWithGoogle(auth.idToken!);
-      if (userData != null) {
-        // hide loading
-        LoadingOverlayHelper.hide();
+      if (currentUser != null && auth != null && auth.idToken != null) {
+        UserData? userData = await _authApi.loginWithGoogle(auth.idToken!);
+        if (userData != null) {
+          // hide loading
+          LoadingOverlayHelper.hide();
 
-        // initialize notification
-        await FirebaseApi().initNotifications();
+          // initialize notification
+          await FirebaseApi().initNotifications();
 
-        // check permission
-        final permission = await Geolocator.checkPermission();
+          // check permission
+          final permission = await Geolocator.checkPermission();
 
-        if (permission == LocationPermission.denied) {
-          await Geolocator.requestPermission();
+          if (permission == LocationPermission.denied) {
+            await Geolocator.requestPermission();
+          }
+
+          goToPageHelper(routeName: MyNavigationBar.routeName);
+          showSuccessSnackBar();
+          return true;
         }
-
-        goToPageHelper(routeName: MyNavigationBar.routeName);
-        return true;
+        // If userData is null, it means login failed
+        throw Exception("Login failed");
+      } else {
+        // If we don't have a currentUser or auth, it means Google Sign-In failed
+        throw Exception("Google Sign-In failed");
       }
-      GoogleAuthApi.signOut();
-    }
+    } catch (e) {
+      // hide loading
+      LoadingOverlayHelper.hide();
 
-    // hide loading
-    LoadingOverlayHelper.hide();
-    return false;
+      // Show error SnackBar
+      showErrorSnackBar(getErrorMessage(e));
+      return false;
+    }
   }
 
   @override
@@ -248,6 +261,44 @@ class _LoginScreenState extends State<LoginScreen> {
         padding: const EdgeInsets.all(10),
       ),
     );
+  }
+
+  void showSuccessSnackBar() {
+    showCustomSnackBar(
+      MySnackBar(
+        prefix: Icon(
+          Icons.check_circle_rounded,
+          color: Theme.of(context).colorScheme.surface,
+        ),
+        message: Message.loginSuccess,
+        backgroundColor: Theme.of(context).colorScheme.onError,
+      ),
+    );
+  }
+
+  void showErrorSnackBar(String message) {
+    showCustomSnackBar(
+      MySnackBar(
+        prefix: Icon(
+          Icons.cancel_rounded,
+          color: Theme.of(context).colorScheme.surface,
+        ),
+        message: message,
+        backgroundColor: Theme.of(context).colorScheme.error,
+      ),
+    );
+  }
+
+  String getErrorMessage(dynamic error) {
+    if (error is SocketException) {
+      return 'Network error. Please check your internet connection.';
+    } else if (error is TimeoutException) {
+      return 'The request timed out. Please try again.';
+    } else if (error is FormatException) {
+      return 'Error parsing response. Please try again later.';
+    } else {
+      return 'An unexpected error occurred. Please try again.';
+    }
   }
 
   void goToPageHelper({String? routeName}) {
