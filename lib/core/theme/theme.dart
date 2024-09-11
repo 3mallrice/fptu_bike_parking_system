@@ -76,6 +76,13 @@ ThemeData lightMode = ThemeData(
       fontFamily: GoogleFonts.roboto().fontFamily,
     ),
 
+    headlineSmall: TextStyle(
+      color: ColorLightMode.primaryText,
+      fontSize: 20,
+      fontWeight: FontWeight.normal,
+      fontFamily: GoogleFonts.roboto().fontFamily,
+    ),
+
     //title
     titleMedium: TextStyle(
       color: ColorLightMode.primaryText,
