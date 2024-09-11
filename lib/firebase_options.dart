@@ -65,4 +65,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'bai-parking.appspot.com',
     iosBundleId: 'com.example.fptuBikeParkingSystem',
   );
+
 }
