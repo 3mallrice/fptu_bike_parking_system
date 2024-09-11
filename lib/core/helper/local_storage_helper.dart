@@ -37,6 +37,7 @@ class LocalStorageKey {
   static const String userData = 'userData';
   static const String ignoreIntroScreen = 'ignoreIntroScreen';
   static const String isHiddenBalance = 'isHiddenBalance';
+  static const String fcmToken = 'fcmToken';
 }
 
 class GetLocalHelper {

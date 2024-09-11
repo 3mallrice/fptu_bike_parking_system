@@ -369,7 +369,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     }
 
     bool? isPaymentSuccess;
-    var vnPayData;
+    dynamic vnPayData;
 
     if (paymentUrl.isNotEmpty) {
       if (!mounted) return;
