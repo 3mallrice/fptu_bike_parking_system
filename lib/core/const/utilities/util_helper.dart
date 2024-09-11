@@ -1,6 +1,8 @@
 import 'package:intl/intl.dart';
+import 'package:logger/logger.dart';
 
 class UltilHelper {
+  static final log = Logger();
   // Function to check if a date is today
   static bool _isToday(DateTime date) {
     final now = DateTime.now();
@@ -31,7 +33,7 @@ class UltilHelper {
       );
       return DateFormat('dd/MM/yyyy HH:mm:ss').format(dateTime);
     } catch (e) {
-      print('Error parsing date: $e');
+      log.d('Error parsing date: $e');
       return 'N/A';
     }
   }

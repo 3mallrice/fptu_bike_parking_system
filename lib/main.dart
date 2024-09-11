@@ -1,82 +1,88 @@
-import 'dart:io';
+import 'dart:async';
 
 import 'package:bai_system/core/helper/local_storage_helper.dart';
 import 'package:bai_system/firebase_options.dart';
 import 'package:bai_system/representation/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:logger/web.dart';
 import 'package:provider/provider.dart';
 
+import 'api/service/weather/geo.dart';
+import 'core/helper/firebase_helper.dart';
 import 'core/theme/theme_provider.dart';
 import 'route.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
+var log = Logger();
 
-void main() async {
-  //flutter init
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  //init Hive
-  await Hive.initFlutter();
-  await LocalStorageHelper.initLocalStorageHelper();
+  try {
+    // Khởi tạo Hive
+    await Hive.initFlutter();
+    await LocalStorageHelper.initLocalStorageHelper();
 
-  //firebase init
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  // await FirebaseApi().initNotifications();
+    // Khởi tạo Firebase
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
 
-  //flutter init
-  WidgetsFlutterBinding.ensureInitialized();
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
-  /*This should be used while in development mode,
-  do NOT do this when you want to release to production,
-  the aim of this answer is to make the development
-  a bit easier for you,
-  for production, you need to fix your certificate issue
-  and use it properly, look at the other answers for this
-  as it might be helpful for your case.
-  */
-  HttpOverrides.global = MyHttpOverrides();
+    if (!kIsWeb) {
+      await initLocalNotifications();
+    }
 
-  //light/dart theme
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => ThemeProvider(),
-      child: const MyApp(),
-    ),
-  );
+    // Lấy token FCM
+    await getFcmToken();
+
+    await GeoPermission().checkLocationPermission();
+
+    // Chạy ứng dụng
+    runApp(
+      ChangeNotifierProvider(
+        create: (context) => ThemeProvider(),
+        child: const MyApp(),
+      ),
+    );
+  } catch (error, stack) {
+    log.e('Lỗi khởi tạo: $error');
+    log.d(stack);
+  }
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initPushNotification();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'BAI',
       debugShowCheckedModeBanner: false,
       theme: Provider.of<ThemeProvider>(context).themeData,
-
       home: const AspectRatio(
         aspectRatio: 16 / 9,
-        //child: MyNavigationBar(),
         child: SplashScreen(),
       ),
-      // initialRoute: HomeScreen.routeName,
       routes: routes,
       navigatorKey: navigatorKey,
     );
-  }
-}
-
-class MyHttpOverrides extends HttpOverrides {
-  @override
-  HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
   }
 }
