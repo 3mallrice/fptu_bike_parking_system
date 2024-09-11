@@ -3,6 +3,7 @@ import 'package:bai_system/component/shadow_container.dart';
 import 'package:bai_system/core/helper/google_auth.dart';
 import 'package:bai_system/core/helper/local_storage_helper.dart';
 import 'package:bai_system/representation/about_screen.dart';
+import 'package:bai_system/representation/exception_screen.dart';
 import 'package:bai_system/representation/feedback.dart';
 import 'package:bai_system/representation/profile.dart';
 import 'package:flutter/material.dart';
@@ -206,7 +207,8 @@ class _MeScreenState extends State<MeScreen> {
                                   .copyWith(fontSize: 18),
                             ), () {
                           Navigator.of(context).pushNamed(AboutUs.routeName);
-                        })
+                        }),
+                        TextButton(onPressed: () => Navigator.of(context).pushNamed(ExceptionScreen.routeName), child: const Text('exception'))
                       ],
                     ),
                   ),
