@@ -4,7 +4,6 @@ import 'package:bai_system/api/model/bai_model/wallet_model.dart';
 import 'package:bai_system/representation/about_screen.dart';
 import 'package:bai_system/representation/add_bai_screen.dart';
 import 'package:bai_system/representation/bai_details.dart';
-import 'package:bai_system/representation/exception_screen.dart';
 import 'package:bai_system/representation/feedback.dart';
 import 'package:bai_system/representation/fundin_screen.dart';
 import 'package:bai_system/representation/history.dart';
@@ -13,6 +12,7 @@ import 'package:bai_system/representation/intro_screen.dart';
 import 'package:bai_system/representation/login.dart';
 import 'package:bai_system/representation/me.dart';
 import 'package:bai_system/representation/navigation_bar.dart';
+import 'package:bai_system/representation/no_connection_screen.dart';
 import 'package:bai_system/representation/notification_screen.dart';
 import 'package:bai_system/representation/payment.dart';
 import 'package:bai_system/representation/payos.dart';
@@ -74,5 +74,5 @@ final Map<String, WidgetBuilder> routes = {
   InsightScreen.routeName: (context) => const InsightScreen(),
   NotificationScreen.routeName: (context) => const NotificationScreen(),
   WalletScreen.routeName: (context) => const WalletScreen(),
-  ExceptionScreen.routeName: (context) => const ExceptionScreen(),
+  NoInternetScreen.routeName: (context) => const NoInternetScreen(),
 };

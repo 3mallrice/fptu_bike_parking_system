@@ -2,6 +2,7 @@ import 'package:bai_system/representation/bai_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
 
+import '../component/internet_connection_wrapper.dart';
 import '../component/main_app_bar.dart';
 import 'history.dart';
 import 'home.dart';
@@ -52,8 +53,10 @@ class _MyNavigationBarState extends State<MyNavigationBar> {
       appBar: const MainAppBar(),
       body: PopScope(
         canPop: false,
-        child: Center(
-          child: _widgetOptions.elementAt(_selectedIndex),
+        child: InternetConnectionWrapper(
+          child: Center(
+            child: _widgetOptions.elementAt(_selectedIndex),
+          ),
         ),
       ),
       bottomNavigationBar: StylishBottomBar(

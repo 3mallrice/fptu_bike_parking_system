@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bai_system/api/model/bai_model/wallet_model.dart';
 import 'package:bai_system/api/service/bai_be/wallet_service.dart';
 import 'package:bai_system/core/const/utilities/util_helper.dart';
@@ -54,6 +56,13 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
   void initState() {
     super.initState();
     _initialize();
+  }
+
+  @override
+  void dispose() {
+    _focusNode.removeListener(_onFocusChange);
+    _focusNode.dispose();
+    super.dispose();
   }
 
   void _initialize() async {
@@ -674,13 +683,6 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
         : 'GMT${weatherData.timezone ~/ 3600}';
 
     return '$lastUpdated $timezone';
-  }
-
-  @override
-  void dispose() {
-    _focusNode.removeListener(_onFocusChange);
-    _focusNode.dispose();
-    super.dispose();
   }
 }
 
