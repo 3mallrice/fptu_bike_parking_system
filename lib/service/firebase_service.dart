@@ -6,9 +6,9 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:logger/logger.dart';
 
 import '../api/model/bai_model/notification_model.dart';
-import '../api/service/bai_be/notification_service.dart';
 import '../core/helper/local_storage_helper.dart';
 import '../firebase_options.dart';
+import 'notification_service.dart';
 
 var log = Logger();
 
@@ -52,6 +52,10 @@ Future<void> getFcmToken() async {
 Future<void> requestPermission() async {
   var settings = await _firebaseMessaging.requestPermission(
     provisional: true,
+    sound: true,
+    badge: true,
+    announcement: true,
+    alert: true,
   );
 
   if (settings.authorizationStatus == AuthorizationStatus.authorized) {

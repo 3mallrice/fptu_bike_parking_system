@@ -1,4 +1,5 @@
 import 'package:bai_system/component/how_did_you_pay.dart';
+import 'package:bai_system/component/response_handler.dart';
 import 'package:bai_system/component/shadow_container.dart';
 import 'package:bai_system/core/const/utilities/util_helper.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,8 @@ import 'package:logger/logger.dart';
 
 import '../api/model/bai_model/statistic.dart';
 import '../api/service/bai_be/statistic_service.dart';
+import '../component/dialog.dart';
+import '../core/const/frontend/message.dart';
 
 class InsightScreen extends StatefulWidget {
   const InsightScreen({super.key});
@@ -16,7 +19,7 @@ class InsightScreen extends StatefulWidget {
   State<InsightScreen> createState() => _InsightScreenState();
 }
 
-class _InsightScreenState extends State<InsightScreen> {
+class _InsightScreenState extends State<InsightScreen> with ApiResponseHandler {
   final callStatisticApi = StatisticApi();
   var log = Logger();
 
@@ -35,20 +38,42 @@ class _InsightScreenState extends State<InsightScreen> {
   ];
 
   Future<void> getStatisticData() async {
-    final howDidYouParkResponse = await callStatisticApi.getHowDidYouPark();
-    final howDidYouPayResponse = await callStatisticApi.getHowDidYouPay();
+    try {
+      final howDidYouParkResponse = await callStatisticApi.getHowDidYouPark();
+      final howDidYouPayResponse = await callStatisticApi.getHowDidYouPay();
 
-    // Kiểm tra tính hợp lệ của token và cập nhật dữ liệu nếu hợp lệ
-    if (howDidYouParkResponse.isTokenValid &&
-        howDidYouPayResponse.isTokenValid) {
-      setState(() {
-        howDidYouParkAndSpend = howDidYouParkResponse.data;
-        paymentMethodUsageList = howDidYouPayResponse.data ?? [];
-      });
+      if (!mounted) return;
 
-      log.i('HowDidYouPay response: ${howDidYouPayResponse.data}');
-    } else {
-      log.e('Token is invalid');
+      final bool isParkResValid = await handleApiResponse(
+        context: context,
+        response: howDidYouParkResponse,
+        showErrorDialog: _showErrorDialog,
+      );
+
+      if (!mounted) return;
+      final bool isPayResValid = await handleApiResponse(
+        context: context,
+        response: howDidYouPayResponse,
+        showErrorDialog: _showErrorDialog,
+      );
+
+      if (!isParkResValid || !isPayResValid) return;
+
+      if (howDidYouParkResponse.isTokenValid &&
+          howDidYouPayResponse.isTokenValid) {
+        setState(() {
+          howDidYouParkAndSpend = howDidYouParkResponse.data;
+          paymentMethodUsageList = howDidYouPayResponse.data ?? [];
+        });
+
+        log.i('HowDidYouPay response: ${howDidYouPayResponse.data}');
+      } else {
+        log.e('Token is invalid');
+      }
+    } catch (e, stackTrace) {
+      log.e('Error in getStatisticData: $e');
+      log.e(stackTrace.toString());
+      _showErrorDialog('An error occurred while fetching data.');
     }
   }
 
@@ -257,4 +282,19 @@ class _InsightScreenState extends State<InsightScreen> {
           ],
         ),
       );
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return OKDialog(
+          title: ErrorMessage.error,
+          content: Text(
+            message,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        );
+      },
+    );
+  }
 }

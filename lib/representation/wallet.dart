@@ -1,3 +1,4 @@
+import 'package:bai_system/component/response_handler.dart';
 import 'package:bai_system/representation/receipt.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -15,7 +16,6 @@ import '../component/shadow_container.dart';
 import '../core/const/frontend/message.dart';
 import '../core/const/utilities/util_helper.dart';
 import '../core/helper/local_storage_helper.dart';
-import '../core/helper/return_login_dialog.dart';
 import 'fundin_screen.dart';
 import 'navigation_bar.dart';
 
@@ -29,7 +29,7 @@ class WalletScreen extends StatefulWidget {
 }
 
 class _WalletScreenState extends State<WalletScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, ApiResponseHandler {
   late TabController _tabController;
   bool _hideBalance = false;
   var log = Logger();
@@ -98,20 +98,38 @@ class _WalletScreenState extends State<WalletScreen>
     });
   }
 
-  void checkToken(APIResponse result) {
-    if (result.isTokenValid == false &&
-        result.message == ErrorMessage.tokenInvalid) {
-      log.e('Token is invalid');
-      if (!mounted) return;
-      ReturnLoginDialog.returnLogin(context);
-    }
+  void _catchError(APIResponse response) async {
+    if (!mounted) return;
+
+    final bool isResponseValid = await handleApiResponse(
+      context: context,
+      response: response,
+      showErrorDialog: _showErrorDialog,
+    );
+
+    if (!isResponseValid) return;
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return OKDialog(
+          title: ErrorMessage.error,
+          content: Text(
+            message,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        );
+      },
+    );
   }
 
   Future<void> getMainBalance() async {
     try {
       final APIResponse<int> result =
           await callWalletApi.getMainWalletBalance();
-      checkToken(result);
+      _catchError(result);
       if (!mounted) return;
       setState(() {
         mainBalance = result.data ?? 0;
@@ -125,7 +143,7 @@ class _WalletScreenState extends State<WalletScreen>
     try {
       APIResponse<ExtraBalanceModel> extraBalanceModel =
           await callWalletApi.getExtraWalletBalance();
-      checkToken(extraBalanceModel);
+      _catchError(extraBalanceModel);
       if (!mounted) return;
       if (extraBalanceModel.data != null) {
         setState(() {
@@ -148,7 +166,7 @@ class _WalletScreenState extends State<WalletScreen>
     try {
       final APIResponse<List<WalletModel>> result = await callWalletApi
           .getMainWalletTransactions(mainPageIndex, pageSize, from, to);
-      checkToken(result);
+      _catchError(result);
       if (!mounted) return;
       setState(() {
         if (isLoadMore) {
@@ -178,7 +196,7 @@ class _WalletScreenState extends State<WalletScreen>
     try {
       final APIResponse<List<WalletModel>> result = await callWalletApi
           .getExtraWalletTransactions(extraPageIndex, pageSize, from, to);
-      checkToken(result);
+      _catchError(result);
       if (!mounted) return;
       setState(() {
         if (isLoadMore) {

@@ -5,6 +5,8 @@ import 'package:bai_system/api/model/bai_model/coin_package_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
+import '../../../core/const/frontend/error_catcher.dart';
+import '../../../core/const/frontend/message.dart';
 import 'api_root.dart';
 
 class CallPackageApi {
@@ -16,7 +18,7 @@ class CallPackageApi {
 
   // GET: /packages/active
   // Get all active packages
-  Future<List<CoinPackage>?> getPackages() async {
+  Future<APIResponse<List<CoinPackage>>> getPackages() async {
     try {
       final response = await http.get(
         Uri.parse('$api/customer'),
@@ -30,14 +32,20 @@ class CallPackageApi {
               .map((item) => CoinPackage.fromJson(item as Map<String, dynamic>))
               .toList(),
         );
-        return apiResponse.data;
+        return apiResponse;
       } else {
         log.e('Failed to get package: ${response.statusCode}');
-        return null;
+        return APIResponse(
+          statusCode: response.statusCode,
+          message: HttpErrorMapper.getErrorMessage(response.statusCode),
+        );
       }
     } catch (e) {
       log.e('Error during get package: $e');
+      return APIResponse(
+        statusCode: 400,
+        message: ErrorMessage.somethingWentWrong,
+      );
     }
-    return null;
   }
 }

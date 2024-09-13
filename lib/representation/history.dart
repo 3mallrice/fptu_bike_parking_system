@@ -3,6 +3,7 @@ import 'package:bai_system/api/model/bai_model/history_model.dart';
 import 'package:bai_system/api/service/bai_be/feedback_service.dart';
 import 'package:bai_system/api/service/bai_be/history_service.dart';
 import 'package:bai_system/component/dialog.dart';
+import 'package:bai_system/component/response_handler.dart';
 import 'package:bai_system/core/const/utilities/util_helper.dart';
 import 'package:bai_system/core/helper/asset_helper.dart';
 import 'package:dotted_line/dotted_line.dart';
@@ -15,9 +16,9 @@ import 'package:widgets_to_image/widgets_to_image.dart';
 import '../api/model/bai_model/feedback_model.dart';
 import '../component/empty_box.dart';
 import '../component/loading_component.dart';
+import '../component/snackbar.dart';
 import '../component/widget_to_image_template.dart';
 import '../core/const/frontend/message.dart';
-import '../core/helper/return_login_dialog.dart';
 
 class HistoryScreen extends StatefulWidget {
   static String routeName = '/history_screen';
@@ -28,7 +29,7 @@ class HistoryScreen extends StatefulWidget {
   State<HistoryScreen> createState() => _HistoryScreenState();
 }
 
-class _HistoryScreenState extends State<HistoryScreen> {
+class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
   final ScrollController _scrollController = ScrollController();
   late final WidgetsToImageController _controller;
   int pageSize = 5;
@@ -47,24 +48,21 @@ class _HistoryScreenState extends State<HistoryScreen> {
       final APIResponse<List<HistoryModel>> result =
           await callHistoryAPI.getCustomerHistories(pageSize, pageIndex);
 
-      if (result.isTokenValid == false &&
-          result.message == ErrorMessage.tokenInvalid) {
-        log.e('Token is invalid');
+      if (!mounted) return;
 
-        if (!mounted) return;
-        ReturnLoginDialog.returnLogin(context);
-        return;
-      }
+      final bool isResponseValid = await handleApiResponse(
+        context: context,
+        response: result,
+        showErrorDialog: _showErrorDialog,
+      );
+
+      if (!isResponseValid) return;
 
       if (mounted) {
         setState(() {
-          if (result.data != null) {
-            isLoading = false;
-            histories = result.data ?? [];
-            _hasNextPage = result.data!.length == pageSize;
-          } else {
-            log.e('Failed to get customer histories: ${result.message}');
-          }
+          isLoading = false;
+          histories = result.data ?? [];
+          _hasNextPage = result.data!.length == pageSize;
         });
       }
     } catch (e) {
@@ -96,12 +94,31 @@ class _HistoryScreenState extends State<HistoryScreen> {
       setState(() {
         _isLoadMoreRunning = true;
       });
-      pageIndex += 1;
+
       try {
+        if (!mounted) return;
+
         final result =
-            await callHistoryAPI.getCustomerHistories(pageSize, pageIndex);
-        if (result.data != null && result.data!.isNotEmpty) {
+            await callHistoryAPI.getCustomerHistories(pageSize, pageIndex + 1);
+
+        if (!mounted) return;
+
+        final bool isResponseValid = await handleApiResponse(
+          context: context,
+          response: result,
+          showErrorDialog: _showErrorDialog,
+        );
+
+        if (!isResponseValid || result.data == null) {
           setState(() {
+            _hasNextPage = false;
+          });
+          return;
+        }
+
+        if (result.data!.isNotEmpty && mounted) {
+          setState(() {
+            pageIndex += 1;
             histories.addAll(result.data!);
             _hasNextPage = result.data!.length == pageSize;
           });
@@ -112,10 +129,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
         }
       } catch (e) {
         log.e('Error during get more histories: $e');
+        if (mounted) {
+          _showErrorDialog('Failed to load more histories. Please try again.');
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoadMoreRunning = false;
+          });
+        }
       }
-      setState(() {
-        _isLoadMoreRunning = false;
-      });
     }
   }
 
@@ -399,6 +422,25 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
+  void showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: MySnackBar(
+          prefix: Icon(
+            Icons.cancel_rounded,
+            color: Theme.of(context).colorScheme.surface,
+          ),
+          message: message,
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        padding: const EdgeInsets.all(10),
+      ),
+    );
+  }
+
   //dialog add feedback
   void addFeedbackDialog(String sessionId) {
     final callFeedback = FeedbackApi();
@@ -409,10 +451,26 @@ class _HistoryScreenState extends State<HistoryScreen> {
     //send feedback to Bai Be
     Future<void> sendFeedback(SendFeedbackModel sendFeedbackModel) async {
       try {
-        log.i('Send feedback: $sendFeedbackModel');
-        callFeedback.sendFeedback(sendFeedbackModel);
+        log.i('Sending feedback: $sendFeedbackModel');
+
+        APIResponse response =
+            await callFeedback.sendFeedback(sendFeedbackModel);
+
+        if (!mounted) return;
+
+        final bool isResponseValid = await handleApiResponse(
+          context: context,
+          response: response,
+          showErrorDialog: showErrorSnackBar,
+        );
+
+        if (!isResponseValid) return;
+
+        log.i('Feedback sent successfully');
+        return;
       } catch (e) {
-        log.e('Error during send feedback: $e');
+        log.e('Error during sending feedback: $e');
+        showErrorSnackBar(ErrorMessage.somethingWentWrong);
       }
     }
 
@@ -683,6 +741,21 @@ class _HistoryScreenState extends State<HistoryScreen> {
             log.i('Share canceled');
             Navigator.of(context).pop();
           },
+        );
+      },
+    );
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return OKDialog(
+          title: ErrorMessage.error,
+          content: Text(
+            message,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
         );
       },
     );

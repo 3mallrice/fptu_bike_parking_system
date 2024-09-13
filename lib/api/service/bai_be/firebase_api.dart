@@ -5,6 +5,7 @@ import 'package:bai_system/core/helper/local_storage_helper.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
+import '../../../core/const/frontend/error_catcher.dart';
 import '../../../core/const/frontend/message.dart';
 import 'api_root.dart';
 
@@ -48,13 +49,15 @@ class FirebaseApi {
       } else {
         log.e('Failed to put customer fcm token: ${response.statusCode}');
         return APIResponse(
-          message: '${ErrorMessage.somethingWentWrong}: ${response.statusCode}',
+          statusCode: response.statusCode,
+          message: HttpErrorMapper.getErrorMessage(response.statusCode),
         );
       }
     } catch (e) {
       log.e('Error during put customer fcm token: $e');
       return APIResponse(
-        message: 'Error during put customer fcm token',
+        statusCode: 400,
+        message: ErrorMessage.somethingWentWrong,
       );
     }
   }

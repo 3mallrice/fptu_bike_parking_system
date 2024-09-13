@@ -38,6 +38,7 @@ class LocalStorageKey {
   static const String ignoreIntroScreen = 'ignoreIntroScreen';
   static const String isHiddenBalance = 'isHiddenBalance';
   static const String fcmToken = 'fcmToken';
+  static const String storageKey = 'notifications';
 }
 
 class GetLocalHelper {
@@ -51,5 +52,9 @@ class GetLocalHelper {
   static String? getBearerToken() {
     UserData? userData = getUserData();
     return userData != null ? 'Bearer ${userData.bearerToken ?? ""}' : null;
+  }
+
+  static String? getFCMToken() {
+    return LocalStorageHelper.getValue(LocalStorageKey.fcmToken);
   }
 }

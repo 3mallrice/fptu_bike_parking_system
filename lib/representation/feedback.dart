@@ -1,7 +1,9 @@
 import 'package:bai_system/api/model/bai_model/feedback_model.dart';
 import 'package:bai_system/component/app_bar_component.dart';
+import 'package:bai_system/component/dialog.dart';
 import 'package:bai_system/component/empty_box.dart';
 import 'package:bai_system/component/loading_component.dart';
+import 'package:bai_system/component/response_handler.dart';
 import 'package:bai_system/component/shadow_container.dart';
 import 'package:bai_system/core/const/utilities/util_helper.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +11,6 @@ import 'package:logger/logger.dart';
 
 import '../api/service/bai_be/feedback_service.dart';
 import '../core/const/frontend/message.dart';
-import '../core/helper/return_login_dialog.dart';
 
 class FeedbackScreen extends StatefulWidget {
   const FeedbackScreen({super.key});
@@ -20,7 +21,8 @@ class FeedbackScreen extends StatefulWidget {
   State<FeedbackScreen> createState() => _FeedbackScreenState();
 }
 
-class _FeedbackScreenState extends State<FeedbackScreen> {
+class _FeedbackScreenState extends State<FeedbackScreen>
+    with ApiResponseHandler {
   //pagination
   ScrollController _scrollController = ScrollController();
   int pageSize = 10;
@@ -190,29 +192,44 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   Future<void> getFeedbacks() async {
     try {
       final response = await callFeedbackApi.getFeedbacks(pageIndex, pageSize);
-      if (response.isTokenValid) {
-        if (response.data != null) {
-          setState(() {
-            feedbacks = response.data!;
-            _hasNextPage = response.data!.length == pageSize;
-            log.e('total: ${response.totalRecord}');
-          });
-        }
-      } else if (response.message == ErrorMessage.tokenInvalid &&
-          !response.isTokenValid) {
-        log.e('Token is invalid');
-        if (!mounted) return;
-        ReturnLoginDialog.returnLogin(context);
-        return;
-      } else {
-        log.e('Failed to get feedbacks: ${response.message}');
-      }
+      if (!mounted) return;
+
+      final bool isResponseValid = await handleApiResponse(
+        context: context,
+        response: response,
+        showErrorDialog: _showErrorDialog,
+      );
+
+      if (!isResponseValid) return;
+
+      setState(() {
+        feedbacks = response.data!;
+        _hasNextPage = response.data!.length == pageSize;
+        log.e('total: ${response.totalRecord}');
+      });
     } catch (e) {
       log.e('Error during get feedbacks: $e');
+      _showErrorDialog(ErrorMessage.somethingWentWrong);
+
+      setState(() {
+        isLoading = false;
+      });
     }
-    setState(() {
-      isLoading = false;
-    });
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return OKDialog(
+          title: ErrorMessage.error,
+          content: Text(
+            message,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        );
+      },
+    );
   }
 
   void _loadMore() async {
@@ -225,6 +242,17 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       pageIndex += 1;
       try {
         final res = await callFeedbackApi.getFeedbacks(pageIndex, pageSize);
+
+        if (!mounted) return;
+
+        final bool isResponseValid = await handleApiResponse(
+          context: context,
+          response: res,
+          showErrorDialog: _showErrorDialog,
+        );
+
+        if (!isResponseValid) return;
+
         if (res.data != null && res.data!.isNotEmpty) {
           setState(() {
             feedbacks.addAll(res.data!);

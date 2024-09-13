@@ -1,4 +1,4 @@
-import 'package:bai_system/api/service/bai_be/notification_service.dart';
+import 'package:bai_system/service/notification_service.dart';
 import 'package:flutter/material.dart';
 
 class NotificationScreen extends StatefulWidget {

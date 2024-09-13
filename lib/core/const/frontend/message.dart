@@ -1,3 +1,5 @@
+import '../../../api/model/bai_model/coin_package_model.dart';
+
 class Message {
   static String saveImageSuccessfully = "Image saved successfully!";
   static String saveImageUnSuccessfully = "Saved unsuccessfully!";
@@ -111,4 +113,19 @@ class ZaloPayMessage {
   static const String success = "Payment was successful!";
   static const String failed = "Payment failed. Please try again.";
   static const String processing = "Payment is processing...";
+}
+
+String packageDetail(CoinPackage package) {
+  final totalCoins = int.parse(package.amount) + (package.extraCoin ?? 0);
+
+  return '''
+      If you purchase the ${package.packageName}, you will get:
+        • ${package.amount} bic (Main Wallet).
+        ${package.extraCoin != null ? '• ${package.extraCoin} Extra bic (Extra Wallet).\n' : ''}
+        ${package.extraEXP != null ? '• Your Extra Wallet\'s expiration period will increase by ${package.extraEXP} days.\n' : ''}
+      Total Coins to Spend: $totalCoins bic.
+        ${package.extraEXP != null ? 'Expiration Extension: +${package.extraEXP} days added to the current expiration date of your Extra Wallet coins.\n' : ''}
+      Keep in mind:
+      Each purchase extends the expiration of all your extra coins by the specified days, giving you more flexibility to use them.
+      ''';
 }

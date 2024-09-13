@@ -1,16 +1,20 @@
 import 'package:bai_system/api/model/bai_model/api_response.dart';
 import 'package:bai_system/api/service/bai_be/auth_service.dart';
 import 'package:bai_system/component/dialog.dart';
+import 'package:bai_system/component/response_handler.dart';
 import 'package:bai_system/component/shadow_container.dart';
-import 'package:bai_system/core/const/frontend/user_friendly_error_message.dart';
+import 'package:bai_system/core/const/frontend/error_catcher.dart';
 import 'package:bai_system/core/helper/asset_helper.dart';
+import 'package:bai_system/core/helper/local_storage_helper.dart';
 import 'package:bai_system/representation/navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:logger/logger.dart';
 
 import '../api/model/bai_model/login_model.dart';
+import '../api/service/bai_be/firebase_api.dart';
 import '../component/internet_connection_wrapper.dart';
+import '../core/const/frontend/message.dart';
 import '../core/helper/google_auth.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -22,11 +26,13 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen> with ApiResponseHandler {
   static final _log = Logger();
   final _authApi = CallAuthApi();
   bool _isLoading = false;
   Alignment _alignment = const Alignment(1, 0);
+
+  // Sign in with Google
   Future<void> _signIn() async {
     setState(() {
       _isLoading = true;
@@ -43,19 +49,30 @@ class _LoginScreenState extends State<LoginScreen> {
       if (currentUser != null && auth != null && auth.idToken != null) {
         final APIResponse<UserData> userData =
             await _authApi.loginWithGoogle(auth.idToken!);
+
         if (userData.data != null) {
           await _initializeAfterLogin();
           _navigateToHome();
         } else {
-          throw Exception("Login failed: User data is null");
+          // Sử dụng thông báo từ API response nếu có
+          throw Exception(
+              userData.message ?? "Login failed: User data is null");
         }
       } else {
         throw Exception("Login failed: Google authentication failed");
       }
     } catch (e) {
       _log.e("Login error: $e");
-      String userFriendlyMessage = UserFriendErrMess.loginErrMessage(e);
-      await _showErrorDialog(userFriendlyMessage);
+
+      String userFriendlyMessage;
+      if (e is Exception &&
+          e.toString().contains("Google authentication failed")) {
+        userFriendlyMessage = UserFriendErrMess.loginErrMessage(e);
+      } else {
+        userFriendlyMessage = ErrorMessage.somethingWentWrong;
+      }
+
+      _showErrorDialog(userFriendlyMessage);
     } finally {
       if (mounted) {
         setState(() {
@@ -65,23 +82,50 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _showErrorDialog(String errorMessage) async {
-    return showDialog<void>(
+  //send FCM token to server
+  Future<void> _sendTokenToServer() async {
+    final fcmToken = GetLocalHelper.getFCMToken();
+
+    if (fcmToken != null) {
+      final APIResponse<dynamic> response =
+          await FirebaseApi().sendTokenToServer(fcmToken);
+
+      if (!mounted) return;
+
+      final bool isResponseValid = await handleApiResponse(
+        context: context,
+        response: response,
+        showErrorDialog: _showErrorDialog,
+      );
+
+      if (!isResponseValid) return;
+
+      log.i('FCM token sent to server');
+      return;
+    } else {
+      log.e('FCM token is null');
+      return;
+    }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
       context: context,
-      barrierDismissible: false,
       builder: (BuildContext context) {
         return OKDialog(
-          title: 'Login Failed!',
-          content: Text(errorMessage),
-          onClick: () => Navigator.of(context).pop(),
+          title: ErrorMessage.error,
+          content: Text(
+            message,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
         );
       },
     );
   }
 
   Future<void> _initializeAfterLogin() async {
-    // await initNotifications();
     await _checkLocationPermission();
+    await _sendTokenToServer();
   }
 
   Future<void> _checkLocationPermission() async {

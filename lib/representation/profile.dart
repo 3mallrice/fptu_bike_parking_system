@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bai_system/api/model/bai_model/login_model.dart';
 import 'package:bai_system/component/app_bar_component.dart';
 import 'package:bai_system/component/dialog.dart';
+import 'package:bai_system/component/response_handler.dart';
 import 'package:bai_system/component/shadow_container.dart';
 import 'package:bai_system/core/const/frontend/message.dart';
 import 'package:bai_system/core/helper/loading_overlay_helper.dart';
@@ -13,7 +14,6 @@ import 'package:logger/logger.dart';
 import '../api/service/bai_be/customer_service.dart';
 import '../component/snackbar.dart';
 import '../core/helper/google_auth.dart';
-import '../core/helper/return_login_dialog.dart';
 import 'login.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -25,7 +25,7 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends State<ProfileScreen> with ApiResponseHandler {
   var log = Logger();
   late final UserData? userData;
   late final TextEditingController nameTextController;
@@ -184,21 +184,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<bool> updateUserData() async {
     try {
       LoadingOverlayHelper.show(context);
+
       final response =
           await callCustomerApi.updateCustomerInfo(nameTextController.text);
-      if (response.isTokenValid) {
-        log.i('Update user data successfully');
+
+      if (!mounted) return false;
+      final bool isResponseValid = await handleApiResponse(
+        context: context,
+        response: response,
+        showErrorDialog: _showErrorDialog,
+      );
+
+      if (!isResponseValid) {
+        log.e('Update user data failed');
+        return false;
+      }
+
+      log.i('Update user data successfully');
+
+      if (mounted) {
         setState(() {
           isUpdating = false;
           isSuccessful = true;
         });
-        return true;
-      } else {
-        log.e('Token is invalid');
-        if (!mounted) return false;
-        ReturnLoginDialog.returnLogin(context);
-        return false;
       }
+
+      return true;
     } catch (e) {
       log.e('Error during updateUserData: $e');
       return false;
@@ -231,6 +242,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
         elevation: 0,
         padding: const EdgeInsets.all(10),
       ),
+    );
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return OKDialog(
+          title: ErrorMessage.error,
+          content: Text(
+            message,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        );
+      },
     );
   }
 

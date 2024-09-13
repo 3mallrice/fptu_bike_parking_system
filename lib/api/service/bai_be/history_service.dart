@@ -6,6 +6,7 @@ import 'package:bai_system/core/helper/local_storage_helper.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/web.dart';
 
+import '../../../core/const/frontend/error_catcher.dart';
 import '../../../core/const/frontend/message.dart';
 import 'api_root.dart';
 
@@ -53,13 +54,15 @@ class CallHistoryAPI {
       } else {
         log.e('Failed to get customer histories: ${response.statusCode}');
         return APIResponse(
-          message: '${ErrorMessage.somethingWentWrong}: ${response.statusCode}',
+          statusCode: response.statusCode,
+          message: HttpErrorMapper.getErrorMessage(response.statusCode),
         );
       }
     } catch (e) {
       log.e('Error during get customer histories: $e');
       return APIResponse(
-        message: 'Error during get customer histories',
+        statusCode: 400,
+        message: ErrorMessage.somethingWentWrong,
       );
     }
   }

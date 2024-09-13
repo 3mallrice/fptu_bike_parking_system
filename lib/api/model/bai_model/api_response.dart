@@ -7,13 +7,14 @@ class APIResponse<T> {
   final String? message;
   final int? totalRecord;
   final bool isTokenValid;
+  final int statusCode;
 
-  APIResponse({
-    this.data,
-    this.message,
-    this.totalRecord,
-    this.isTokenValid = true,
-  });
+  APIResponse(
+      {this.data,
+      this.message,
+      this.totalRecord,
+      this.isTokenValid = true,
+      this.statusCode = 200});
 
   factory APIResponse.fromJson(
       Map<String, dynamic> json, T Function(Object? json) fromJsonT) {

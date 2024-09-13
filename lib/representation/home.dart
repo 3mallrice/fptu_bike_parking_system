@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bai_system/api/model/bai_model/wallet_model.dart';
 import 'package:bai_system/api/service/bai_be/wallet_service.dart';
+import 'package:bai_system/component/response_handler.dart';
 import 'package:bai_system/core/const/utilities/util_helper.dart';
 import 'package:bai_system/representation/insight.dart';
 import 'package:bai_system/representation/navigation_bar.dart';
@@ -18,6 +19,7 @@ import 'package:logger/logger.dart';
 import '../api/model/bai_model/api_response.dart';
 import '../api/model/weather/weather.dart';
 import '../api/service/weather/open_weather_api.dart';
+import '../component/dialog.dart';
 import '../component/shadow_container.dart';
 import '../core/const/frontend/message.dart';
 import '../core/helper/asset_helper.dart';
@@ -34,7 +36,7 @@ class HomeAppScreen extends StatefulWidget {
   State<HomeAppScreen> createState() => _HomeAppScreenState();
 }
 
-class _HomeAppScreenState extends State<HomeAppScreen> {
+class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
   bool _hideBalance = false;
   bool isAllowLocation = false;
   bool isReloading = false;
@@ -155,12 +157,15 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
       APIResponse<ExtraBalanceModel> extraBalanceModel =
           await _walletApi.getExtraWalletBalance();
 
-      if (extraBalanceModel.isTokenValid == false &&
-          extraBalanceModel.message == ErrorMessage.tokenInvalid) {
-        if (!mounted) return;
-        ReturnLoginDialog.returnLogin(context);
-        return;
-      }
+      if (!mounted) return;
+
+      final bool isResponseValid = await handleApiResponse(
+        context: context,
+        response: extraBalanceModel,
+        showErrorDialog: _showErrorDialog,
+      );
+
+      if (!isResponseValid) return;
 
       if (extraBalanceModel.data != null) {
         setState(() {
@@ -683,6 +688,21 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
         : 'GMT${weatherData.timezone ~/ 3600}';
 
     return '$lastUpdated $timezone';
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return OKDialog(
+          title: ErrorMessage.error,
+          content: Text(
+            message,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        );
+      },
+    );
   }
 }
 

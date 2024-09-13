@@ -6,6 +6,7 @@ import 'package:bai_system/core/const/frontend/message.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
+import '../../../core/const/frontend/error_catcher.dart';
 import '../../../core/helper/local_storage_helper.dart';
 import 'api_root.dart';
 
@@ -56,11 +57,16 @@ class CallPaymentApi {
         );
       } else {
         log.e('Failed to deposit coin: ${response.statusCode}');
-        return APIResponse(message: ErrorMessage.somethingWentWrong);
+        return APIResponse(
+            statusCode: response.statusCode,
+            message: HttpErrorMapper.getErrorMessage(response.statusCode));
       }
     } catch (e) {
       log.e('Error during deposit coin: $e');
-      return APIResponse(message: ErrorMessage.somethingWentWrong);
+      return APIResponse(
+        statusCode: 400,
+        message: ErrorMessage.somethingWentWrong,
+      );
     }
   }
 
@@ -104,11 +110,16 @@ class CallPaymentApi {
         );
       } else {
         log.e('Failed to deposit coin via VnPay: ${response.statusCode}');
-        return APIResponse(message: ErrorMessage.somethingWentWrong);
+        return APIResponse(
+            statusCode: response.statusCode,
+            message: HttpErrorMapper.getErrorMessage(response.statusCode));
       }
     } catch (e) {
       log.e('Error during deposit coin via VnPay: $e');
-      return APIResponse(message: ErrorMessage.somethingWentWrong);
+      return APIResponse(
+        statusCode: 400,
+        message: ErrorMessage.somethingWentWrong,
+      );
     }
   }
 }
