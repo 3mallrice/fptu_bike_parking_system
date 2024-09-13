@@ -20,7 +20,11 @@ import 'fundin_screen.dart';
 import 'navigation_bar.dart';
 
 class WalletScreen extends StatefulWidget {
-  const WalletScreen({super.key});
+  final int? walletType;
+  const WalletScreen({
+    super.key,
+    this.walletType,
+  });
 
   static const String routeName = '/wallet';
 
@@ -30,6 +34,7 @@ class WalletScreen extends StatefulWidget {
 
 class _WalletScreenState extends State<WalletScreen>
     with SingleTickerProviderStateMixin, ApiResponseHandler {
+  late int walletType;
   late TabController _tabController;
   bool _hideBalance = false;
   var log = Logger();
@@ -62,7 +67,9 @@ class _WalletScreenState extends State<WalletScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    walletType = widget.walletType ?? 0;
+    _tabController =
+        TabController(length: 2, vsync: this, initialIndex: walletType);
     _loadHideBalance();
     _initializeData();
   }

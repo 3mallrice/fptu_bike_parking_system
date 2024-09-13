@@ -8,6 +8,7 @@ import 'package:bai_system/core/const/frontend/message.dart';
 import 'package:bai_system/core/const/utilities/util_helper.dart';
 import 'package:bai_system/core/helper/local_storage_helper.dart';
 import 'package:bai_system/representation/payment.dart';
+import 'package:bai_system/representation/wallet.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:logger/web.dart';
@@ -19,7 +20,6 @@ import '../component/app_bar_component.dart';
 import '../component/dialog.dart';
 import '../component/shadow_container.dart';
 import '../core/helper/asset_helper.dart';
-import 'wallet_screen.dart';
 
 class FundinScreen extends StatefulWidget {
   const FundinScreen({super.key});
@@ -37,7 +37,6 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
 
   int _balance = 0;
   int _extraBalance = 0;
-  DateTime? _expiredDate;
   bool _hideBalance = false;
   bool _isLoading = true;
   String? _error;
@@ -120,7 +119,6 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
       if (extraBalanceModel.data != null) {
         setState(() {
           _extraBalance = extraBalanceModel.data!.balance;
-          _expiredDate = extraBalanceModel.data!.expiredDate;
         });
       }
     } catch (e) {
@@ -323,7 +321,7 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
             padding: const EdgeInsets.all(8.0),
             child: IconButton(
               onPressed: () =>
-                  Navigator.of(context).pushNamed(MyWallet.routeName),
+                  Navigator.of(context).pushNamed(WalletScreen.routeName),
               icon: Icon(
                 Icons.wallet,
                 color: Theme.of(context).colorScheme.onSecondary,

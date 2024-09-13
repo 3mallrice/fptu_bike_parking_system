@@ -7,7 +7,7 @@ import 'package:bai_system/component/response_handler.dart';
 import 'package:bai_system/component/shadow_container.dart';
 import 'package:bai_system/core/const/frontend/message.dart';
 import 'package:bai_system/representation/receipt.dart';
-import 'package:bai_system/representation/wallet_screen.dart';
+import 'package:bai_system/representation/wallet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_zalopay_sdk/flutter_zalopay_sdk.dart';
@@ -499,7 +499,8 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
           ),
           onClick: () {
             isSuccess
-                ? Navigator.of(context).pushReplacementNamed(MyWallet.routeName)
+                ? Navigator.of(context)
+                    .pushReplacementNamed(WalletScreen.routeName)
                 : Navigator.of(context).pop();
           },
           contentPadding: const EdgeInsets.all(20),

@@ -7,8 +7,6 @@ import 'package:bai_system/core/const/utilities/util_helper.dart';
 import 'package:bai_system/representation/insight.dart';
 import 'package:bai_system/representation/navigation_bar.dart';
 import 'package:bai_system/representation/wallet.dart';
-import 'package:bai_system/representation/wallet_extra_screen.dart';
-import 'package:bai_system/representation/wallet_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -260,7 +258,8 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
       children: [
         Expanded(
           child: GestureDetector(
-            onTap: () => Navigator.of(context).pushNamed(MyWallet.routeName),
+            onTap: () =>
+                Navigator.of(context).pushNamed(WalletScreen.routeName),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.start,
@@ -281,8 +280,8 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
         ),
         Expanded(
           child: GestureDetector(
-            onTap: () =>
-                Navigator.of(context).pushNamed(WalletExtraScreen.routeName),
+            onTap: () => Navigator.of(context)
+                .pushNamed(WalletScreen.routeName, arguments: 1),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.end,

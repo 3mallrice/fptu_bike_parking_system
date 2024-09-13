@@ -38,7 +38,6 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
 
   late Color _backgroundColor;
   late Color _onSuccessful;
-  late Color _onUnsuccessful;
 
   @override
   void initState() {
@@ -52,7 +51,6 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
     super.didChangeDependencies();
     _backgroundColor = Theme.of(context).colorScheme.surface;
     _onSuccessful = Theme.of(context).colorScheme.onError;
-    _onUnsuccessful = Theme.of(context).colorScheme.error;
   }
 
   Future<void> _fetchVehicleType() async {
