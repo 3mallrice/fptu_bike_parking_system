@@ -18,10 +18,10 @@ class CallPackageApi {
 
   // GET: /packages/active
   // Get all active packages
-  Future<APIResponse<List<CoinPackage>>> getPackages() async {
+  Future<APIResponse<List<CoinPackage>>> getPackages(int pageIndex) async {
     try {
       final response = await http.get(
-        Uri.parse('$api/customer'),
+        Uri.parse('$api/customer?pageIndex=$pageIndex&pageSize=10'),
       );
       if (response.statusCode == 200) {
         var jsonResponse = jsonDecode(response.body);

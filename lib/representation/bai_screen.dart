@@ -59,7 +59,6 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
       });
     } catch (e) {
       log.e('Error fetching bikes: $e');
-      // Xử lý lỗi nếu cần thiết
       if (mounted) {
         setState(() {
           isCalling = false;
@@ -255,11 +254,12 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
                     ),
                   ),
                   if (bai.status == 'REJECTED')
-                    Padding(
+                    Container(
+                      alignment: Alignment.centerLeft,
                       padding: const EdgeInsets.only(
                           left: 20, right: 20, bottom: 10),
                       child: Text(
-                        'Reason: Wrong information. Please check again.',
+                        'Wrong information. Please check again.',
                         style: Theme.of(context).textTheme.labelSmall!.copyWith(
                               color: Theme.of(context).colorScheme.error,
                             ),
@@ -269,11 +269,12 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
                       ),
                     ),
                   if (bai.status == 'PENDING')
-                    Padding(
+                    Container(
+                      alignment: Alignment.centerLeft,
                       padding: const EdgeInsets.only(
                           left: 20, right: 20, bottom: 10),
                       child: Text(
-                        'Note: Please park your vehicle in our facility for the first time to activate it.',
+                        'Please park your vehicle in our facility for the first time to activate it.',
                         style: Theme.of(context).textTheme.labelSmall!.copyWith(
                               color: Theme.of(context).colorScheme.primary,
                             ),
@@ -301,6 +302,12 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
             message,
             style: Theme.of(context).textTheme.bodySmall,
           ),
+          onClick: () {
+            Navigator.of(context).pop();
+            setState(() {
+              isCalling = false;
+            });
+          },
         );
       },
     );

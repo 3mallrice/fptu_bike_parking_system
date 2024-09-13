@@ -7,6 +7,7 @@ import 'package:bai_system/component/shadow_container.dart';
 import 'package:bai_system/component/snackbar.dart';
 import 'package:bai_system/core/const/utilities/regex.dart';
 import 'package:bai_system/core/const/utilities/util_helper.dart';
+import 'package:bai_system/core/helper/loading_overlay_helper.dart';
 import 'package:bai_system/representation/navigation_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -171,7 +172,7 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
                     if (bai.status == 'REJECTED')
                       SizedBox(
                         child: Text(
-                          'Reason: Wrong information. Please check again.',
+                          'Wrong information. Please check again.',
                           style: contentTextStyle.copyWith(
                             color: Theme.of(context).colorScheme.error,
                           ),
@@ -183,7 +184,7 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
                     if (bai.status == 'PENDING')
                       SizedBox(
                         child: Text(
-                          'Note: Please park your vehicle in our facility for the first time to activate it.',
+                          'Please park your vehicle in our facility for the first time to activate it.',
                           style: contentTextStyle.copyWith(
                             color: Theme.of(context).colorScheme.primary,
                           ),
@@ -421,6 +422,8 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
   // Delete Bai
   Future<void> deleteBai(String id) async {
     try {
+      Navigator.of(context).pop();
+      LoadingOverlayHelper.show(context);
       APIResponse response = await callVehicleApi.deleteBai(bai.id);
 
       if (!mounted) return;
@@ -443,6 +446,8 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
       showSnackBar(
           message: Message.deleteUnSuccess(message: ListName.bai),
           isSuccessful: false);
+    } finally {
+      LoadingOverlayHelper.hide();
     }
   }
 

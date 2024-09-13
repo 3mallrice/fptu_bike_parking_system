@@ -1,3 +1,5 @@
+import 'package:bai_system/core/const/utilities/util_helper.dart';
+
 import '../../../api/model/bai_model/coin_package_model.dart';
 
 class Message {
@@ -37,6 +39,7 @@ class Message {
 
 class ListName {
   static String bai = "Bai";
+  static String package = "Package";
   static String vehicleType = "Vehicle Type";
   static String plateNumber = "Plate Number";
   static String vehicle = "Vehicle";
@@ -116,16 +119,35 @@ class ZaloPayMessage {
 }
 
 String packageDetail(CoinPackage package) {
-  final totalCoins = int.parse(package.amount) + (package.extraCoin ?? 0);
+  final totalCoins = UltilHelper.formatMoney(
+      int.parse(package.amount) + (package.extraCoin ?? 0));
 
-  return '''
-      If you purchase the ${package.packageName}, you will get:
-        • ${package.amount} bic (Main Wallet).
-        ${package.extraCoin != null ? '• ${package.extraCoin} Extra bic (Extra Wallet).\n' : ''}
-        ${package.extraEXP != null ? '• Your Extra Wallet\'s expiration period will increase by ${package.extraEXP} days.\n' : ''}
-      Total Coins to Spend: $totalCoins bic.
-        ${package.extraEXP != null ? 'Expiration Extension: +${package.extraEXP} days added to the current expiration date of your Extra Wallet coins.\n' : ''}
-      Keep in mind:
-      Each purchase extends the expiration of all your extra coins by the specified days, giving you more flexibility to use them.
-      ''';
+  List<String> details = [];
+
+  details.add('If you purchase the ${package.packageName}, you will get:');
+  details.add(
+      '  • ${UltilHelper.formatMoney(int.parse(package.amount))} bic (Main Wallet).');
+
+  if (package.extraCoin != null) {
+    details.add(
+        '  • ${UltilHelper.formatMoney(package.extraCoin!)} Extra bic (Extra Wallet).');
+  }
+
+  if (package.extraEXP != null) {
+    details.add(
+        '  • Your Extra Wallet\'s expiration period will increase by ${UltilHelper.formatMoney(package.extraEXP!)} days.\n');
+  }
+
+  details.add('Total Coins to Spend: $totalCoins bic.');
+
+  if (package.extraEXP != null) {
+    details.add(
+        'Expiration Extension: +${package.extraEXP} days added to the current expiration date of your Extra Wallet coins.\n');
+  }
+
+  details.add('Keep in mind:');
+  details.add(
+      'Each purchase extends the expiration of all your extra coins by the specified days, giving you more flexibility to use them.');
+
+  return details.join('\n');
 }

@@ -1,6 +1,7 @@
 import 'package:bai_system/api/model/bai_model/wallet_model.dart';
 import 'package:bai_system/api/service/bai_be/package_service.dart';
 import 'package:bai_system/api/service/bai_be/wallet_service.dart';
+import 'package:bai_system/component/empty_box.dart';
 import 'package:bai_system/component/loading_component.dart';
 import 'package:bai_system/component/response_handler.dart';
 import 'package:bai_system/component/shadow_button.dart';
@@ -39,13 +40,50 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
   int _extraBalance = 0;
   bool _hideBalance = false;
   bool _isLoading = true;
-  String? _error;
   List<CoinPackage> _packages = [];
+
+  int _currentPage = 1;
+  bool _hasNextPage = true;
+  final ScrollController _scrollController = ScrollController();
+  bool _isLoadingMore = false;
+
+  //Fake coin package data
+  List<CoinPackage> coins = [
+    CoinPackage(id: '1', packageName: 'Package 1', amount: '1000', price: 1000),
+    CoinPackage(id: '2', packageName: 'Package 2', amount: '2000', price: 2000),
+    CoinPackage(id: '3', packageName: 'Package 3', amount: '3000', price: 3000),
+    CoinPackage(id: '4', packageName: 'Package 4', amount: '4000', price: 4000),
+    CoinPackage(id: '5', packageName: 'Package 5', amount: '5000', price: 5000),
+    CoinPackage(id: '6', packageName: 'Package 6', amount: '6000', price: 6000),
+    CoinPackage(id: '7', packageName: 'Package 7', amount: '7000', price: 7000),
+    CoinPackage(id: '8', packageName: 'Package 8', amount: '8000', price: 8000),
+    CoinPackage(id: '9', packageName: 'Package 9', amount: '9000', price: 9000),
+    CoinPackage(
+        id: '10', packageName: 'Package 10', amount: '10000', price: 10000),
+  ];
 
   @override
   void initState() {
     super.initState();
     _initializeData();
+    _scrollController.addListener(_scrollListener);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_scrollListener);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollListener() {
+    if (_scrollController.offset >=
+            _scrollController.position.maxScrollExtent * 0.75 &&
+        !_scrollController.position.outOfRange &&
+        !_isLoadingMore &&
+        _hasNextPage) {
+      _loadNextPage();
+    }
   }
 
   Future<void> _initializeData() async {
@@ -128,7 +166,7 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
 
   Future<void> _loadPackages() async {
     try {
-      final packages = await _packageApi.getPackages();
+      final packages = await _packageApi.getPackages(_currentPage);
 
       if (!mounted) return;
 
@@ -141,13 +179,28 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
       if (!isResponseValid) return;
 
       setState(() {
-        _packages = packages.data ?? [];
+        if (_currentPage == 1) {
+          _packages = packages.data ?? [];
+        } else {
+          _packages.addAll(packages.data ?? []);
+        }
+        _hasNextPage = packages.data!.length <= (packages.totalRecord ?? 0);
       });
     } catch (e) {
-      setState(() {
-        _error = e.toString();
-      });
+      _logger.e('Error during load packages: $e');
     }
+  }
+
+  Future<void> _loadNextPage() async {
+    if (_isLoadingMore) return;
+    setState(() {
+      _isLoadingMore = true;
+    });
+    _currentPage++;
+    await _loadPackages();
+    setState(() {
+      _isLoadingMore = false;
+    });
   }
 
   void _showPackageDetail(CoinPackage package) {
@@ -168,7 +221,7 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
         ),
       ),
       builder: (context) => ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: 400),
+        constraints: const BoxConstraints(minHeight: 400, maxHeight: 600),
         child: SizedBox(
           height: MediaQuery.of(context).size.height * 0.6,
           child: Padding(
@@ -332,13 +385,17 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
         ],
       ),
       body: _isLoading
-          ? const LoadingCircle(isHeight: false, size: 50)
-          : _buildBody(),
+          ? const LoadingCircle(isHeight: false)
+          : Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: _buildBody(),
+            ),
     );
   }
 
   Widget _buildBody() {
     return SingleChildScrollView(
+      controller: _scrollController,
       child: Align(
         alignment: Alignment.center,
         child: Container(
@@ -352,6 +409,11 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
               _buildProviderSection(),
               const SizedBox(height: 35),
               _buildPackagesSection(),
+              if (_isLoadingMore)
+                const Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
             ],
           ),
         ),
@@ -432,10 +494,10 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
             style: Theme.of(context).textTheme.bodyLarge,
           ),
         ),
-        if (_error != null)
-          Center(child: Text('Error: $_error'))
-        else if (_packages.isEmpty)
-          const Center(child: Text('No packages available'))
+        if (_packages.isEmpty)
+          EmptyBox(
+            message: EmptyBoxMessage.emptyList(label: ListName.package),
+          )
         else
           _buildCoinPackageGridView(_packages),
       ],

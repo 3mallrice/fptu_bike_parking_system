@@ -44,6 +44,10 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
   List<HistoryModel> histories = [];
 
   Future<void> getCustomerHistories() async {
+    setState(() {
+      isLoading = true;
+    });
+
     try {
       final APIResponse<List<HistoryModel>> result =
           await callHistoryAPI.getCustomerHistories(pageSize, pageIndex);
@@ -56,7 +60,12 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
         showErrorDialog: _showErrorDialog,
       );
 
-      if (!isResponseValid) return;
+      if (!isResponseValid) {
+        setState(() {
+          isLoading = false;
+        });
+        return;
+      }
 
       if (mounted) {
         setState(() {
@@ -67,6 +76,12 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
       }
     } catch (e) {
       log.e('Error during get customer histories: $e');
+      setState(() {
+        isLoading = false;
+      });
+      if (mounted) {
+        _showErrorDialog('An error occurred while fetching histories.');
+      }
     }
   }
 
@@ -756,6 +771,12 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
             message,
             style: Theme.of(context).textTheme.bodySmall,
           ),
+          onClick: () {
+            Navigator.of(context).pop();
+            setState(() {
+              isLoading = false;
+            });
+          },
         );
       },
     );
