@@ -38,6 +38,7 @@ class LocalStorageKey {
   static const String ignoreIntroScreen = 'ignoreIntroScreen';
   static const String isHiddenBalance = 'isHiddenBalance';
   static const String fcmToken = 'fcmToken';
+  static const String pageSize = 'pageSize';
   static const String storageKey = 'notifications';
 }
 
@@ -54,7 +55,22 @@ class GetLocalHelper {
     return userData != null ? 'Bearer ${userData.bearerToken ?? ""}' : null;
   }
 
-  static String? getFCMToken() {
-    return LocalStorageHelper.getValue(LocalStorageKey.fcmToken);
+  static String? getFCMToken() =>
+      LocalStorageHelper.getValue(LocalStorageKey.fcmToken);
+
+  static int getPageSize() =>
+      LocalStorageHelper.getValue(LocalStorageKey.pageSize) ?? 10;
+
+  static bool getHideBalance() =>
+      LocalStorageHelper.getValue(LocalStorageKey.isHiddenBalance) ?? false;
+}
+
+class SetLocalHelper {
+  static Future<void> setUserData(String username) async {
+    UserData? userData = GetLocalHelper.getUserData();
+
+    userData?.name = username;
+    await LocalStorageHelper.setValue(
+        LocalStorageKey.userData, userData?.toJson());
   }
 }

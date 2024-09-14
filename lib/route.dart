@@ -15,10 +15,11 @@ import 'package:bai_system/representation/navigation_bar.dart';
 import 'package:bai_system/representation/no_connection_screen.dart';
 import 'package:bai_system/representation/notification_screen.dart';
 import 'package:bai_system/representation/payment.dart';
-import 'package:bai_system/representation/profile.dart';
 import 'package:bai_system/representation/receipt.dart';
+import 'package:bai_system/representation/settings.dart';
 import 'package:bai_system/representation/splash_screen.dart';
 import 'package:bai_system/representation/support.dart';
+import 'package:bai_system/representation/update_profile.dart';
 import 'package:bai_system/representation/wallet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -39,7 +40,6 @@ final Map<String, WidgetBuilder> routes = {
   FundinScreen.routeName: (context) => const FundinScreen(),
   BaiScreen.routeName: (context) => const BaiScreen(),
   MeScreen.routeName: (context) => const MeScreen(),
-  ProfileScreen.routeName: (context) => const ProfileScreen(),
   AboutUs.routeName: (context) => const AboutUs(),
   FeedbackScreen.routeName: (context) => const FeedbackScreen(),
   SplashScreen.routeName: (context) => const SplashScreen(),
@@ -76,4 +76,11 @@ final Map<String, WidgetBuilder> routes = {
   },
   NoInternetScreen.routeName: (context) => const NoInternetScreen(),
   SupportScreen.routeName: (context) => const SupportScreen(),
+  SettingScreen.routeName: (context) => const SettingScreen(),
+  UpdateProfile.routeName: (context) {
+    final args = ModalRoute.of(context)!.settings.arguments as String;
+    return UpdateProfile(
+      name: args,
+    );
+  }
 };

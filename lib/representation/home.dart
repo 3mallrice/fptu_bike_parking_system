@@ -144,7 +144,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
       );
 
       if (!isResponseValid) {
-        throw Exception('Invalid response');
+        return;
       }
 
       setState(() {

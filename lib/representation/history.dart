@@ -19,6 +19,7 @@ import '../component/loading_component.dart';
 import '../component/snackbar.dart';
 import '../component/widget_to_image_template.dart';
 import '../core/const/frontend/message.dart';
+import '../core/helper/local_storage_helper.dart';
 
 class HistoryScreen extends StatefulWidget {
   static String routeName = '/history_screen';
@@ -32,7 +33,7 @@ class HistoryScreen extends StatefulWidget {
 class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
   final ScrollController _scrollController = ScrollController();
   late final WidgetsToImageController _controller;
-  int pageSize = 5;
+  late int _pageSize = 10;
   int pageIndex = 1;
   bool _hasNextPage = true;
   bool _isLoadMoreRunning = false;
@@ -50,7 +51,7 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
 
     try {
       final APIResponse<List<HistoryModel>> result =
-          await callHistoryAPI.getCustomerHistories(pageSize, pageIndex);
+          await callHistoryAPI.getCustomerHistories(_pageSize, pageIndex);
 
       if (!mounted) return;
 
@@ -71,7 +72,7 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
         setState(() {
           isLoading = false;
           histories = result.data ?? [];
-          _hasNextPage = result.data!.length == pageSize;
+          _hasNextPage = result.data!.length == _pageSize;
         });
       }
     } catch (e) {
@@ -89,6 +90,7 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
   void initState() {
     _controller = WidgetsToImageController();
     super.initState();
+    _pageSize = GetLocalHelper.getPageSize();
     getCustomerHistories();
     _scrollController.addListener(_loadMore);
     isLoading = true;
@@ -114,7 +116,7 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
         if (!mounted) return;
 
         final result =
-            await callHistoryAPI.getCustomerHistories(pageSize, pageIndex + 1);
+            await callHistoryAPI.getCustomerHistories(_pageSize, pageIndex + 1);
 
         if (!mounted) return;
 
@@ -135,7 +137,7 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
           setState(() {
             pageIndex += 1;
             histories.addAll(result.data!);
-            _hasNextPage = result.data!.length == pageSize;
+            _hasNextPage = result.data!.length == _pageSize;
           });
         } else {
           setState(() {
@@ -265,8 +267,12 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
               ),
             ),
             Text(
-              history.plateNumber,
-              style: Theme.of(context).textTheme.headlineMedium,
+              UltilHelper.formatPlateNumber(history.plateNumber),
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -366,8 +372,12 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
                                 const SizedBox(width: 5),
                                 Text(
                                   '${UltilHelper.formatMoney(history.amount!)} bic',
-                                  style:
-                                      Theme.of(context).textTheme.displayMedium,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .displayMedium!
+                                      .copyWith(
+                                        fontSize: 14,
+                                      ),
                                 )
                               ],
                             )

@@ -22,7 +22,7 @@ class LoadingCircle extends StatelessWidget {
         alignment: Alignment.center,
         child: LoadingAnimationWidget.waveDots(
           color: Theme.of(context).colorScheme.primary,
-          size: size ?? 100,
+          size: size ?? 60,
         ),
       ),
     );

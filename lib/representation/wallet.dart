@@ -57,7 +57,7 @@ class _WalletScreenState extends State<WalletScreen>
 
   int mainPageIndex = 1;
   int extraPageIndex = 1;
-  int pageSize = 10;
+  late int _pageSize = 10;
 
   final RefreshController _mainRefreshController =
       RefreshController(initialRefresh: false);
@@ -68,9 +68,13 @@ class _WalletScreenState extends State<WalletScreen>
   void initState() {
     super.initState();
     walletType = widget.walletType ?? 0;
-    _tabController =
-        TabController(length: 2, vsync: this, initialIndex: walletType);
-    _loadHideBalance();
+    _tabController = TabController(
+        length: 2,
+        vsync: this,
+        initialIndex: walletType,
+        animationDuration: const Duration(milliseconds: 300));
+    _hideBalance = GetLocalHelper.getHideBalance();
+    _pageSize = GetLocalHelper.getPageSize();
     _initializeData();
   }
 
@@ -89,14 +93,6 @@ class _WalletScreenState extends State<WalletScreen>
       getMainTransactions(),
       getExtraTransactions(),
     ]);
-  }
-
-  Future<void> _loadHideBalance() async {
-    bool? hideBalance =
-        await LocalStorageHelper.getValue(LocalStorageKey.isHiddenBalance);
-    setState(() {
-      _hideBalance = hideBalance ?? false;
-    });
   }
 
   void _toggleHideBalance() {
@@ -172,7 +168,7 @@ class _WalletScreenState extends State<WalletScreen>
     }
     try {
       final APIResponse<List<WalletModel>> result = await callWalletApi
-          .getMainWalletTransactions(mainPageIndex, pageSize, from, to);
+          .getMainWalletTransactions(mainPageIndex, _pageSize, from, to);
       _catchError(result);
       if (!mounted) return;
       setState(() {
@@ -202,7 +198,7 @@ class _WalletScreenState extends State<WalletScreen>
     }
     try {
       final APIResponse<List<WalletModel>> result = await callWalletApi
-          .getExtraWalletTransactions(extraPageIndex, pageSize, from, to);
+          .getExtraWalletTransactions(extraPageIndex, _pageSize, from, to);
       _catchError(result);
       if (!mounted) return;
       setState(() {
@@ -278,6 +274,11 @@ class _WalletScreenState extends State<WalletScreen>
             unselectedLabelColor: Theme.of(context).colorScheme.onSecondary,
             tabAlignment: TabAlignment.fill,
             automaticIndicatorColorAdjustment: true,
+            splashFactory: InkSparkle.constantTurbulenceSeedSplashFactory,
+            splashBorderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
             tabs: const [
               Tab(text: 'Main Wallet'),
               Tab(text: 'Extra Wallet'),
@@ -301,12 +302,12 @@ class _WalletScreenState extends State<WalletScreen>
     return SmartRefresher(
       enablePullDown: true,
       enablePullUp: true,
-      header: const WaterDropHeader(),
+      header: const ClassicHeader(),
       footer: CustomFooter(
         builder: (BuildContext context, LoadStatus? mode) {
           Widget body;
           if (mode == LoadStatus.idle &&
-              (isMain ? mainPageIndex : extraPageIndex) * pageSize <
+              (isMain ? mainPageIndex : extraPageIndex) * _pageSize <
                   (isMain ? totalMainTransactions : totalExtraTransactions)) {
             body = const Text('pull up load');
           } else if (mode == LoadStatus.loading) {
