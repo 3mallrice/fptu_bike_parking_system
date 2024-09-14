@@ -1,3 +1,4 @@
+import 'package:bai_system/component/response_handler.dart';
 import 'package:bai_system/representation/receipt.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -15,12 +16,15 @@ import '../component/shadow_container.dart';
 import '../core/const/frontend/message.dart';
 import '../core/const/utilities/util_helper.dart';
 import '../core/helper/local_storage_helper.dart';
-import '../core/helper/return_login_dialog.dart';
 import 'fundin_screen.dart';
 import 'navigation_bar.dart';
 
 class WalletScreen extends StatefulWidget {
-  const WalletScreen({super.key});
+  final int? walletType;
+  const WalletScreen({
+    super.key,
+    this.walletType,
+  });
 
   static const String routeName = '/wallet';
 
@@ -29,7 +33,8 @@ class WalletScreen extends StatefulWidget {
 }
 
 class _WalletScreenState extends State<WalletScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, ApiResponseHandler {
+  late int walletType;
   late TabController _tabController;
   bool _hideBalance = false;
   var log = Logger();
@@ -52,7 +57,7 @@ class _WalletScreenState extends State<WalletScreen>
 
   int mainPageIndex = 1;
   int extraPageIndex = 1;
-  int pageSize = 10;
+  late int _pageSize = 10;
 
   final RefreshController _mainRefreshController =
       RefreshController(initialRefresh: false);
@@ -62,8 +67,14 @@ class _WalletScreenState extends State<WalletScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-    _loadHideBalance();
+    walletType = widget.walletType ?? 0;
+    _tabController = TabController(
+        length: 2,
+        vsync: this,
+        initialIndex: walletType,
+        animationDuration: const Duration(milliseconds: 300));
+    _hideBalance = GetLocalHelper.getHideBalance();
+    _pageSize = GetLocalHelper.getPageSize();
     _initializeData();
   }
 
@@ -84,34 +95,44 @@ class _WalletScreenState extends State<WalletScreen>
     ]);
   }
 
-  Future<void> _loadHideBalance() async {
-    bool? hideBalance =
-        await LocalStorageHelper.getValue(LocalStorageKey.isHiddenBalance);
-    setState(() {
-      _hideBalance = hideBalance ?? false;
-    });
-  }
-
   void _toggleHideBalance() {
     setState(() {
       _hideBalance = !_hideBalance;
     });
   }
 
-  void checkToken(APIResponse result) {
-    if (result.isTokenValid == false &&
-        result.message == ErrorMessage.tokenInvalid) {
-      log.e('Token is invalid');
-      if (!mounted) return;
-      ReturnLoginDialog.returnLogin(context);
-    }
+  void _catchError(APIResponse response) async {
+    if (!mounted) return;
+
+    final bool isResponseValid = await handleApiResponse(
+      context: context,
+      response: response,
+      showErrorDialog: _showErrorDialog,
+    );
+
+    if (!isResponseValid) return;
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return OKDialog(
+          title: ErrorMessage.error,
+          content: Text(
+            message,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        );
+      },
+    );
   }
 
   Future<void> getMainBalance() async {
     try {
       final APIResponse<int> result =
           await callWalletApi.getMainWalletBalance();
-      checkToken(result);
+      _catchError(result);
       if (!mounted) return;
       setState(() {
         mainBalance = result.data ?? 0;
@@ -125,7 +146,7 @@ class _WalletScreenState extends State<WalletScreen>
     try {
       APIResponse<ExtraBalanceModel> extraBalanceModel =
           await callWalletApi.getExtraWalletBalance();
-      checkToken(extraBalanceModel);
+      _catchError(extraBalanceModel);
       if (!mounted) return;
       if (extraBalanceModel.data != null) {
         setState(() {
@@ -147,8 +168,8 @@ class _WalletScreenState extends State<WalletScreen>
     }
     try {
       final APIResponse<List<WalletModel>> result = await callWalletApi
-          .getMainWalletTransactions(mainPageIndex, pageSize, from, to);
-      checkToken(result);
+          .getMainWalletTransactions(mainPageIndex, _pageSize, from, to);
+      _catchError(result);
       if (!mounted) return;
       setState(() {
         if (isLoadMore) {
@@ -177,8 +198,8 @@ class _WalletScreenState extends State<WalletScreen>
     }
     try {
       final APIResponse<List<WalletModel>> result = await callWalletApi
-          .getExtraWalletTransactions(extraPageIndex, pageSize, from, to);
-      checkToken(result);
+          .getExtraWalletTransactions(extraPageIndex, _pageSize, from, to);
+      _catchError(result);
       if (!mounted) return;
       setState(() {
         if (isLoadMore) {
@@ -253,6 +274,11 @@ class _WalletScreenState extends State<WalletScreen>
             unselectedLabelColor: Theme.of(context).colorScheme.onSecondary,
             tabAlignment: TabAlignment.fill,
             automaticIndicatorColorAdjustment: true,
+            splashFactory: InkSparkle.constantTurbulenceSeedSplashFactory,
+            splashBorderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
             tabs: const [
               Tab(text: 'Main Wallet'),
               Tab(text: 'Extra Wallet'),
@@ -276,12 +302,12 @@ class _WalletScreenState extends State<WalletScreen>
     return SmartRefresher(
       enablePullDown: true,
       enablePullUp: true,
-      header: const WaterDropHeader(),
+      header: const ClassicHeader(),
       footer: CustomFooter(
         builder: (BuildContext context, LoadStatus? mode) {
           Widget body;
           if (mode == LoadStatus.idle &&
-              (isMain ? mainPageIndex : extraPageIndex) * pageSize <
+              (isMain ? mainPageIndex : extraPageIndex) * _pageSize <
                   (isMain ? totalMainTransactions : totalExtraTransactions)) {
             body = const Text('pull up load');
           } else if (mode == LoadStatus.loading) {

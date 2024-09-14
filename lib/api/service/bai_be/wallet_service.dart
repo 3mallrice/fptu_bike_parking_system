@@ -4,6 +4,7 @@ import 'package:bai_system/api/model/bai_model/api_response.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
+import '../../../core/const/frontend/error_catcher.dart';
 import '../../../core/const/frontend/message.dart';
 import '../../../core/helper/local_storage_helper.dart';
 import '../../model/bai_model/wallet_model.dart';
@@ -56,12 +57,15 @@ class CallWalletApi {
       } else {
         log.e('Failed to get main wallet transactions: ${response.statusCode}');
         return APIResponse(
-            message:
-                "${ErrorMessage.somethingWentWrong}: Status code ${response.statusCode}");
+            statusCode: response.statusCode,
+            message: HttpErrorMapper.getErrorMessage(response.statusCode));
       }
     } catch (e) {
       log.e('Error during get main wallet transactions: $e');
-      return APIResponse(message: "${ErrorMessage.somethingWentWrong}: $e");
+      return APIResponse(
+        statusCode: 400,
+        message: ErrorMessage.somethingWentWrong,
+      );
     }
   }
 
@@ -91,7 +95,7 @@ class CallWalletApi {
           'Content-Type': 'application/json',
         },
       );
-      log.d('Request: ${response.request?.url}');
+
       if (response.statusCode == 200) {
         final responseJson = jsonDecode(response.body);
 
@@ -107,12 +111,15 @@ class CallWalletApi {
         log.e(
             'Failed to get extra wallet transactions: ${response.statusCode}');
         return APIResponse(
-            message:
-                "${ErrorMessage.somethingWentWrong}: Status code ${response.statusCode}");
+            statusCode: response.statusCode,
+            message: HttpErrorMapper.getErrorMessage(response.statusCode));
       }
     } catch (e) {
       log.e('Error during get extra wallet transactions: $e');
-      return APIResponse(message: "${ErrorMessage.somethingWentWrong}: $e");
+      return APIResponse(
+        statusCode: 400,
+        message: ErrorMessage.somethingWentWrong,
+      );
     }
   }
 
@@ -153,13 +160,16 @@ class CallWalletApi {
       } else {
         log.e('Failed to get main wallet balance: ${response.statusCode}');
         return APIResponse(
-            message:
-                "${ErrorMessage.somethingWentWrong}: Status code ${response.statusCode}");
+            statusCode: response.statusCode,
+            message: HttpErrorMapper.getErrorMessage(response.statusCode));
       }
     } catch (e) {
       log.e('Error during get main wallet balance: $e');
 
-      return APIResponse(message: "${ErrorMessage.somethingWentWrong}: $e");
+      return APIResponse(
+        statusCode: 400,
+        message: ErrorMessage.somethingWentWrong,
+      );
     }
   }
 
@@ -195,12 +205,15 @@ class CallWalletApi {
       } else {
         log.e('Failed to get extra wallet balance: ${response.statusCode}');
         return APIResponse(
-            message:
-                "${ErrorMessage.somethingWentWrong}: Status code ${response.statusCode}");
+            statusCode: response.statusCode,
+            message: HttpErrorMapper.getErrorMessage(response.statusCode));
       }
     } catch (e) {
       log.e('Error during get extra wallet balance: $e');
-      return APIResponse(message: "${ErrorMessage.somethingWentWrong}: $e");
+      return APIResponse(
+        statusCode: 400,
+        message: ErrorMessage.somethingWentWrong,
+      );
     }
   }
 }

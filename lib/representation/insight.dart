@@ -1,62 +1,84 @@
 import 'package:bai_system/component/how_did_you_pay.dart';
+import 'package:bai_system/component/loading_component.dart';
+import 'package:bai_system/component/response_handler.dart';
 import 'package:bai_system/component/shadow_container.dart';
 import 'package:bai_system/core/const/utilities/util_helper.dart';
+import 'package:bai_system/core/helper/asset_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
 import '../api/model/bai_model/statistic.dart';
 import '../api/service/bai_be/statistic_service.dart';
+import '../component/dialog.dart';
+import '../core/const/frontend/message.dart';
 
 class InsightScreen extends StatefulWidget {
   const InsightScreen({super.key});
 
-  static String routeName = '/insight_screen';
+  static const String routeName = '/insight_screen';
 
   @override
   State<InsightScreen> createState() => _InsightScreenState();
 }
 
-class _InsightScreenState extends State<InsightScreen> {
-  final callStatisticApi = StatisticApi();
-  var log = Logger();
+class _InsightScreenState extends State<InsightScreen> with ApiResponseHandler {
+  final StatisticApi _statisticApi = StatisticApi();
+  final Logger _logger = Logger();
 
-  late HowDidYouParkAndSpend? howDidYouParkAndSpend;
-
-  // PaymentMethodUsage Wallet and Other/Cash
-  late List<PaymentMethodUsage> paymentMethodUsageList = [
-    PaymentMethodUsage(
-      method: 'Wallet',
-      count: 0,
-    ),
-    PaymentMethodUsage(
-      method: 'Other/Cash',
-      count: 0,
-    ),
+  bool _isLoading = true;
+  HowDidYouParkAndSpend? _howDidYouParkAndSpend;
+  List<PaymentMethodUsage> _paymentMethodUsageList = [
+    PaymentMethodUsage(method: 'Wallet', count: 0),
+    PaymentMethodUsage(method: 'Other/Cash', count: 0),
   ];
-
-  Future<void> getStatisticData() async {
-    final howDidYouParkResponse = await callStatisticApi.getHowDidYouPark();
-    final howDidYouPayResponse = await callStatisticApi.getHowDidYouPay();
-
-    // Kiểm tra tính hợp lệ của token và cập nhật dữ liệu nếu hợp lệ
-    if (howDidYouParkResponse.isTokenValid &&
-        howDidYouPayResponse.isTokenValid) {
-      setState(() {
-        howDidYouParkAndSpend = howDidYouParkResponse.data;
-        paymentMethodUsageList = howDidYouPayResponse.data ?? [];
-      });
-
-      log.i('HowDidYouPay response: ${howDidYouPayResponse.data}');
-    } else {
-      log.e('Token is invalid');
-    }
-  }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    getStatisticData();
+    _fetchStatisticData();
+  }
+
+  Future<void> _fetchStatisticData() async {
+    setState(() => _isLoading = true);
+    try {
+      final parkResponse = await _statisticApi.getHowDidYouPark();
+      final payResponse = await _statisticApi.getHowDidYouPay();
+
+      if (!mounted) return;
+
+      final isParkResValid = await handleApiResponse(
+        context: context,
+        response: parkResponse,
+        showErrorDialog: _showErrorDialog,
+      );
+
+      if (!mounted) return;
+      final isPayResValid = await handleApiResponse(
+        context: context,
+        response: payResponse,
+        showErrorDialog: _showErrorDialog,
+      );
+
+      if (!isParkResValid || !isPayResValid) return;
+
+      if (parkResponse.isTokenValid && payResponse.isTokenValid) {
+        setState(() {
+          _howDidYouParkAndSpend = parkResponse.data;
+          _paymentMethodUsageList = payResponse.data ?? _paymentMethodUsageList;
+        });
+        _logger.i('HowDidYouPay response: ${payResponse.data}');
+      } else {
+        _logger.e('Token is invalid');
+      }
+    } catch (e, stackTrace) {
+      _logger.e('Error in _fetchStatisticData: $e');
+      _logger.e(stackTrace.toString());
+      _showErrorDialog('An error occurred while fetching data.');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   @override
@@ -65,150 +87,135 @@ class _InsightScreenState extends State<InsightScreen> {
       appBar: AppBar(
         title: Text(
           'Insights',
-          style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                fontSize: 20,
-              ),
+          style:
+              Theme.of(context).textTheme.titleMedium!.copyWith(fontSize: 20),
         ),
         automaticallyImplyLeading: true,
         elevation: 0,
       ),
-      body: RefreshIndicator(
-        onRefresh: getStatisticData,
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: SingleChildScrollView(
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.95,
-              child: Column(
-                children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.9,
-                    alignment: Alignment.topLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: Text(
-                        'How did you park this month?',
-                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              color: Theme.of(context).colorScheme.outline,
-                            ),
-                      ),
-                    ),
-                  ),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+      body: _isLoading
+          ? const LoadingCircle()
+          : RefreshIndicator(
+              onRefresh: _fetchStatisticData,
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: MediaQuery.of(context).size.width * 0.05),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      insightNumberContainer(
-                        'Total parking times',
-                        howDidYouParkAndSpend?.totalTimePakedInThisMonth ?? 0,
-                      ),
+                      _buildSectionTitle('How did you park this month?'),
+                      _buildParkingStats(),
                       SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.06,
-                      ),
-                      insightNumberContainer(
-                        'Total spending',
-                        howDidYouParkAndSpend?.totalPaymentInThisMonth ?? 0,
-                        isMoney: true,
-                      ),
+                          height: MediaQuery.of(context).size.height * 0.03),
+                      _buildSectionTitle('How did you pay this month?'),
+                      _buildPaymentMethodChart(),
+                      const SizedBox(height: 20),
+                      _buildTipWidget(),
+                      SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.03),
+                      _buildCashlessHero(),
+                      SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.05),
                     ],
                   ),
-
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.03),
-
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.9,
-                    alignment: Alignment.topLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: Text(
-                        'How did you pay this month?',
-                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.outline,
-                              fontSize: 18,
-                            ),
-                      ),
-                    ),
-                  ),
-
-                  // PieChart: Payment method usage in this month
-                  insightContainer(
-                    paymentMethodUsageList: paymentMethodUsageList,
-                    HowDidYouPay(
-                      paymentMethodUsageList: paymentMethodUsageList,
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.lightbulb_circle,
-                        color: Theme.of(context).colorScheme.outline,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 10),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.5,
-                        child: Text(
-                          'Paying by wallet will be faster and more convenient',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall!
-                              .copyWith(
-                                color:
-                                    Theme.of(context).colorScheme.onSecondary,
-                              ),
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-                ],
+                ),
               ),
             ),
-          ),
-        ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              color: Theme.of(context).colorScheme.outline,
+            ),
       ),
     );
   }
 
-  // Container for chart widget
-  Widget insightContainer(Widget insightWidget,
-      {List<PaymentMethodUsage>? paymentMethodUsageList}) {
+  Widget _buildParkingStats() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _buildStatContainer(
+          'Total parking times',
+          _howDidYouParkAndSpend?.totalTimePakedInThisMonth ?? 0,
+        ),
+        _buildStatContainer(
+          'Total spending',
+          _howDidYouParkAndSpend?.totalPaymentInThisMonth ?? 0,
+          isMoney: true,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatContainer(String title, int number, {bool isMoney = false}) {
     return ShadowContainer(
-      width: MediaQuery.of(context).size.width * 0.9,
-      // height: MediaQuery.of(context).size.height * 0.30,
-      padding: const EdgeInsets.only(top: 15, right: 15),
-      child: Stack(
+      width: MediaQuery.of(context).size.width * 0.42,
+      height: MediaQuery.of(context).size.width * 0.2,
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          insightWidget,
-          if (paymentMethodUsageList?[0].count == 0 &&
-              paymentMethodUsageList?[1].count == 0)
-            Center(
-              child: Container(
-                alignment: Alignment.center,
-                width: MediaQuery.of(context).size.width * 0.6,
-                padding: const EdgeInsets.all(10),
-                margin: const EdgeInsets.only(top: 30),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Theme.of(context).colorScheme.outline,
+          Text(
+            title,
+            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.onSecondary,
                 ),
-                child: Text(
-                  'Don\'t have any data to show yet',
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.surface,
-                      ),
-                ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 5),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(
+                isMoney ? UltilHelper.formatMoney(number) : '$number',
+                style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+              ),
+              const SizedBox(width: 2),
+              Text(
+                isMoney ? 'VND' : 'times',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPaymentMethodChart() {
+    return ShadowContainer(
+      width: double.infinity,
+      padding: const EdgeInsets.all(15),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          HowDidYouPay(paymentMethodUsageList: _paymentMethodUsageList),
+          if (_paymentMethodUsageList.every((usage) => usage.count == 0))
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Theme.of(context).colorScheme.outline,
+              ),
+              child: Text(
+                'Don\'t have any data to show yet',
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: Theme.of(context).colorScheme.surface,
+                    ),
               ),
             ),
         ],
@@ -216,45 +223,89 @@ class _InsightScreenState extends State<InsightScreen> {
     );
   }
 
-  Widget insightNumberContainer(String title, int number,
-          {bool isMoney = false}) =>
-      ShadowContainer(
-        width: MediaQuery.of(context).size.width * 0.42,
-        height: MediaQuery.of(context).size.width * 0.2,
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          children: [
-            Text(
-              title,
-              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+  Widget _buildTipWidget() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.lightbulb_circle,
+            color: Theme.of(context).colorScheme.outline,
+            size: 20,
+          ),
+          Expanded(
+            child: Text(
+              'Paying by wallet will be faster and more convenient',
+              style: Theme.of(context).textTheme.bodySmall!.copyWith(
                     color: Theme.of(context).colorScheme.onSecondary,
                   ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  isMoney ? UltilHelper.formatMoney(number) : '$number',
-                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
-                  child: Text(
-                    isMoney ? 'VND' : 'times',
-                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                          fontSize: 12,
-                        ),
-                  ),
-                ),
-              ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCashlessHero() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(30),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.onBackground,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(2),
+            margin: const EdgeInsets.only(bottom: 15),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(50),
             ),
-          ],
-        ),
-      );
+            child: Image.asset(
+              AssetHelper.cashlessExplorer,
+              width: 65,
+              fit: BoxFit.fitWidth,
+            ),
+          ),
+          Text(
+            'Be a Cashless Hero',
+            style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+          ),
+          Text(
+            'Pay with ease, park with care, and go greener!',
+            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.onSecondary,
+                ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return OKDialog(
+          title: ErrorMessage.error,
+          content: Text(
+            message,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        );
+      },
+    );
+  }
 }

@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:bai_system/api/model/bai_model/bai_model.dart';
 import 'package:bai_system/api/service/bai_be/bai_service.dart';
 import 'package:bai_system/component/shadow_container.dart';
-import 'package:bai_system/core/helper/return_login_dialog.dart';
 import 'package:bai_system/representation/navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,6 +10,8 @@ import 'package:logger/logger.dart';
 
 import '../api/model/bai_model/api_response.dart';
 import '../component/app_bar_component.dart';
+import '../component/dialog.dart';
+import '../component/response_handler.dart';
 import '../component/shadow_button.dart';
 import '../component/snackbar.dart';
 import '../core/const/frontend/message.dart';
@@ -18,7 +19,7 @@ import '../core/const/utilities/regex.dart';
 import '../core/helper/loading_overlay_helper.dart';
 
 class AddBai extends StatefulWidget {
-  static String routeName = '/addBai';
+  static const String routeName = '/addBai';
 
   const AddBai({super.key});
 
@@ -26,65 +27,86 @@ class AddBai extends StatefulWidget {
   State<AddBai> createState() => _AddBaiState();
 }
 
-class _AddBaiState extends State<AddBai> {
-  var log = Logger();
-  String? imageUrl;
+class _AddBaiState extends State<AddBai> with ApiResponseHandler {
+  final Logger _log = Logger();
+  String? _imageUrl;
   String? _selectedVehicleTypeId;
-  late String responseText;
   final TextEditingController _plateNumberController = TextEditingController();
-  CallBikeApi api = CallBikeApi();
-  bool isValidInput = true;
+  final CallBikeApi _api = CallBikeApi();
+  bool _isValidInput = true;
+  List<VehicleTypeModel> _vehicleTypes = [];
 
-  late Color backgroundColor = Theme.of(context).colorScheme.surface;
-  late Color onSuccessful = Theme.of(context).colorScheme.onError;
-  late Color onUnsuccessful = Theme.of(context).colorScheme.error;
+  late Color _backgroundColor;
+  late Color _onSuccessful;
 
   @override
   void initState() {
     super.initState();
-    log.i('AddBai widget initialized');
+    _log.i('AddBai widget initialized');
     _fetchVehicleType();
   }
 
-  List<VehicleTypeModel> _vehicleType = [];
-  bool isLoaded = false;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _backgroundColor = Theme.of(context).colorScheme.surface;
+    _onSuccessful = Theme.of(context).colorScheme.onError;
+  }
 
-  Future<void> selectImage(BuildContext context) async {
+  Future<void> _fetchVehicleType() async {
     try {
-      ImageSource? source = await showSourceDialog(context);
-      if (source == null) return;
+      APIResponse<List<VehicleTypeModel>> vehicleTypes =
+          await _api.getVehicleType();
 
-      XFile? imageFile = await ImagePicker().pickImage(source: source);
-      if (imageFile == null) return;
+      if (vehicleTypes.data == null && vehicleTypes.message != null) {
+        _log.e('Vehicle type is null');
+        return _showErrorDialog(
+            vehicleTypes.message ?? ErrorMessage.somethingWentWrong);
+      }
 
-      String imagePath = imageFile.path;
       if (mounted) {
         setState(() {
-          imageUrl = imagePath;
+          _vehicleTypes = vehicleTypes.data!;
+        });
+      }
+    } catch (e) {
+      _log.e('Error fetching vehicle type: $e');
+      _showErrorDialog('Failed to load vehicle types. Please try again.');
+    }
+  }
+
+  Future<void> _selectImage() async {
+    try {
+      final ImageSource? source = await _showSourceDialog();
+      if (source == null) return;
+
+      final XFile? imageFile = await ImagePicker().pickImage(source: source);
+      if (imageFile == null) return;
+
+      final String imagePath = imageFile.path;
+      if (mounted) {
+        setState(() {
+          _imageUrl = imagePath;
           _plateNumberController.clear();
         });
       }
 
-      log.i('Image successfully picked: $imageUrl');
+      _log.i('Image successfully picked: $_imageUrl');
 
-      await detectPlateNumber(File(imagePath));
-    } catch (e, stackTrace) {
-      log.e('Error picking image: $e');
-      log.e(stackTrace);
+      await _detectPlateNumber(File(imagePath));
+    } catch (e) {
+      _log.e('Error picking image: $e');
+      _showErrorDialog('Failed to select image. Please try again.');
     }
   }
 
-  // Get plate number from image
-  Future<void> detectPlateNumber(File imageFile) async {
+  Future<void> _detectPlateNumber(File imageFile) async {
     try {
-      // Show loading
       LoadingOverlayHelper.show(context);
 
-      // Detect plate number
-      PlateNumberResponse? plateNumberResponse =
-          await api.detectPlateNumber(imageFile);
+      final PlateNumberResponse? plateNumberResponse =
+          await _api.detectPlateNumber(imageFile);
 
-      // Hide loading
       LoadingOverlayHelper.hide();
 
       if (plateNumberResponse?.data?.plateNumber != null) {
@@ -95,371 +117,68 @@ class _AddBaiState extends State<AddBai> {
           });
         }
       } else {
-        log.e('Failed to detect plate number');
-
-        //remove image
+        _log.e('Failed to detect plate number');
         if (mounted) {
           setState(() {
-            imageUrl = null;
+            _imageUrl = null;
             _plateNumberController.clear();
           });
         }
+        _showErrorDialog('Failed to detect plate number. Please try again.');
       }
-    } catch (e, stackTrace) {
+    } catch (e) {
       LoadingOverlayHelper.hide();
-      log.e('Error detecting plate number: $e');
-      log.e(stackTrace);
+      _log.e('Error detecting plate number: $e');
+      _showErrorDialog('Error detecting plate number. Please try again.');
     }
   }
 
   Future<void> _saveVehicleRegistration() async {
-    if (imageUrl != null && _selectedVehicleTypeId != null) {
-      if (_plateNumberController.text.isEmpty) {
-        log.e('Plate number is empty');
-        showCustomSnackBar(
-          MySnackBar(
-            prefix: Icon(
-              Icons.cancel_rounded,
-              color: backgroundColor,
-            ),
-            message: 'Plate number is required.',
-            backgroundColor: onUnsuccessful,
-          ),
-        );
-        return;
-      }
+    if (_imageUrl == null || _selectedVehicleTypeId == null) {
+      _showErrorDialog('Please select an image and vehicle type.');
+      return;
+    }
 
-      AddBaiModel addBaiModel = AddBaiModel(
+    if (_plateNumberController.text.isEmpty) {
+      _showErrorDialog('Plate number is required.');
+      return;
+    }
+
+    try {
+      final addBaiModel = AddBaiModel(
         plateNumber: _plateNumberController.text,
-        plateImage: File(imageUrl!),
+        plateImage: File(_imageUrl!),
         vehicleTypeId: _selectedVehicleTypeId!,
       );
 
-      log.i('Saving vehicle registration: $addBaiModel');
+      _log.i('Saving vehicle registration: $addBaiModel');
 
-      APIResponse<AddBaiRespModel> result = await api.createBai(addBaiModel);
+      LoadingOverlayHelper.show(context);
+      final APIResponse<AddBaiRespModel> result =
+          await _api.createBai(addBaiModel);
+      LoadingOverlayHelper.hide();
 
-      if (result.isTokenValid == false &&
-          result.message == ErrorMessage.tokenInvalid) {
-        log.e('Token is invalid');
+      if (!mounted) return;
 
-        if (!mounted) return;
-        //show login dialog
-        ReturnLoginDialog.returnLogin(context);
-        return;
-      }
-
-      if (result.data == null || result.message != null) {
-        log.e('Failed to save vehicle registration');
-        showCustomSnackBar(
-          MySnackBar(
-            prefix: Icon(
-              Icons.cancel_rounded,
-              color: backgroundColor,
-            ),
-            message: result.message ?? ErrorMessage.somethingWentWrong,
-            backgroundColor: onUnsuccessful,
-          ),
-        );
-        return;
-      }
-
-      if (result.data != null) {
-        log.i('Vehicle registration saved successfully');
-        showCustomSnackBar(
-          MySnackBar(
-            prefix: Icon(
-              Icons.check_circle_rounded,
-              color: backgroundColor,
-            ),
-            message: Message.actionSuccessfully(
-                action: LabelMessage.add(message: ListName.bai)),
-            backgroundColor: onSuccessful,
-          ),
-        );
-
-        goToPageHelper(
-          MyNavigationBar.routeName,
-          index: 1,
-        );
-      } else {
-        log.e('Failed to save vehicle registration');
-        showCustomSnackBar(
-          MySnackBar(
-            prefix: Icon(
-              Icons.cancel_rounded,
-              color: backgroundColor,
-            ),
-            message: ErrorMessage.somethingWentWrong,
-            backgroundColor: onUnsuccessful,
-          ),
-        );
-      }
-    } else {
-      log.e('Vehicle type, image URL, or plate number is null');
-
-      showCustomSnackBar(
-        MySnackBar(
-          prefix: Icon(
-            Icons.cancel_rounded,
-            color: backgroundColor,
-          ),
-          message: ErrorMessage.inputRequired(message: ListName.vehicle),
-          backgroundColor: onUnsuccessful,
-        ),
+      final bool isResponseValid = await handleApiResponse(
+        context: context,
+        response: result,
+        showErrorDialog: _showErrorDialog,
       );
-    }
-  }
 
-  void _fetchVehicleType() async {
-    try {
-      List<VehicleTypeModel>? vehicleType = await api.getVehicleType();
+      if (!isResponseValid) return;
 
-      if (mounted) {
-        setState(() {
-          _vehicleType = vehicleType;
-          isLoaded = true;
-        });
-      }
+      _showSuccessSnackBar(Message.actionSuccessfully(
+          action: LabelMessage.add(message: ListName.bai)));
+
+      _goToPage(MyNavigationBar.routeName, index: 1);
     } catch (e) {
-      log.e('Error fetching vehicle type: $e');
-      if (mounted) {
-        setState(() {
-          isLoaded = true;
-        });
-      }
+      _log.e('Error saving vehicle registration: $e');
+      _showErrorDialog(ErrorMessage.somethingWentWrong);
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const AppBarCom(
-        leading: true,
-        appBarText: 'Add Bike',
-      ),
-      body: SingleChildScrollView(
-        child: SafeArea(
-          child: Center(
-            child: Container(
-              padding: const EdgeInsets.only(top: 25),
-              width: MediaQuery.of(context).size.width * 0.9,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  GestureDetector(
-                    onTap: () async => await selectImage(context),
-                    child: ShadowContainer(
-                      padding: const EdgeInsets.all(0),
-                      color: Theme.of(context).colorScheme.outlineVariant,
-                      height: MediaQuery.of(context).size.height * 0.35,
-                      child: imageUrl == null
-                          ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.add_photo_alternate_rounded,
-                                  size: 50,
-                                  color:
-                                      Theme.of(context).colorScheme.onSecondary,
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Text(
-                                  'Upload your vehicle image\nrequired*',
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
-                            )
-                          : Image.file(
-                              File(imageUrl!),
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: double.infinity,
-                            ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.04,
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Vehicle Type*',
-                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                              color: Theme.of(context).colorScheme.outline,
-                            ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      ShadowContainer(
-                        padding: const EdgeInsets.all(10),
-                        height: MediaQuery.of(context).size.height * 0.065,
-                        child: DropdownButton<String>(
-                          hint: Text(
-                            'Select vehicle type',
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                          value: _selectedVehicleTypeId,
-                          items:
-                              _vehicleType.map((VehicleTypeModel vehicleType) {
-                            return DropdownMenuItem<String>(
-                              value: vehicleType.id,
-                              child: Text(
-                                vehicleType.name,
-                                style: Theme.of(context).textTheme.bodyMedium,
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (String? newValue) {
-                            if (mounted) {
-                              setState(() {
-                                _selectedVehicleTypeId = newValue;
-                              });
-                            }
-                            log.i('Selected vehicle type: $newValue');
-                          },
-                          isExpanded: true,
-                          underline: Container(),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-
-                      // Plate number label
-                      Text(
-                        'Plate Number*',
-                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                              color: Theme.of(context).colorScheme.outline,
-                            ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-
-                      // plate number error message
-                      if (!isValidInput)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 5),
-                          child: Text(
-                            ErrorMessage.inputInvalid(
-                                message: ListName.plateNumber),
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall!
-                                .copyWith(
-                                  color: Theme.of(context).colorScheme.error,
-                                ),
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-
-                      // Plate number input field
-                      ShadowContainer(
-                        padding: const EdgeInsets.all(10),
-                        height: MediaQuery.of(context).size.height * 0.065,
-                        child: TextField(
-                          controller: _plateNumberController,
-                          readOnly: imageUrl == null,
-                          keyboardType: TextInputType.text,
-                          textInputAction: TextInputAction.done,
-                          onChanged: (value) {
-                            String updatedValue = value.toUpperCase();
-
-                            if (mounted) {
-                              setState(() {
-                                _plateNumberController.value =
-                                    _plateNumberController.value.copyWith(
-                                  text: updatedValue,
-                                  selection: TextSelection.collapsed(
-                                      offset: updatedValue.length),
-                                );
-                              });
-                            }
-                          },
-                          onEditingComplete: () {
-                            String currentValue = _plateNumberController.text;
-                            if (mounted) {
-                              setState(() {
-                                isValidInput =
-                                    Regex.plateRegExp.hasMatch(currentValue);
-                                _plateNumberController.text =
-                                    isValidInput ? currentValue : '';
-                              });
-                            }
-                          },
-                          style: Theme.of(context).textTheme.bodyMedium,
-                          decoration: InputDecoration(
-                            suffixIcon: Icon(
-                              Icons.edit_rounded,
-                              color: Theme.of(context).colorScheme.onSecondary,
-                            ),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.outline,
-                              ),
-                            ),
-                            hintText: 'ex: 37A012345',
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 25, bottom: 5),
-                    child: Center(
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.6,
-                        child: Text(
-                          'By tapping ADD you agree to submit request new bike to your account.',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall!
-                              .copyWith(
-                                color:
-                                    Theme.of(context).colorScheme.onSecondary,
-                              ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () async {
-                      // show loading
-                      LoadingOverlayHelper.show(context);
-
-                      await _saveVehicleRegistration();
-
-                      // hide loading
-                      LoadingOverlayHelper.hide();
-                    },
-                    child: const ShadowButton(
-                      buttonTitle: 'ADD',
-                      margin: EdgeInsets.symmetric(vertical: 10),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<ImageSource?> showSourceDialog(BuildContext context) async {
+  Future<ImageSource?> _showSourceDialog() async {
     return showDialog<ImageSource?>(
       context: context,
       builder: (BuildContext context) {
@@ -489,8 +208,20 @@ class _AddBaiState extends State<AddBai> {
     );
   }
 
-  // show custom snackbar
-  void showCustomSnackBar(MySnackBar snackBar) {
+  void _showSuccessSnackBar(String message) {
+    _showCustomSnackBar(
+      MySnackBar(
+        prefix: Icon(
+          Icons.check_circle_rounded,
+          color: _backgroundColor,
+        ),
+        message: message,
+        backgroundColor: _onSuccessful,
+      ),
+    );
+  }
+
+  void _showCustomSnackBar(MySnackBar snackBar) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: snackBar,
@@ -502,12 +233,248 @@ class _AddBaiState extends State<AddBai> {
     );
   }
 
-  void goToPageHelper(String? routeName, {int? index}) {
-    routeName == null
-        ? Navigator.of(context).pop()
-        : Navigator.of(context).pushReplacementNamed(
-            routeName,
-            arguments: index,
-          );
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return OKDialog(
+          title: ErrorMessage.error,
+          content: Text(
+            message,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        );
+      },
+    );
+  }
+
+  void _goToPage(String routeName, {int? index}) {
+    Navigator.of(context).pushReplacementNamed(
+      routeName,
+      arguments: index,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: const AppBarCom(
+        leading: true,
+        appBarText: 'Add Bike',
+      ),
+      body: SingleChildScrollView(
+        child: SafeArea(
+          child: Center(
+            child: Container(
+              padding: const EdgeInsets.only(top: 25),
+              width: MediaQuery.of(context).size.width * 0.9,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildImagePicker(),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.04,
+                  ),
+                  _buildVehicleTypeDropdown(),
+                  const SizedBox(height: 20),
+                  _buildPlateNumberInput(),
+                  const SizedBox(height: 20),
+                  _buildAddButton(),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImagePicker() {
+    return GestureDetector(
+      onTap: _selectImage,
+      child: ShadowContainer(
+        padding: const EdgeInsets.all(0),
+        color: Theme.of(context).colorScheme.outlineVariant,
+        height: MediaQuery.of(context).size.height * 0.35,
+        child: _imageUrl == null
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.add_photo_alternate_rounded,
+                    size: 50,
+                    color: Theme.of(context).colorScheme.onSecondary,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Upload your vehicle image\nrequired*',
+                    style: Theme.of(context).textTheme.bodySmall,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              )
+            : Image.file(
+                File(_imageUrl!),
+                fit: BoxFit.cover,
+                width: double.infinity,
+                height: double.infinity,
+              ),
+      ),
+    );
+  }
+
+  Widget _buildVehicleTypeDropdown() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Vehicle Type*',
+          style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                color: Theme.of(context).colorScheme.outline,
+              ),
+        ),
+        const SizedBox(height: 5),
+        ShadowContainer(
+          padding: const EdgeInsets.all(10),
+          height: MediaQuery.of(context).size.height * 0.065,
+          child: DropdownButton<String>(
+            hint: Text(
+              'Select vehicle type',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            value: _selectedVehicleTypeId,
+            items: _vehicleTypes.map((VehicleTypeModel vehicleType) {
+              return DropdownMenuItem<String>(
+                value: vehicleType.id,
+                child: Text(
+                  vehicleType.name,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              );
+            }).toList(),
+            onChanged: (String? newValue) {
+              if (mounted) {
+                setState(() {
+                  _selectedVehicleTypeId = newValue;
+                });
+              }
+              _log.i('Selected vehicle type: $newValue');
+            },
+            isExpanded: true,
+            underline: Container(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPlateNumberInput() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Plate Number*',
+          style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                color: Theme.of(context).colorScheme.outline,
+              ),
+        ),
+        const SizedBox(height: 5),
+        if (!_isValidInput)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 5),
+            child: Text(
+              ErrorMessage.inputInvalid(message: ListName.plateNumber),
+              style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ShadowContainer(
+          padding: const EdgeInsets.all(10),
+          height: MediaQuery.of(context).size.height * 0.065,
+          child: TextField(
+            controller: _plateNumberController,
+            readOnly: _imageUrl == null,
+            keyboardType: TextInputType.text,
+            textInputAction: TextInputAction.done,
+            onChanged: (value) {
+              String updatedValue = value.toUpperCase();
+              if (mounted) {
+                setState(() {
+                  _plateNumberController.value =
+                      _plateNumberController.value.copyWith(
+                    text: updatedValue,
+                    selection:
+                        TextSelection.collapsed(offset: updatedValue.length),
+                  );
+                });
+              }
+            },
+            onEditingComplete: () {
+              String currentValue = _plateNumberController.text;
+              if (mounted) {
+                setState(() {
+                  _isValidInput = Regex.plateRegExp.hasMatch(currentValue);
+                  _plateNumberController.text =
+                      _isValidInput ? currentValue : '';
+                });
+              }
+            },
+            style: Theme.of(context).textTheme.bodyMedium,
+            decoration: InputDecoration(
+              suffixIcon: Icon(
+                Icons.edit_rounded,
+                color: Theme.of(context).colorScheme.onSecondary,
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+              ),
+              hintText: 'ex: 37A012345',
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAddButton() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 25, bottom: 5),
+          child: Center(
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.6,
+              child: Text(
+                'By tapping ADD you agree to submit request new bike to your account.',
+                style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                      color: Theme.of(context).colorScheme.onSecondary,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+        GestureDetector(
+          onTap: _saveVehicleRegistration,
+          child: const ShadowButton(
+            buttonTitle: 'ADD',
+            margin: EdgeInsets.symmetric(vertical: 10),
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  void dispose() {
+    _plateNumberController.dispose();
+    super.dispose();
   }
 }

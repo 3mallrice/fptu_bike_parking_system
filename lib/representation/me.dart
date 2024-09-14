@@ -1,15 +1,11 @@
 import 'package:bai_system/api/model/bai_model/login_model.dart';
 import 'package:bai_system/component/shadow_container.dart';
-import 'package:bai_system/core/helper/google_auth.dart';
 import 'package:bai_system/core/helper/local_storage_helper.dart';
 import 'package:bai_system/representation/about_screen.dart';
-import 'package:bai_system/representation/exception_screen.dart';
 import 'package:bai_system/representation/feedback.dart';
-import 'package:bai_system/representation/profile.dart';
+import 'package:bai_system/representation/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-
-import 'login.dart';
 
 class MeScreen extends StatefulWidget {
   const MeScreen({super.key});
@@ -21,35 +17,9 @@ class MeScreen extends StatefulWidget {
 }
 
 class _MeScreenState extends State<MeScreen> {
-  bool _hideBalance = false;
   var log = Logger();
 
   late final UserData? userData;
-
-  Future<void> _loadHideBalance() async {
-    bool? hideBalance =
-        await LocalStorageHelper.getValue(LocalStorageKey.isHiddenBalance);
-    setState(() {
-      _hideBalance = hideBalance ?? false;
-    });
-  }
-
-  Future<void> _toggleHideBalance() async {
-    setState(() {
-      log.i('Toggle hide balance: $_hideBalance');
-      _hideBalance = !_hideBalance;
-    });
-    await LocalStorageHelper.setValue(
-        LocalStorageKey.isHiddenBalance, _hideBalance);
-  }
-
-  //log out
-  Future<void> _logout() async {
-    await LocalStorageHelper.setValue(LocalStorageKey.userData, null);
-    await GoogleAuthApi.signOut();
-    log.i('Logout success: ${LocalStorageKey.userData}');
-    goToPageHelper(routeName: LoginScreen.routeName);
-  }
 
   void goToPageHelper({String? routeName}) {
     routeName != null
@@ -61,7 +31,6 @@ class _MeScreenState extends State<MeScreen> {
   void initState() {
     super.initState();
     userData = GetLocalHelper.getUserData();
-    _loadHideBalance();
   }
 
   @override
@@ -91,12 +60,12 @@ class _MeScreenState extends State<MeScreen> {
                     ),
                     child: userData == null
                         ? Text(
-                            getInitials(userData?.name ?? 'Anonymous User'),
+                            _getInitials(userData?.name ?? 'Anonymous User'),
                             style: Theme.of(context)
                                 .textTheme
                                 .displayLarge!
                                 .copyWith(
-                                  fontSize: 64,
+                                  fontSize: 30,
                                   fontWeight: FontWeight.w900,
                                   color: Theme.of(context).colorScheme.surface,
                                 ),
@@ -116,7 +85,9 @@ class _MeScreenState extends State<MeScreen> {
                   const SizedBox(height: 5),
                   Text(
                     userData?.email ?? 'anonymous@fpt.edu.vn',
-                    style: Theme.of(context).textTheme.labelMedium,
+                    style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                          fontSize: 12,
+                        ),
                   ),
                   const SizedBox(height: 40),
                   ShadowContainer(
@@ -126,109 +97,51 @@ class _MeScreenState extends State<MeScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        meItem(
-                          Icons.account_circle_outlined,
+                        _meItem(
+                          Icons.settings_suggest_outlined,
                           Text(
-                            'View Profile',
+                            'Settings & profile',
                             style: Theme.of(context)
                                 .textTheme
                                 .titleMedium!
-                                .copyWith(fontSize: 18),
+                                .copyWith(fontSize: 16),
                           ),
-                          () {
-                            Navigator.of(context)
-                                .pushNamed(ProfileScreen.routeName);
-                          },
+                          onTap: () => goToPageHelper(
+                              routeName: SettingScreen.routeName),
                         ),
                         Divider(
                           color: Theme.of(context).colorScheme.outlineVariant,
                           thickness: 1,
                         ),
-                        meItem(
-                          _hideBalance
-                              ? Icons.visibility_off_outlined
-                              : Icons.visibility_outlined,
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Hide Balance',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium!
-                                    .copyWith(fontSize: 18),
-                              ),
-                              Text(
-                                '* Your balances on home screen will appear as ******\n* To reveal, hold on your balance',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall!
-                                    .copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSecondary,
-                                      fontSize: 12,
-                                    ),
-                              ),
-                            ],
-                          ),
-                          _toggleHideBalance,
-                        ),
-                        Divider(
-                          color: Theme.of(context).colorScheme.outlineVariant,
-                          thickness: 1,
-                        ),
-                        meItem(
+                        _meItem(
                           Icons.feedback_outlined,
                           Text(
                             'Feedbacks',
                             style: Theme.of(context)
                                 .textTheme
                                 .titleMedium!
-                                .copyWith(fontSize: 18),
+                                .copyWith(fontSize: 16),
                           ),
-                          () {
-                            Navigator.of(context)
-                                .pushNamed(FeedbackScreen.routeName);
-                          },
+                          onTap: () => goToPageHelper(
+                              routeName: FeedbackScreen.routeName),
                         ),
                         Divider(
                           color: Theme.of(context).colorScheme.outlineVariant,
                           thickness: 1,
                         ),
-                        meItem(
-                            Icons.info_outlined,
-                            Text(
-                              'About Bai',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium!
-                                  .copyWith(fontSize: 18),
-                            ), () {
-                          Navigator.of(context).pushNamed(AboutUs.routeName);
-                        }),
-                        TextButton(onPressed: () => Navigator.of(context).pushNamed(ExceptionScreen.routeName), child: const Text('exception'))
+                        _meItem(
+                          Icons.info_outlined,
+                          Text(
+                            'About Bai',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(fontSize: 16),
+                          ),
+                          onTap: () =>
+                              goToPageHelper(routeName: AboutUs.routeName),
+                        ),
                       ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  GestureDetector(
-                    onTap: _logout,
-                    child: ShadowContainer(
-                      alignment: Alignment.center,
-                      width: MediaQuery.of(context).size.width * 0.5,
-                      height: 60,
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      color: Theme.of(context).colorScheme.primary,
-                      child: Text(
-                        'Logout',
-                        style:
-                            Theme.of(context).textTheme.titleMedium!.copyWith(
-                                  fontSize: 18,
-                                  color: Theme.of(context).colorScheme.surface,
-                                ),
-                      ),
                     ),
                   ),
                   SizedBox(height: MediaQuery.of(context).size.width * 0.05),
@@ -242,7 +155,7 @@ class _MeScreenState extends State<MeScreen> {
   }
 
   // split name into many parts by space and get the first letter of each part
-  String getInitials(String name) {
+  String _getInitials(String name) {
     List<String> parts = name.split(' ');
     String initials = '';
     for (var part in parts) {
@@ -251,17 +164,24 @@ class _MeScreenState extends State<MeScreen> {
     return initials.toUpperCase();
   }
 
-  // a ListTile with icon, content and onTap event
-  Widget meItem(IconData? iconData, Widget content, VoidCallback onTap) {
+  Widget _meItem(IconData? iconData, Widget content,
+      {VoidCallback? onTap, Widget? trailing}) {
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-      horizontalTitleGap: 10,
-      leadingAndTrailingTextStyle: Theme.of(context).textTheme.titleMedium,
-      leading: Icon(
-        iconData,
-        size: 28,
+      horizontalTitleGap: 13,
+      leading: Container(
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.outline,
+          borderRadius: BorderRadius.circular(50),
+        ),
+        child: Icon(
+          iconData,
+          size: 20,
+          color: Theme.of(context).colorScheme.surface,
+        ),
       ),
-      title: Padding(padding: const EdgeInsets.all(10), child: content),
+      trailing: trailing,
+      title: Padding(padding: const EdgeInsets.all(5), child: content),
       onTap: onTap,
     );
   }

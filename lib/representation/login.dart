@@ -1,14 +1,20 @@
 import 'package:bai_system/api/model/bai_model/api_response.dart';
 import 'package:bai_system/api/service/bai_be/auth_service.dart';
 import 'package:bai_system/component/dialog.dart';
+import 'package:bai_system/component/response_handler.dart';
 import 'package:bai_system/component/shadow_container.dart';
+import 'package:bai_system/core/const/frontend/error_catcher.dart';
 import 'package:bai_system/core/helper/asset_helper.dart';
+import 'package:bai_system/core/helper/local_storage_helper.dart';
 import 'package:bai_system/representation/navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:logger/logger.dart';
 
 import '../api/model/bai_model/login_model.dart';
+import '../api/service/bai_be/firebase_api.dart';
+import '../component/internet_connection_wrapper.dart';
+import '../core/const/frontend/message.dart';
 import '../core/helper/google_auth.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -20,11 +26,13 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen> with ApiResponseHandler {
   static final _log = Logger();
   final _authApi = CallAuthApi();
   bool _isLoading = false;
+  Alignment _alignment = const Alignment(0.9, 0.4);
 
+  // Sign in with Google
   Future<void> _signIn() async {
     setState(() {
       _isLoading = true;
@@ -41,18 +49,29 @@ class _LoginScreenState extends State<LoginScreen> {
       if (currentUser != null && auth != null && auth.idToken != null) {
         final APIResponse<UserData> userData =
             await _authApi.loginWithGoogle(auth.idToken!);
+
         if (userData.data != null) {
           await _initializeAfterLogin();
           _navigateToHome();
         } else {
-          throw Exception("Login failed: User data is null");
+          throw Exception(userData.statusCode);
         }
       } else {
         throw Exception("Login failed: Google authentication failed");
       }
     } catch (e) {
       _log.e("Login error: $e");
-      await _showErrorDialog(e.toString());
+
+      String userFriendlyMessage;
+      if (e is Exception &&
+          e.toString().contains("Google authentication failed")) {
+        userFriendlyMessage = UserFriendErrMess.loginErrMessage(e);
+      } else {
+        userFriendlyMessage =
+            HttpErrorMapper.getErrorMessage(int.parse(e.toString()));
+      }
+
+      _showErrorDialog(userFriendlyMessage);
     } finally {
       if (mounted) {
         setState(() {
@@ -62,24 +81,50 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _showErrorDialog(String errorMessage) async {
-    return showDialog<void>(
+  //send FCM token to server
+  Future<void> _sendTokenToServer() async {
+    final fcmToken = GetLocalHelper.getFCMToken();
+
+    if (fcmToken != null) {
+      final APIResponse<dynamic> response =
+          await FirebaseApi().sendTokenToServer(fcmToken);
+
+      if (!mounted) return;
+
+      final bool isResponseValid = await handleApiResponse(
+        context: context,
+        response: response,
+        showErrorDialog: _showErrorDialog,
+      );
+
+      if (!isResponseValid) return;
+
+      log.i('FCM token sent to server');
+      return;
+    } else {
+      log.e('FCM token is null');
+      return;
+    }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
       context: context,
-      barrierDismissible: false,
       builder: (BuildContext context) {
         return OKDialog(
-          title: 'Login Error',
+          title: ErrorMessage.error,
           content: Text(
-              'An error occurred while signing in. Please try again: $errorMessage'),
-          onClick: () => Navigator.of(context).pop(),
+            message,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
         );
       },
     );
   }
 
   Future<void> _initializeAfterLogin() async {
-    // await initNotifications();
     await _checkLocationPermission();
+    await _sendTokenToServer();
   }
 
   Future<void> _checkLocationPermission() async {
@@ -97,27 +142,77 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      child: Scaffold(
-        body: SingleChildScrollView(
-          child: Align(
-            alignment: Alignment.center,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: MediaQuery.of(context).size.height * 0.27),
-                Image.asset(AssetHelper.imgLogo, width: 200, height: 200),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.1),
-                _buildWelcomeText(),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.06),
-                _buildTermsText(),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                _buildGoogleSignInButton(),
-                _buildFooter(),
-              ],
+      child: InternetConnectionWrapper(
+        goToPageRouteName: LoginScreen.routeName,
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              child: Align(
+                alignment: Alignment.center,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.27),
+                    Image.asset(AssetHelper.imgLogo, width: 200, height: 200),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+                    _buildWelcomeText(),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.06),
+                    _buildTermsText(),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                    _buildGoogleSignInButton(),
+                    _buildFooter(),
+                  ],
+                ),
+              ),
             ),
-          ),
+            Align(
+              alignment: _alignment,
+              child: GestureDetector(
+                onPanUpdate: (details) {
+                  setState(() {
+                    _alignment += Alignment(
+                      details.delta.dx /
+                          (MediaQuery.of(context).size.width / 2),
+                      details.delta.dy /
+                          (MediaQuery.of(context).size.height / 2),
+                    );
+                    log.i('Alignment: $_alignment');
+                  });
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 100),
+                  child: _buildSupportIcon(),
+                ),
+              ),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSupportIcon() {
+    return CircleAvatar(
+      backgroundColor: Theme.of(context).colorScheme.outline,
+      radius: 25,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.headset_mic_rounded,
+            size: 28,
+            color: Theme.of(context).colorScheme.surface,
+          ),
+          Text(
+            'Support',
+            style: Theme.of(context).textTheme.displaySmall!.copyWith(
+                  color: Theme.of(context).colorScheme.surface,
+                  fontSize: 7,
+                ),
+          ),
+        ],
       ),
     );
   }

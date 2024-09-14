@@ -3,10 +3,11 @@ import 'package:bai_system/api/model/bai_model/coin_package_model.dart';
 import 'package:bai_system/api/service/bai_be/payment_service.dart';
 import 'package:bai_system/component/app_bar_component.dart';
 import 'package:bai_system/component/my_radio_button.dart';
+import 'package:bai_system/component/response_handler.dart';
 import 'package:bai_system/component/shadow_container.dart';
 import 'package:bai_system/core/const/frontend/message.dart';
 import 'package:bai_system/representation/receipt.dart';
-import 'package:bai_system/representation/wallet_screen.dart';
+import 'package:bai_system/representation/wallet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_zalopay_sdk/flutter_zalopay_sdk.dart';
@@ -19,7 +20,6 @@ import '../component/snackbar.dart';
 import '../core/const/utilities/util_helper.dart';
 import '../core/helper/asset_helper.dart';
 import '../core/helper/loading_overlay_helper.dart';
-import '../core/helper/return_login_dialog.dart';
 
 class PaymentScreen extends StatefulWidget {
   final CoinPackage package;
@@ -35,7 +35,7 @@ class PaymentScreen extends StatefulWidget {
   State<PaymentScreen> createState() => _PaymentScreenState();
 }
 
-class _PaymentScreenState extends State<PaymentScreen> {
+class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
   int selectedPaymentOption = 0;
   late final CoinPackage _package = widget.package;
   final log = Logger();
@@ -355,6 +355,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     await openZaloPayApp(_package);
     showSnackBar(payResult, type: type);
     if (type == 1) {
+      if (!mounted) return;
       Navigator.of(context).pushReplacementNamed(ReceiptScreen.routeName);
     }
   }
@@ -433,18 +434,17 @@ class _PaymentScreenState extends State<PaymentScreen> {
       final APIResponse<ZaloPayModel> response =
           await paymentApi.depositCoinZaloPay(packageId);
 
-      if (!response.isTokenValid &&
-          response.message == ErrorMessage.tokenInvalid) {
-        ReturnLoginDialog.returnLogin(context);
-        return;
-      }
+      if (!mounted) return;
 
-      if (response.data == null ||
-          response.message == ErrorMessage.somethingWentWrong) {
-        showSnackBar(ErrorMessage.somethingWentWrong);
-      } else {
-        setState(() => zaloPayModel = response.data!);
-      }
+      final bool isResponseValid = await handleApiResponse(
+        context: context,
+        response: response,
+        showErrorDialog: _showErrorDialog,
+      );
+
+      if (!isResponseValid) return;
+
+      setState(() => zaloPayModel = response.data!);
     } catch (e) {
       log.e('Error during buy now: $e');
       showSnackBar('An error occurred. Please try again.');
@@ -456,16 +456,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
       final APIResponse<VnPayResponse> response =
           await paymentApi.depositCoinVnPay(packageId, bankCode);
 
-      if (!response.isTokenValid &&
-          response.message == ErrorMessage.tokenInvalid) {
-        ReturnLoginDialog.returnLogin(context);
-        return;
-      }
+      if (!mounted) return;
 
-      if (response.message == ErrorMessage.somethingWentWrong) {
-        showSnackBar(ErrorMessage.somethingWentWrong);
-        return;
-      }
+      final bool isResponseValid = await handleApiResponse(
+        context: context,
+        response: response,
+        showErrorDialog: _showErrorDialog,
+      );
+
+      if (!isResponseValid) return;
 
       if (response.data != null) {
         setState(() => paymentUrl = response.data!.paymentUrl);
@@ -500,7 +499,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
           ),
           onClick: () {
             isSuccess
-                ? Navigator.of(context).pushReplacementNamed(MyWallet.routeName)
+                ? Navigator.of(context)
+                    .pushReplacementNamed(WalletScreen.routeName)
                 : Navigator.of(context).pop();
           },
           contentPadding: const EdgeInsets.all(20),
@@ -628,6 +628,21 @@ class _PaymentScreenState extends State<PaymentScreen> {
         elevation: 0,
         padding: const EdgeInsets.all(10),
       ),
+    );
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return OKDialog(
+          title: ErrorMessage.error,
+          content: Text(
+            message,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        );
+      },
     );
   }
 }

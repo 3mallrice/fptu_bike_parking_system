@@ -1,6 +1,7 @@
 import 'package:bai_system/component/app_bar_component.dart';
 import 'package:bai_system/component/shadow_container.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../core/helper/asset_helper.dart';
@@ -15,6 +16,7 @@ class AboutUs extends StatefulWidget {
 }
 
 class _AboutUsState extends State<AboutUs> {
+  final _log = Logger();
   late PackageInfo _packageInfo = PackageInfo(
     appName: 'Unknown',
     packageName: 'Unknown',
@@ -30,10 +32,14 @@ class _AboutUsState extends State<AboutUs> {
   }
 
   Future<void> _initPackageInfo() async {
-    final info = await PackageInfo.fromPlatform();
-    setState(() {
-      _packageInfo = info;
-    });
+    try {
+      final PackageInfo info = await PackageInfo.fromPlatform();
+      setState(() {
+        _packageInfo = info;
+      });
+    } catch (e) {
+      _log.e('Error: $e');
+    }
   }
 
   @override

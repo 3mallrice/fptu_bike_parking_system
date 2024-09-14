@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bai_system/core/helper/local_storage_helper.dart';
 import 'package:bai_system/firebase_options.dart';
 import 'package:bai_system/representation/splash_screen.dart';
+import 'package:bai_system/service/internet_connection_checker.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -12,9 +13,9 @@ import 'package:logger/web.dart';
 import 'package:provider/provider.dart';
 
 import 'api/service/weather/geo.dart';
-import 'core/helper/firebase_helper.dart';
 import 'core/theme/theme_provider.dart';
 import 'route.dart';
+import 'service/firebase_service.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 var log = Logger();
@@ -43,10 +44,15 @@ Future<void> main() async {
 
     await GeoPermission().checkLocationPermission();
 
-    // Chạy ứng dụng
     runApp(
-      ChangeNotifierProvider(
-        create: (context) => ThemeProvider(),
+      MultiProvider(
+        providers: [
+          Provider(
+            create: (context) => InternetConnectionService(),
+            dispose: (_, service) => service.dispose(),
+          ),
+          ChangeNotifierProvider(create: (context) => ThemeProvider()),
+        ],
         child: const MyApp(),
       ),
     );

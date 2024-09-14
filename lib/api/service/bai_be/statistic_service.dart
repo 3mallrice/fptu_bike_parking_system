@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
+import '../../../core/const/frontend/error_catcher.dart';
 import '../../../core/const/frontend/message.dart';
 import '../../../core/helper/local_storage_helper.dart';
 import '../../model/bai_model/api_response.dart';
@@ -51,12 +52,15 @@ class StatisticApi {
         log.e(
             'Failed to get how did you park in last 30 days: ${response.statusCode}');
         return APIResponse(
-            message:
-                "${ErrorMessage.somethingWentWrong}: Status code ${response.statusCode}");
+            statusCode: response.statusCode,
+            message: HttpErrorMapper.getErrorMessage(response.statusCode));
       }
     } catch (e) {
       log.e('Error during get how did you park in last 30 days: $e');
-      return APIResponse(message: "${ErrorMessage.somethingWentWrong}: $e");
+      return APIResponse(
+        statusCode: 400,
+        message: ErrorMessage.somethingWentWrong,
+      );
     }
   }
 
@@ -98,12 +102,15 @@ class StatisticApi {
         log.e(
             'Failed to get how did you pay in this month: ${response.statusCode}');
         return APIResponse(
-            message:
-                "${ErrorMessage.somethingWentWrong}: Status code ${response.statusCode}");
+            statusCode: response.statusCode,
+            message: HttpErrorMapper.getErrorMessage(response.statusCode));
       }
     } catch (e) {
       log.e('Error during get how did you pay in this month: $e');
-      return APIResponse(message: "${ErrorMessage.somethingWentWrong}: $e");
+      return APIResponse(
+        statusCode: 400,
+        message: ErrorMessage.somethingWentWrong,
+      );
     }
   }
 }

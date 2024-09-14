@@ -4,7 +4,6 @@ import 'package:bai_system/api/model/bai_model/wallet_model.dart';
 import 'package:bai_system/representation/about_screen.dart';
 import 'package:bai_system/representation/add_bai_screen.dart';
 import 'package:bai_system/representation/bai_details.dart';
-import 'package:bai_system/representation/exception_screen.dart';
 import 'package:bai_system/representation/feedback.dart';
 import 'package:bai_system/representation/fundin_screen.dart';
 import 'package:bai_system/representation/history.dart';
@@ -13,15 +12,15 @@ import 'package:bai_system/representation/intro_screen.dart';
 import 'package:bai_system/representation/login.dart';
 import 'package:bai_system/representation/me.dart';
 import 'package:bai_system/representation/navigation_bar.dart';
+import 'package:bai_system/representation/no_connection_screen.dart';
 import 'package:bai_system/representation/notification_screen.dart';
 import 'package:bai_system/representation/payment.dart';
-import 'package:bai_system/representation/payos.dart';
-import 'package:bai_system/representation/profile.dart';
 import 'package:bai_system/representation/receipt.dart';
+import 'package:bai_system/representation/settings.dart';
 import 'package:bai_system/representation/splash_screen.dart';
+import 'package:bai_system/representation/support.dart';
+import 'package:bai_system/representation/update_profile.dart';
 import 'package:bai_system/representation/wallet.dart';
-import 'package:bai_system/representation/wallet_extra_screen.dart';
-import 'package:bai_system/representation/wallet_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -39,19 +38,15 @@ final Map<String, WidgetBuilder> routes = {
     );
   },
   FundinScreen.routeName: (context) => const FundinScreen(),
-  MyWallet.routeName: (context) => const MyWallet(),
   BaiScreen.routeName: (context) => const BaiScreen(),
   MeScreen.routeName: (context) => const MeScreen(),
-  ProfileScreen.routeName: (context) => const ProfileScreen(),
   AboutUs.routeName: (context) => const AboutUs(),
   FeedbackScreen.routeName: (context) => const FeedbackScreen(),
   SplashScreen.routeName: (context) => const SplashScreen(),
   IntroScreen.routeName: (context) => const IntroScreen(),
   LoginScreen.routeName: (context) => const LoginScreen(),
   AddBai.routeName: (context) => const AddBai(),
-  PayOsScreen.routeName: (context) => const PayOsScreen(),
   HistoryScreen.routeName: (context) => const HistoryScreen(),
-  WalletExtraScreen.routeName: (context) => const WalletExtraScreen(),
   PaymentScreen.routeName: (context) {
     final agrs = ModalRoute.of(context)!.settings.arguments as CoinPackage;
     return PaymentScreen(
@@ -73,6 +68,19 @@ final Map<String, WidgetBuilder> routes = {
   },
   InsightScreen.routeName: (context) => const InsightScreen(),
   NotificationScreen.routeName: (context) => const NotificationScreen(),
-  WalletScreen.routeName: (context) => const WalletScreen(),
-  ExceptionScreen.routeName: (context) => const ExceptionScreen(),
+  WalletScreen.routeName: (context) {
+    final args = ModalRoute.of(context)!.settings.arguments as int?;
+    return WalletScreen(
+      walletType: args,
+    );
+  },
+  NoInternetScreen.routeName: (context) => const NoInternetScreen(),
+  SupportScreen.routeName: (context) => const SupportScreen(),
+  SettingScreen.routeName: (context) => const SettingScreen(),
+  UpdateProfile.routeName: (context) {
+    final args = ModalRoute.of(context)!.settings.arguments as String;
+    return UpdateProfile(
+      name: args,
+    );
+  }
 };

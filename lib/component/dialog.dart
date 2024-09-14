@@ -162,8 +162,8 @@ class ConfirmDialog extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        TextButton(
-                          onPressed: () {
+                        GestureDetector(
+                          onTap: () {
                             if (onCancel != null) {
                               onCancel!();
                             } else {
@@ -180,8 +180,9 @@ class ConfirmDialog extends StatelessWidget {
                                 ),
                           ),
                         ),
-                        TextButton(
-                          onPressed: () {
+                        const SizedBox(width: 20),
+                        GestureDetector(
+                          onTap: () {
                             if (onConfirm != null) {
                               onConfirm!();
                             }

@@ -9,6 +9,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:logger/web.dart';
 import 'package:mime/mime.dart';
 
+import '../../../core/const/frontend/error_catcher.dart';
 import '../../../core/const/frontend/message.dart';
 import 'api_root.dart';
 
@@ -73,50 +74,52 @@ class CallBikeApi {
           responseJson,
           (json) => AddBaiRespModel.fromJson(json as Map<String, dynamic>),
         );
-      } else if (response.statusCode == 409) {
-        return APIResponse(
-          message: responseJson['message'],
-        );
       } else {
         log.e('Failed to create bai: ${response.statusCode}');
         return APIResponse(
-          message: "${ErrorMessage.somethingWentWrong}: ${response.statusCode}",
+          statusCode: response.statusCode,
+          message: HttpErrorMapper.getErrorMessage(response.statusCode),
         );
       }
     } catch (e) {
       log.e('Error during create bai: $e');
-      return APIResponse(message: "${ErrorMessage.somethingWentWrong}: $e");
+      return APIResponse(
+        statusCode: 400,
+        message: ErrorMessage.somethingWentWrong,
+      );
     }
   }
 
-  Future<List<VehicleTypeModel>> getVehicleType() async {
+  Future<APIResponse<List<VehicleTypeModel>>> getVehicleType() async {
     try {
       final response = await http.get(
         Uri.parse('$api/type'),
       );
+
+      var jsonResponse = jsonDecode(response.body);
       if (response.statusCode == 200) {
-        var jsonResponse = jsonDecode(response.body);
-        if (jsonResponse is List) {
-          return jsonResponse
-              .map((json) => VehicleTypeModel.fromJson(json))
-              .toList();
-        } else if (jsonResponse is Map) {
-          var jsonList = jsonResponse['data'] as List;
-          return jsonList
-              .map((json) => VehicleTypeModel.fromJson(json))
-              .toList();
-        } else {
-          log.e('Unexpected JSON format: $jsonResponse');
-          return [];
-        }
+        APIResponse<List<VehicleTypeModel>> apiResponse = APIResponse.fromJson(
+          jsonResponse,
+          (json) => (json as List)
+              .map((item) =>
+                  VehicleTypeModel.fromJson(item as Map<String, dynamic>))
+              .toList(),
+        );
+        return apiResponse;
       } else {
         log.e('Failed to get vehicle types: ${response.statusCode}');
-        return [];
+        return APIResponse(
+          statusCode: response.statusCode,
+          message: HttpErrorMapper.getErrorMessage(response.statusCode),
+        );
       }
     } catch (e) {
       log.e('Error during get vehicle type: $e');
+      return APIResponse(
+        statusCode: 400,
+        message: ErrorMessage.somethingWentWrong,
+      );
     }
-    return [];
   }
 
   Future<APIResponse<List<BaiModel>>> getBai() async {
@@ -151,12 +154,16 @@ class CallBikeApi {
       } else {
         log.e('Failed to get vehicle: ${response.statusCode} ${response.body}');
         return APIResponse(
-          message: "${ErrorMessage.somethingWentWrong}: ${response.statusCode}",
+          statusCode: response.statusCode,
+          message: HttpErrorMapper.getErrorMessage(response.statusCode),
         );
       }
     } catch (e) {
       log.e('Error during get bai: $e');
-      return APIResponse(message: "${ErrorMessage.somethingWentWrong}: $e");
+      return APIResponse(
+        statusCode: 400,
+        message: ErrorMessage.somethingWentWrong,
+      );
     }
   }
 
@@ -201,7 +208,7 @@ class CallBikeApi {
 
   //DELETE: /vehicles/customer/{id}
   // Delete vehicle
-  Future<APIResponse<int>> deleteBai(String id) async {
+  Future<APIResponse> deleteBai(String id) async {
     try {
       token = GetLocalHelper.getBearerToken() ?? "";
       if (token == "") {
@@ -221,29 +228,27 @@ class CallBikeApi {
 
       if (response.statusCode == 200) {
         return APIResponse(
-          data: response.statusCode,
           message: Message.deleteSuccess(message: ListName.vehicle),
         );
       }
 
-      final errorMessage = response.statusCode == 404
-          ? ErrorMessage.notFound(message: ListName.vehicle)
-          : "${ErrorMessage.somethingWentWrong}: ${response.statusCode}";
-
       log.e('Failed to delete vehicle: ${response.statusCode}');
       return APIResponse(
-        data: response.statusCode,
-        message: errorMessage,
+        statusCode: response.statusCode,
+        message: HttpErrorMapper.getErrorMessage(response.statusCode),
       );
     } catch (e) {
       log.e('Error during delete bai: $e');
-      return APIResponse(message: "${ErrorMessage.somethingWentWrong}: $e");
+      return APIResponse(
+        statusCode: 400,
+        message: ErrorMessage.somethingWentWrong,
+      );
     }
   }
 
   // PUT: /vehicles/customer
   // Update vehicle
-  Future<APIResponse<int>> updateBai(UpdateBaiModel updateBaiModel) async {
+  Future<APIResponse> updateBai(UpdateBaiModel updateBaiModel) async {
     try {
       token = GetLocalHelper.getBearerToken() ?? "";
       if (token == "") {
@@ -264,23 +269,21 @@ class CallBikeApi {
 
       if (response.statusCode == 200) {
         return APIResponse(
-          data: response.statusCode,
           message: Message.deleteSuccess(message: ListName.vehicle),
         );
       }
 
-      final errorMessage = response.statusCode == 404
-          ? ErrorMessage.notFound(message: ListName.vehicle)
-          : "${ErrorMessage.somethingWentWrong}: ${response.statusCode}";
-
       log.e('Failed to delete vehicle: ${response.statusCode}');
       return APIResponse(
-        data: response.statusCode,
-        message: errorMessage,
+        statusCode: response.statusCode,
+        message: HttpErrorMapper.getErrorMessage(response.statusCode),
       );
     } catch (e) {
       log.e('Error during delete bai: $e');
-      return APIResponse(message: "${ErrorMessage.somethingWentWrong}: $e");
+      return APIResponse(
+        statusCode: 400,
+        message: ErrorMessage.somethingWentWrong,
+      );
     }
   }
 
@@ -317,12 +320,16 @@ class CallBikeApi {
         log.e(
             'Failed to get vehicle by ID: ${response.statusCode} ${response.body}');
         return APIResponse(
-          message: "${ErrorMessage.somethingWentWrong}: ${response.statusCode}",
+          statusCode: response.statusCode,
+          message: HttpErrorMapper.getErrorMessage(response.statusCode),
         );
       }
     } catch (e) {
       log.e('Error during get vehicle by ID: $e');
-      return APIResponse(message: "${ErrorMessage.somethingWentWrong}: $e");
+      return APIResponse(
+        statusCode: 400,
+        message: ErrorMessage.somethingWentWrong,
+      );
     }
   }
 }

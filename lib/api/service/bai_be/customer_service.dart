@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:bai_system/core/const/frontend/error_catcher.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
@@ -52,12 +53,14 @@ class CallCustomerApi {
         log.e(
             'Failed to updateCustomerInfo.\nStatus code: ${response.statusCode}\n Message: ${apiResponseJson['message']}');
         return APIResponse(
-          message: apiResponseJson['message'],
+          statusCode: response.statusCode,
+          message: HttpErrorMapper.getErrorMessage(response.statusCode),
         );
       }
     } catch (e) {
       log.e('Error during updateCustomerInfo: $e');
       return APIResponse(
+        statusCode: 400,
         message: ErrorMessage.somethingWentWrong,
       );
     }

@@ -11,6 +11,9 @@ class ColorLightMode {
   static const Color success = Color(0xFF00A676);
   static const Color fail = Color(0xFFF42B03);
   static const Color zaloPay = Color(0xFF008fe5);
+
+  static const Color darkgreen = Color(0xff2E7D32);
+  static const Color backgroundGreen = Color(0xFFEAFBF5);
 }
 
 class ColorDarkMode {

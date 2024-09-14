@@ -1,11 +1,12 @@
+import 'dart:async';
+
 import 'package:bai_system/api/model/bai_model/wallet_model.dart';
 import 'package:bai_system/api/service/bai_be/wallet_service.dart';
+import 'package:bai_system/component/response_handler.dart';
 import 'package:bai_system/core/const/utilities/util_helper.dart';
 import 'package:bai_system/representation/insight.dart';
 import 'package:bai_system/representation/navigation_bar.dart';
 import 'package:bai_system/representation/wallet.dart';
-import 'package:bai_system/representation/wallet_extra_screen.dart';
-import 'package:bai_system/representation/wallet_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -16,11 +17,11 @@ import 'package:logger/logger.dart';
 import '../api/model/bai_model/api_response.dart';
 import '../api/model/weather/weather.dart';
 import '../api/service/weather/open_weather_api.dart';
+import '../component/dialog.dart';
 import '../component/shadow_container.dart';
 import '../core/const/frontend/message.dart';
 import '../core/helper/asset_helper.dart';
 import '../core/helper/local_storage_helper.dart';
-import '../core/helper/return_login_dialog.dart';
 import 'fundin_screen.dart';
 
 class HomeAppScreen extends StatefulWidget {
@@ -32,7 +33,7 @@ class HomeAppScreen extends StatefulWidget {
   State<HomeAppScreen> createState() => _HomeAppScreenState();
 }
 
-class _HomeAppScreenState extends State<HomeAppScreen> {
+class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
   bool _hideBalance = false;
   bool isAllowLocation = false;
   bool isReloading = false;
@@ -56,6 +57,13 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
     _initialize();
   }
 
+  @override
+  void dispose() {
+    _focusNode.removeListener(_onFocusChange);
+    _focusNode.dispose();
+    super.dispose();
+  }
+
   void _initialize() async {
     _focusNode = FocusNode()..addListener(_onFocusChange);
     await _loadHideBalance();
@@ -69,6 +77,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
       getBalance(),
       getExtraBalance(),
     ]);
+    if (!mounted) return;
     setState(() => isReloading = false);
   }
 
@@ -126,10 +135,15 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
     try {
       final APIResponse<int> result = await _walletApi.getMainWalletBalance();
 
-      if (result.isTokenValid == false &&
-          result.message == ErrorMessage.tokenInvalid) {
-        if (!mounted) return;
-        ReturnLoginDialog.returnLogin(context);
+      if (!mounted) return;
+
+      final bool isResponseValid = await handleApiResponse(
+        context: context,
+        response: result,
+        showErrorDialog: _showErrorDialog,
+      );
+
+      if (!isResponseValid) {
         return;
       }
 
@@ -146,12 +160,15 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
       APIResponse<ExtraBalanceModel> extraBalanceModel =
           await _walletApi.getExtraWalletBalance();
 
-      if (extraBalanceModel.isTokenValid == false &&
-          extraBalanceModel.message == ErrorMessage.tokenInvalid) {
-        if (!mounted) return;
-        ReturnLoginDialog.returnLogin(context);
-        return;
-      }
+      if (!mounted) return;
+
+      final bool isResponseValid = await handleApiResponse(
+        context: context,
+        response: extraBalanceModel,
+        showErrorDialog: _showErrorDialog,
+      );
+
+      if (!isResponseValid) return;
 
       if (extraBalanceModel.data != null) {
         setState(() {
@@ -246,7 +263,8 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
       children: [
         Expanded(
           child: GestureDetector(
-            onTap: () => Navigator.of(context).pushNamed(MyWallet.routeName),
+            onTap: () =>
+                Navigator.of(context).pushNamed(WalletScreen.routeName),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.start,
@@ -267,8 +285,8 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
         ),
         Expanded(
           child: GestureDetector(
-            onTap: () =>
-                Navigator.of(context).pushNamed(WalletExtraScreen.routeName),
+            onTap: () => Navigator.of(context)
+                .pushNamed(WalletScreen.routeName, arguments: 1),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.end,
@@ -676,11 +694,19 @@ class _HomeAppScreenState extends State<HomeAppScreen> {
     return '$lastUpdated $timezone';
   }
 
-  @override
-  void dispose() {
-    _focusNode.removeListener(_onFocusChange);
-    _focusNode.dispose();
-    super.dispose();
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return OKDialog(
+          title: ErrorMessage.error,
+          content: Text(
+            message,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        );
+      },
+    );
   }
 }
 

@@ -2,10 +2,12 @@
 
 import 'package:bai_system/api/service/bai_be/bai_service.dart';
 import 'package:bai_system/component/dialog.dart';
+import 'package:bai_system/component/response_handler.dart';
 import 'package:bai_system/component/shadow_container.dart';
 import 'package:bai_system/component/snackbar.dart';
 import 'package:bai_system/core/const/utilities/regex.dart';
 import 'package:bai_system/core/const/utilities/util_helper.dart';
+import 'package:bai_system/core/helper/loading_overlay_helper.dart';
 import 'package:bai_system/representation/navigation_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +20,6 @@ import '../api/model/bai_model/bai_model.dart';
 import '../component/app_bar_component.dart';
 import '../component/image_not_found_component.dart';
 import '../core/const/frontend/message.dart';
-import '../core/helper/return_login_dialog.dart';
 
 class BaiDetails extends StatefulWidget {
   final BaiModel baiModel;
@@ -34,7 +35,7 @@ class BaiDetails extends StatefulWidget {
   State<BaiDetails> createState() => _BaiDetailsState();
 }
 
-class _BaiDetailsState extends State<BaiDetails> {
+class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
   late BaiModel bai = widget.baiModel;
   final callVehicleApi = CallBikeApi();
 
@@ -168,10 +169,10 @@ class _BaiDetailsState extends State<BaiDetails> {
                       ],
                     ),
                     const SizedBox(height: 5),
-                    if(bai.status == 'REJECTED')
+                    if (bai.status == 'REJECTED')
                       SizedBox(
                         child: Text(
-                          'Reason: Wrong information. Please check again.',
+                          'Wrong information. Please check again.',
                           style: contentTextStyle.copyWith(
                             color: Theme.of(context).colorScheme.error,
                           ),
@@ -180,10 +181,10 @@ class _BaiDetailsState extends State<BaiDetails> {
                           textAlign: TextAlign.justify,
                         ),
                       ),
-                    if(bai.status == 'PENDING')
+                    if (bai.status == 'PENDING')
                       SizedBox(
                         child: Text(
-                          'Note: Please park your vehicle in our facility for the first time to activate it.',
+                          'Please park your vehicle in our facility for the first time to activate it.',
                           style: contentTextStyle.copyWith(
                             color: Theme.of(context).colorScheme.primary,
                           ),
@@ -393,35 +394,22 @@ class _BaiDetailsState extends State<BaiDetails> {
   // edit Bai
   Future<void> editBai(UpdateBaiModel baiModel) async {
     try {
-      APIResponse<int> response = await callVehicleApi.updateBai(baiModel);
+      APIResponse response = await callVehicleApi.updateBai(baiModel);
 
-      if (response.isTokenValid == false &&
-          response.message == ErrorMessage.tokenInvalid) {
-        log.e('Token is invalid');
-        if (!mounted) return;
-        ReturnLoginDialog.returnLogin(context);
-        return;
-      }
+      if (!mounted) return;
 
-      switch (response.data.toString()) {
-        case '200':
-          log.d('Edit Bai successfully');
-          goToPage(routeName: MyNavigationBar.routeName, arguments: 1);
-          showSnackBar(
-              message: Message.editSuccess(message: ListName.bai),
-              isSuccessful: true);
-          break;
-        case '409':
-          log.d('Edit Bai failed: Not Authorized');
-          showSnackBar(message: Message.permissionDeny, isSuccessful: false);
-          break;
-        default:
-          log.e('Failed to edit Bai: ${response.message}');
-          showSnackBar(
-              message: Message.editUnSuccess(message: ListName.bai),
-              isSuccessful: false);
-          break;
-      }
+      final bool isResponseValid = await handleApiResponse(
+        context: context,
+        response: response,
+        showErrorDialog: _showErrorDialog,
+      );
+
+      if (!isResponseValid) return;
+
+      goToPage(routeName: MyNavigationBar.routeName, arguments: 1);
+      showSnackBar(
+          message: Message.editSuccess(message: ListName.bai),
+          isSuccessful: true);
       return;
     } catch (e) {
       log.e('Error during edit Bai: $e');
@@ -434,41 +422,32 @@ class _BaiDetailsState extends State<BaiDetails> {
   // Delete Bai
   Future<void> deleteBai(String id) async {
     try {
-      APIResponse<int> response = await callVehicleApi.deleteBai(bai.id);
+      Navigator.of(context).pop();
+      LoadingOverlayHelper.show(context);
+      APIResponse response = await callVehicleApi.deleteBai(bai.id);
 
-      if (response.isTokenValid == false &&
-          response.message == ErrorMessage.tokenInvalid) {
-        log.e('Token is invalid');
-        if (!mounted) return;
-        ReturnLoginDialog.returnLogin(context);
-        return;
-      }
+      if (!mounted) return;
 
-      switch (response.data.toString()) {
-        case '200':
-          log.d('Delete Bai successfully');
-          goToPage(routeName: MyNavigationBar.routeName, arguments: 1);
-          showSnackBar(
-              message: Message.deleteSuccess(message: ListName.bai),
-              isSuccessful: true);
-          break;
-        case '409':
-          log.d('Delete Bai failed: Not Authorized');
-          showSnackBar(message: Message.permissionDeny, isSuccessful: false);
-          break;
-        default:
-          log.e('Failed to delete Bai: ${response.message}');
-          showSnackBar(
-              message: Message.deleteUnSuccess(message: ListName.bai),
-              isSuccessful: false);
-          break;
-      }
-      return;
+      final bool isResponseValid = await handleApiResponse(
+        context: context,
+        response: response,
+        showErrorDialog: _showErrorDialog,
+      );
+
+      if (!isResponseValid) return;
+
+      goToPage(routeName: MyNavigationBar.routeName, arguments: 1);
+      showSnackBar(
+        message: Message.deleteSuccess(message: ListName.bai),
+        isSuccessful: true,
+      );
     } catch (e) {
       log.e('Error during delete Bai: $e');
       showSnackBar(
           message: Message.deleteUnSuccess(message: ListName.bai),
           isSuccessful: false);
+    } finally {
+      LoadingOverlayHelper.hide();
     }
   }
 
@@ -477,40 +456,47 @@ class _BaiDetailsState extends State<BaiDetails> {
       APIResponse<BaiModel> response =
           await callVehicleApi.getCustomerBaiById(id);
 
-      if (response.isTokenValid == false &&
-          response.message == ErrorMessage.tokenInvalid) {
-        log.e('Token is invalid');
-        if (!mounted) return;
-        ReturnLoginDialog.returnLogin(context);
-        return;
-      }
+      if (!mounted) return;
 
-      if (response.data != null) {
-        setState(() {
-          bai = response.data!;
-        });
-      } else {
-        log.e('Failed to fetch Bai details: ${response.message}');
-      }
+      final bool isResponseValid = await handleApiResponse(
+        context: context,
+        response: response,
+        showErrorDialog: _showErrorDialog,
+      );
+
+      if (!isResponseValid) return;
+
+      setState(() {
+        bai = response.data!;
+      });
     } catch (e) {
       log.e('Error during fetch Bai details: $e');
+      _showErrorDialog(ErrorMessage.somethingWentWrong);
     }
   }
 
   //Get Vehicle Type
   Future<void> getVehicleType() async {
     try {
-      List<VehicleTypeModel> response = await callVehicleApi.getVehicleType();
+      APIResponse<List<VehicleTypeModel>> response =
+          await callVehicleApi.getVehicleType();
 
-      if (response.isNotEmpty) {
-        setState(() {
-          _vehicleType = response;
-        });
-      } else {
-        log.e('Failed to fetch Vehicle Type: $response');
-      }
+      if (!mounted) return;
+
+      final bool isResponseValid = await handleApiResponse(
+        context: context,
+        response: response,
+        showErrorDialog: _showErrorDialog,
+      );
+
+      if (!isResponseValid) return;
+
+      setState(() {
+        _vehicleType = response.data!;
+      });
     } catch (e) {
       log.e('Error during fetch Vehicle Type: $e');
+      _showErrorDialog(ErrorMessage.somethingWentWrong);
     }
   }
 
@@ -596,5 +582,20 @@ class _BaiDetailsState extends State<BaiDetails> {
       return true;
     }
     return false;
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return OKDialog(
+          title: ErrorMessage.error,
+          content: Text(
+            message,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        );
+      },
+    );
   }
 }

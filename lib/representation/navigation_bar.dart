@@ -1,3 +1,4 @@
+import 'package:bai_system/component/internet_connection_wrapper.dart';
 import 'package:bai_system/representation/bai_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
@@ -46,65 +47,67 @@ class _MyNavigationBarState extends State<MyNavigationBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      extendBody: true,
-      appBar: const MainAppBar(),
-      body: PopScope(
-        canPop: false,
-        child: Center(
-          child: _widgetOptions.elementAt(_selectedIndex),
+    return InternetConnectionWrapper(
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        extendBody: true,
+        appBar: const MainAppBar(),
+        body: PopScope(
+          canPop: false,
+          child: Center(
+            child: _widgetOptions.elementAt(_selectedIndex),
+          ),
         ),
-      ),
-      bottomNavigationBar: StylishBottomBar(
-        option: AnimatedBarOptions(
-          iconSize: 25,
-          iconStyle: IconStyle.Default,
-          barAnimation: BarAnimation.blink,
-          inkColor: Theme.of(context).colorScheme.primary,
-          opacity: 0.5,
-        ),
+        bottomNavigationBar: StylishBottomBar(
+          option: AnimatedBarOptions(
+            iconSize: 25,
+            iconStyle: IconStyle.Default,
+            barAnimation: BarAnimation.blink,
+            inkColor: Theme.of(context).colorScheme.primary,
+            opacity: 0.5,
+          ),
 
-        // elevation: 5,
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        currentIndex: _selectedIndex,
-        iconSpace: 10,
-        items: [
-          BottomBarItem(
-            icon: const Icon(Icons.home_rounded),
-            title: Text(
-              'Home',
-              style: Theme.of(context).textTheme.labelSmall,
+          // elevation: 5,
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          currentIndex: _selectedIndex,
+          iconSpace: 10,
+          items: [
+            BottomBarItem(
+              icon: const Icon(Icons.home_rounded),
+              title: Text(
+                'Home',
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
+              selectedColor: Theme.of(context).colorScheme.primary,
             ),
-            selectedColor: Theme.of(context).colorScheme.primary,
-          ),
-          BottomBarItem(
-            icon: const Icon(Icons.motorcycle_rounded),
-            title: Text(
-              'Bai',
-              style: Theme.of(context).textTheme.labelSmall,
+            BottomBarItem(
+              icon: const Icon(Icons.motorcycle_rounded),
+              title: Text(
+                'Bai',
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
+              selectedColor: Theme.of(context).colorScheme.primary,
             ),
-            selectedColor: Theme.of(context).colorScheme.primary,
-          ),
-          BottomBarItem(
-            icon: const Icon(Icons.history_rounded),
-            title: Text(
-              'History',
-              style: Theme.of(context).textTheme.labelSmall,
+            BottomBarItem(
+              icon: const Icon(Icons.history_rounded),
+              title: Text(
+                'History',
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
+              selectedColor: Theme.of(context).colorScheme.primary,
             ),
-            selectedColor: Theme.of(context).colorScheme.primary,
-          ),
-          BottomBarItem(
-            icon: const Icon(Icons.dehaze_rounded),
-            title: Text(
-              'Others',
-              style: Theme.of(context).textTheme.labelSmall,
+            BottomBarItem(
+              icon: const Icon(Icons.settings_input_svideo_rounded),
+              title: Text(
+                'More',
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
+              selectedColor: Theme.of(context).colorScheme.primary,
             ),
-            selectedColor: Theme.of(context).colorScheme.primary,
-          ),
-        ],
-        notchStyle: NotchStyle.square,
-        onTap: _onItemTapped,
+          ],
+          notchStyle: NotchStyle.square,
+          onTap: _onItemTapped,
+        ),
       ),
     );
   }

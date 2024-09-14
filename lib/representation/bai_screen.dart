@@ -1,5 +1,6 @@
 import 'package:bai_system/api/model/bai_model/api_response.dart';
 import 'package:bai_system/component/empty_box.dart';
+import 'package:bai_system/component/response_handler.dart';
 import 'package:bai_system/core/const/utilities/util_helper.dart';
 import 'package:bai_system/representation/bai_details.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -9,12 +10,12 @@ import 'package:shimmer/shimmer.dart';
 
 import '../api/model/bai_model/bai_model.dart';
 import '../api/service/bai_be/bai_service.dart';
+import '../component/dialog.dart';
 import '../component/image_not_found_component.dart';
 import '../component/loading_component.dart';
 import '../component/shadow_container.dart';
 import '../core/const/frontend/message.dart';
 import '../core/helper/asset_helper.dart';
-import '../core/helper/return_login_dialog.dart';
 import '../representation/add_bai_screen.dart';
 
 class BaiScreen extends StatefulWidget {
@@ -26,7 +27,7 @@ class BaiScreen extends StatefulWidget {
   State<BaiScreen> createState() => _BaiScreenState();
 }
 
-class _BaiScreenState extends State<BaiScreen> {
+class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
   var log = Logger();
   CallBikeApi api = CallBikeApi();
   bool isCalling = true;
@@ -42,25 +43,22 @@ class _BaiScreenState extends State<BaiScreen> {
     try {
       final APIResponse<List<BaiModel>> fetchedBikes = await api.getBai();
 
-      if (fetchedBikes.isTokenValid == false &&
-          fetchedBikes.message == ErrorMessage.tokenInvalid) {
-        log.e('Token is invalid');
+      if (!mounted) return;
 
-        if (!mounted) return;
-        //show login dialog
-        ReturnLoginDialog.returnLogin(context);
-        return;
-      }
+      final bool isResponseValid = await handleApiResponse(
+        context: context,
+        response: fetchedBikes,
+        showErrorDialog: _showErrorDialog,
+      );
 
-      if (mounted) {
-        setState(() {
-          bikes = fetchedBikes.data;
-          isCalling = false;
-        });
-      }
+      if (!isResponseValid) return;
+
+      setState(() {
+        bikes = fetchedBikes.data;
+        isCalling = false;
+      });
     } catch (e) {
       log.e('Error fetching bikes: $e');
-      // Xử lý lỗi nếu cần thiết
       if (mounted) {
         setState(() {
           isCalling = false;
@@ -219,8 +217,7 @@ class _BaiScreenState extends State<BaiScreen> {
                     ),
                   ),
                   Padding(
-                    padding:
-                        const EdgeInsets.only(bottom: 10, left: 10),
+                    padding: const EdgeInsets.only(bottom: 10, left: 10),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -256,27 +253,31 @@ class _BaiScreenState extends State<BaiScreen> {
                       ],
                     ),
                   ),
-                  if(bai.status == 'REJECTED')
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 10),
+                  if (bai.status == 'REJECTED')
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      padding: const EdgeInsets.only(
+                          left: 20, right: 20, bottom: 10),
                       child: Text(
-                        'Reason: Wrong information. Please check again.',
+                        'Wrong information. Please check again.',
                         style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                          color: Theme.of(context).colorScheme.error,
-                        ),
+                              color: Theme.of(context).colorScheme.error,
+                            ),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 2,
                         textAlign: TextAlign.justify,
                       ),
                     ),
-                  if(bai.status == 'PENDING')
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 10),
+                  if (bai.status == 'PENDING')
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      padding: const EdgeInsets.only(
+                          left: 20, right: 20, bottom: 10),
                       child: Text(
-                        'Note: Please park your vehicle in our facility for the first time to activate it.',
+                        'Please park your vehicle in our facility for the first time to activate it.',
                         style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 2,
                         textAlign: TextAlign.justify,
@@ -288,6 +289,27 @@ class _BaiScreenState extends State<BaiScreen> {
           );
         },
       ),
+    );
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return OKDialog(
+          title: ErrorMessage.error,
+          content: Text(
+            message,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          onClick: () {
+            Navigator.of(context).pop();
+            setState(() {
+              isCalling = false;
+            });
+          },
+        );
+      },
     );
   }
 

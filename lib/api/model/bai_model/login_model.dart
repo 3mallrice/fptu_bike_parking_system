@@ -20,6 +20,15 @@ class UserData {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'bearerToken': bearerToken,
+      'name': name,
+      'email': email,
+      'avatar': avatar,
+    };
+  }
+
   @override
   String toString() {
     return 'UserData {bearerToken: $bearerToken, name: $name, email: $email, avartar: $avatar}';
