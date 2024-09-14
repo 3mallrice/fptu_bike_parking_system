@@ -21,14 +21,14 @@ class HowDidYouPay extends StatelessWidget {
             sections: paymentMethodUsageList.map((data) {
               return PieChartSectionData(
                 value: data.count.toDouble(),
-                title: data.method,
-                titleStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                title: data.method == "WALLET" ? "Wallet" : "Other/Cash",
+                titleStyle: Theme.of(context).textTheme.bodySmall!.copyWith(
                       color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                     ),
-                color: data.method == "Wallet"
-                    ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.outline,
+                color: data.method == "WALLET"
+                    ? Theme.of(context).colorScheme.outline
+                    : Theme.of(context).colorScheme.outlineVariant,
                 badgePositionPercentageOffset: 1.35,
                 badgeWidget: Text(
                   '${data.count}',
@@ -45,7 +45,7 @@ class HowDidYouPay extends StatelessWidget {
               show: false,
             ),
             sectionsSpace: 2,
-            centerSpaceRadius: 40,
+            centerSpaceRadius: 20,
             centerSpaceColor: Theme.of(context).colorScheme.surface,
             startDegreeOffset: 180,
           ),

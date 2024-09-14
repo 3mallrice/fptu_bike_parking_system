@@ -2,6 +2,7 @@ import 'package:bai_system/api/model/bai_model/login_model.dart';
 import 'package:bai_system/core/helper/local_storage_helper.dart';
 import 'package:bai_system/representation/navigation_bar.dart';
 import 'package:bai_system/representation/notification_screen.dart';
+import 'package:bai_system/representation/support.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
@@ -77,16 +78,32 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ],
                 ),
-                IconButton(
-                  onPressed: () {
-                    Navigator.of(context)
-                        .pushNamed(NotificationScreen.routeName);
-                  },
-                  icon: Icon(
-                    Icons.notifications,
-                    color: Theme.of(context).colorScheme.primary,
-                    size: 25,
-                  ),
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context)
+                            .pushNamed(SupportScreen.routeName);
+                      },
+                      child: Icon(
+                        Icons.headset_mic_rounded,
+                        color: Theme.of(context).colorScheme.primary,
+                        size: 25,
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context)
+                            .pushNamed(NotificationScreen.routeName);
+                      },
+                      child: Icon(
+                        Icons.notifications,
+                        color: Theme.of(context).colorScheme.primary,
+                        size: 25,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

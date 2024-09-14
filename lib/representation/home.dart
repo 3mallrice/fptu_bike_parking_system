@@ -22,7 +22,6 @@ import '../component/shadow_container.dart';
 import '../core/const/frontend/message.dart';
 import '../core/helper/asset_helper.dart';
 import '../core/helper/local_storage_helper.dart';
-import '../core/helper/return_login_dialog.dart';
 import 'fundin_screen.dart';
 
 class HomeAppScreen extends StatefulWidget {
@@ -78,6 +77,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
       getBalance(),
       getExtraBalance(),
     ]);
+    if (!mounted) return;
     setState(() => isReloading = false);
   }
 
@@ -135,11 +135,16 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
     try {
       final APIResponse<int> result = await _walletApi.getMainWalletBalance();
 
-      if (result.isTokenValid == false &&
-          result.message == ErrorMessage.tokenInvalid) {
-        if (!mounted) return;
-        ReturnLoginDialog.returnLogin(context);
-        return;
+      if (!mounted) return;
+
+      final bool isResponseValid = await handleApiResponse(
+        context: context,
+        response: result,
+        showErrorDialog: _showErrorDialog,
+      );
+
+      if (!isResponseValid) {
+        throw Exception('Invalid response');
       }
 
       setState(() {

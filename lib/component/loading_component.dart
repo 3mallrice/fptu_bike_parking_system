@@ -20,7 +20,7 @@ class LoadingCircle extends StatelessWidget {
       child: Container(
         height: isHeight ? MediaQuery.of(context).size.height * 0.6 : null,
         alignment: Alignment.center,
-        child: LoadingAnimationWidget.fourRotatingDots(
+        child: LoadingAnimationWidget.waveDots(
           color: Theme.of(context).colorScheme.primary,
           size: size ?? 100,
         ),

@@ -30,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> with ApiResponseHandler {
   static final _log = Logger();
   final _authApi = CallAuthApi();
   bool _isLoading = false;
-  Alignment _alignment = const Alignment(1, 0);
+  Alignment _alignment = const Alignment(0.9, 0.4);
 
   // Sign in with Google
   Future<void> _signIn() async {
@@ -54,9 +54,7 @@ class _LoginScreenState extends State<LoginScreen> with ApiResponseHandler {
           await _initializeAfterLogin();
           _navigateToHome();
         } else {
-          // Sử dụng thông báo từ API response nếu có
-          throw Exception(
-              userData.message ?? "Login failed: User data is null");
+          throw Exception(userData.statusCode);
         }
       } else {
         throw Exception("Login failed: Google authentication failed");
@@ -69,7 +67,8 @@ class _LoginScreenState extends State<LoginScreen> with ApiResponseHandler {
           e.toString().contains("Google authentication failed")) {
         userFriendlyMessage = UserFriendErrMess.loginErrMessage(e);
       } else {
-        userFriendlyMessage = ErrorMessage.somethingWentWrong;
+        userFriendlyMessage =
+            HttpErrorMapper.getErrorMessage(int.parse(e.toString()));
       }
 
       _showErrorDialog(userFriendlyMessage);
@@ -178,6 +177,7 @@ class _LoginScreenState extends State<LoginScreen> with ApiResponseHandler {
                       details.delta.dy /
                           (MediaQuery.of(context).size.height / 2),
                     );
+                    log.i('Alignment: $_alignment');
                   });
                 },
                 child: AnimatedContainer(

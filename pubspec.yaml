@@ -39,7 +39,6 @@ dependencies:
   image_picker: ^1.1.0
   flutter_image_slideshow: ^0.1.6
   stylish_bottom_bar: ^1.1.0
-  pretty_qr_code: ^3.3.0
   geolocator: ^12.0.0
   http: ^1.2.1
   font_awesome_flutter: ^10.7.0
@@ -49,7 +48,6 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   dotted_line: ^3.2.2
-  transition: ^2.0.2
   modal_bottom_sheet: ^3.0.0
   widgets_to_image: ^1.0.0
   permission_handler: ^11.3.1

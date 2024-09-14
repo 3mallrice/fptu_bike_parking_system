@@ -19,4 +19,9 @@ class AssetHelper {
   static const String emptyBox = 'assets/imgs/emptyBox.png';
   static const String vnpayQR = 'assets/imgs/vnpay_qr.svg';
   static const String vnpay = 'assets/imgs/vnpay_wallet.svg';
+  static const String cashlessNewbie = 'assets/imgs/Hero_0.png';
+  static const String cashlessExplorer = 'assets/imgs/Hero_1.png';
+  static const String cashlessAdventurer = 'assets/imgs/Hero_2.png';
+  static const String cashlessChampion = 'assets/imgs/Hero_3.png';
+  static const String cashlessMaster = 'assets/imgs/Hero_4.png';
 }

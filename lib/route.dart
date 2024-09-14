@@ -18,6 +18,7 @@ import 'package:bai_system/representation/payment.dart';
 import 'package:bai_system/representation/profile.dart';
 import 'package:bai_system/representation/receipt.dart';
 import 'package:bai_system/representation/splash_screen.dart';
+import 'package:bai_system/representation/support.dart';
 import 'package:bai_system/representation/wallet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -74,4 +75,5 @@ final Map<String, WidgetBuilder> routes = {
     );
   },
   NoInternetScreen.routeName: (context) => const NoInternetScreen(),
+  SupportScreen.routeName: (context) => const SupportScreen(),
 };
