@@ -4,6 +4,7 @@ import 'package:bai_system/core/helper/local_storage_helper.dart';
 import 'package:bai_system/representation/about_screen.dart';
 import 'package:bai_system/representation/feedback.dart';
 import 'package:bai_system/representation/settings.dart';
+import 'package:bai_system/representation/support.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
@@ -130,6 +131,38 @@ class _MeScreenState extends State<MeScreen> {
                           thickness: 1,
                         ),
                         _meItem(
+                          Icons.stars_outlined,
+                          Text(
+                            'Heroic Achievements',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(fontSize: 16),
+                          ),
+                          onTap: () => goToPageHelper(
+                              routeName: SupportScreen.routeName),
+                        ),
+                        Divider(
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                          thickness: 1,
+                        ),
+                        _meItem(
+                          Icons.headset_mic_rounded,
+                          Text(
+                            'Help Center',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(fontSize: 16),
+                          ),
+                          onTap: () => goToPageHelper(
+                              routeName: SupportScreen.routeName),
+                        ),
+                        Divider(
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                          thickness: 1,
+                        ),
+                        _meItem(
                           Icons.info_outlined,
                           Text(
                             'About Bai',
@@ -164,7 +197,7 @@ class _MeScreenState extends State<MeScreen> {
     return initials.toUpperCase();
   }
 
-  Widget _meItem(IconData? iconData, Widget content,
+  Widget _meItem(IconData iconData, Widget content,
       {VoidCallback? onTap, Widget? trailing}) {
     return ListTile(
       horizontalTitleGap: 13,

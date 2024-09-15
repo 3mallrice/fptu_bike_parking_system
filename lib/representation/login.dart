@@ -7,6 +7,7 @@ import 'package:bai_system/core/const/frontend/error_catcher.dart';
 import 'package:bai_system/core/helper/asset_helper.dart';
 import 'package:bai_system/core/helper/local_storage_helper.dart';
 import 'package:bai_system/representation/navigation_bar.dart';
+import 'package:bai_system/representation/support.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:logger/logger.dart';
@@ -196,23 +197,26 @@ class _LoginScreenState extends State<LoginScreen> with ApiResponseHandler {
     return CircleAvatar(
       backgroundColor: Theme.of(context).colorScheme.outline,
       radius: 25,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.headset_mic_rounded,
-            size: 28,
-            color: Theme.of(context).colorScheme.surface,
-          ),
-          Text(
-            'Support',
-            style: Theme.of(context).textTheme.displaySmall!.copyWith(
-                  color: Theme.of(context).colorScheme.surface,
-                  fontSize: 7,
-                ),
-          ),
-        ],
+      child: GestureDetector(
+        onTap: () => Navigator.of(context).pushNamed(SupportScreen.routeName),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.headset_mic_rounded,
+              size: 28,
+              color: Theme.of(context).colorScheme.surface,
+            ),
+            Text(
+              'Support',
+              style: Theme.of(context).textTheme.displaySmall!.copyWith(
+                    color: Theme.of(context).colorScheme.surface,
+                    fontSize: 7,
+                  ),
+            ),
+          ],
+        ),
       ),
     );
   }

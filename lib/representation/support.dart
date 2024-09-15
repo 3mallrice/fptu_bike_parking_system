@@ -13,6 +13,9 @@ class SupportScreen extends StatelessWidget {
         leading: true,
         appBarText: 'Support',
       ),
+      body: Center(
+        child: Text('Support'),
+      ),
     );
   }
 }
