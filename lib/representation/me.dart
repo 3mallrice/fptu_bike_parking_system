@@ -2,6 +2,7 @@ import 'package:bai_system/api/model/bai_model/login_model.dart';
 import 'package:bai_system/component/shadow_container.dart';
 import 'package:bai_system/core/helper/local_storage_helper.dart';
 import 'package:bai_system/representation/about_screen.dart';
+import 'package:bai_system/representation/faq.dart';
 import 'package:bai_system/representation/feedback.dart';
 import 'package:bai_system/representation/settings.dart';
 import 'package:bai_system/representation/support.dart';
@@ -147,7 +148,7 @@ class _MeScreenState extends State<MeScreen> {
                           thickness: 1,
                         ),
                         _meItem(
-                          Icons.headset_mic_rounded,
+                          Icons.question_mark_sharp,
                           Text(
                             'Help Center',
                             style: Theme.of(context)
@@ -155,8 +156,8 @@ class _MeScreenState extends State<MeScreen> {
                                 .titleMedium!
                                 .copyWith(fontSize: 16),
                           ),
-                          onTap: () => goToPageHelper(
-                              routeName: SupportScreen.routeName),
+                          onTap: () =>
+                              goToPageHelper(routeName: FAQScreen.routeName),
                         ),
                         Divider(
                           color: Theme.of(context).colorScheme.outlineVariant,

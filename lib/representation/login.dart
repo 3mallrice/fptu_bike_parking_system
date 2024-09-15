@@ -6,8 +6,8 @@ import 'package:bai_system/component/shadow_container.dart';
 import 'package:bai_system/core/const/frontend/error_catcher.dart';
 import 'package:bai_system/core/helper/asset_helper.dart';
 import 'package:bai_system/core/helper/local_storage_helper.dart';
+import 'package:bai_system/representation/faq.dart';
 import 'package:bai_system/representation/navigation_bar.dart';
-import 'package:bai_system/representation/support.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:logger/logger.dart';
@@ -55,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> with ApiResponseHandler {
           await _initializeAfterLogin();
           _navigateToHome();
         } else {
-          throw Exception(userData.statusCode);
+          throw userData.statusCode.toString();
         }
       } else {
         throw Exception("Login failed: Google authentication failed");
@@ -198,21 +198,22 @@ class _LoginScreenState extends State<LoginScreen> with ApiResponseHandler {
       backgroundColor: Theme.of(context).colorScheme.outline,
       radius: 25,
       child: GestureDetector(
-        onTap: () => Navigator.of(context).pushNamed(SupportScreen.routeName),
+        onTap: () => Navigator.of(context).pushNamed(FAQScreen.routeName),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Icon(
-              Icons.headset_mic_rounded,
-              size: 28,
+              Icons.question_mark_sharp,
+              size: 16,
               color: Theme.of(context).colorScheme.surface,
             ),
+            const SizedBox(height: 3),
             Text(
-              'Support',
+              'FAQs',
               style: Theme.of(context).textTheme.displaySmall!.copyWith(
                     color: Theme.of(context).colorScheme.surface,
-                    fontSize: 7,
+                    fontSize: 9,
                   ),
             ),
           ],

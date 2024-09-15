@@ -8,7 +8,6 @@ class AssetHelper {
   static const String bic = 'assets/imgs/BIC.png';
   static const String poster = 'assets/imgs/poster.png';
   static const String fptedu = 'assets/imgs/fptedu.png';
-  static const String fptu = 'assets/imgs/fptu.png';
   static const String baiLogo = 'assets/imgs/bai.png';
   static const String plateNumber = 'assets/imgs/plateNumber.png';
   static const String splash = 'assets/imgs/Splash.png';
@@ -27,4 +26,11 @@ class AssetHelper {
   static const String messengerLogo = 'assets/imgs/messenger.png';
   static const String zaloLogo = 'assets/imgs/zalo.png';
   static const String facebookLogo = 'assets/imgs/facebook.png';
+  static const String loginScreen = 'assets/imgs/login.jpg';
+  static const String supportScreen = 'assets/imgs/support.jpg';
+  static const String fundInScreen = 'assets/imgs/fundin.jpg';
+  static const String payMethodScreen = 'assets/imgs/payMethod.jpg';
+  static const String walletScreen = 'assets/imgs/wallet.jpg';
+  static const String patnerAtm = 'assets/imgs/partner_atm_acc.png';
+  static const String partnerCard = 'assets/imgs/partnerCard.png';
 }

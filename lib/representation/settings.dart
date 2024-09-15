@@ -121,7 +121,7 @@ class _SettingScreenState extends State<SettingScreen> {
                               .textTheme
                               .bodySmall!
                               .copyWith(
-                                fontSize: 10,
+                                fontSize: 12,
                                 color:
                                     Theme.of(context).colorScheme.onSecondary,
                               ),
@@ -151,7 +151,7 @@ class _SettingScreenState extends State<SettingScreen> {
                               .textTheme
                               .bodySmall!
                               .copyWith(
-                                fontSize: 10,
+                                fontSize: 12,
                                 color:
                                     Theme.of(context).colorScheme.onSecondary,
                               ),
@@ -188,10 +188,10 @@ class _SettingScreenState extends State<SettingScreen> {
                             .copyWith(fontSize: 15),
                       ),
                       Text(
-                        '* Your balances on home screen will appear as ******\n* To reveal, hold on your balance',
+                        '- Your balances on home screen will appear as ******\n- To reveal, hold on your balance',
                         style: Theme.of(context).textTheme.bodySmall!.copyWith(
                               color: Theme.of(context).colorScheme.onSecondary,
-                              fontSize: 10,
+                              fontSize: 12,
                             ),
                       ),
                     ],
@@ -249,7 +249,7 @@ class _SettingScreenState extends State<SettingScreen> {
                         'Set the number of items per page',
                         style: Theme.of(context).textTheme.bodySmall!.copyWith(
                               color: Theme.of(context).colorScheme.onSecondary,
-                              fontSize: 10,
+                              fontSize: 12,
                             ),
                       )
                     ],
@@ -306,6 +306,7 @@ class _SettingScreenState extends State<SettingScreen> {
         ),
       ),
       trailing: trailing,
+      contentPadding: const EdgeInsets.all(7),
       title: Padding(padding: const EdgeInsets.all(5), child: content),
       onTap: onTap,
     );
