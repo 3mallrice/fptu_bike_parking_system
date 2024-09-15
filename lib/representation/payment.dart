@@ -201,7 +201,7 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
       children: [
         _buildRadioButton(
           1,
-          AssetHelper.zaloLogo,
+          AssetHelper.zaloPayLogo,
           'ZaloPay E-Wallet',
           isImage: true,
         ),

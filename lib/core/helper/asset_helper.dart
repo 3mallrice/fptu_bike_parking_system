@@ -15,7 +15,7 @@ class AssetHelper {
   static const String intro2_1 = 'assets/imgs/Parking.png';
   static const String intro2_2 = 'assets/imgs/Intro_bike.png';
   static const String googleLogo = 'assets/imgs/Google.png';
-  static const String zaloLogo = 'assets/imgs/zalopay.png';
+  static const String zaloPayLogo = 'assets/imgs/zalopay.png';
   static const String emptyBox = 'assets/imgs/emptyBox.png';
   static const String vnpayQR = 'assets/imgs/vnpay_qr.svg';
   static const String vnpay = 'assets/imgs/vnpay_wallet.svg';
@@ -24,4 +24,7 @@ class AssetHelper {
   static const String cashlessAdventurer = 'assets/imgs/Hero_2.png';
   static const String cashlessChampion = 'assets/imgs/Hero_3.png';
   static const String cashlessMaster = 'assets/imgs/Hero_4.png';
+  static const String messengerLogo = 'assets/imgs/messenger.png';
+  static const String zaloLogo = 'assets/imgs/zalo.png';
+  static const String facebookLogo = 'assets/imgs/facebook.png';
 }

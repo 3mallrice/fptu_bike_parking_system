@@ -177,7 +177,7 @@ class _AboutUsState extends State<AboutUs> {
                         ),
                   ),
                   TextSpan(
-                    text: 'support@bai.com',
+                    text: 'baiparking.system@gmail.com',
                     style: Theme.of(context).textTheme.titleLarge!.copyWith(
                           fontSize: 13,
                           fontWeight: FontWeight.bold,

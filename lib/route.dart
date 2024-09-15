@@ -75,7 +75,7 @@ final Map<String, WidgetBuilder> routes = {
     );
   },
   NoInternetScreen.routeName: (context) => const NoInternetScreen(),
-  SupportScreen.routeName: (context) => const SupportScreen(),
+  SupportScreen.routeName: (context) => SupportScreen(),
   SettingScreen.routeName: (context) => const SettingScreen(),
   UpdateProfile.routeName: (context) {
     final args = ModalRoute.of(context)!.settings.arguments as String;
