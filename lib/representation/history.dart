@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:bai_system/api/model/bai_model/api_response.dart';
 import 'package:bai_system/api/model/bai_model/history_model.dart';
 import 'package:bai_system/api/service/bai_be/feedback_service.dart';
@@ -10,7 +12,8 @@ import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_extend/share_extend.dart';
 import 'package:widgets_to_image/widgets_to_image.dart';
 
 import '../api/model/bai_model/feedback_model.dart';
@@ -214,7 +217,7 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
                               margin: const EdgeInsets.only(
                                   bottom: 10, left: 10, right: 10),
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
+                                borderRadius: BorderRadius.circular(5),
                                 color: Theme.of(context).colorScheme.secondary,
                               ),
                               child: Text(
@@ -241,7 +244,7 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
         ),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(5),
           border: Border.all(
             color: Theme.of(context).colorScheme.outline,
           ),
@@ -694,7 +697,7 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
           padding: const EdgeInsets.symmetric(horizontal: 10),
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(5),
             border: Border.all(
               color: Theme.of(context).colorScheme.outline,
             ),
@@ -740,26 +743,29 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
             var image = await controller.capture();
 
             if (image != null) {
-              //convert Uint8List to XFile
-              XFile xFile = XFile.fromData(
-                image,
-                mimeType: 'image/png',
-                name: ImageName.imageName(prefix: 'History'),
-                lastModified: DateTime.now(),
+              // Get directory to save image
+              Directory? dir = Platform.isAndroid
+                  ? await getExternalStorageDirectory()
+                  : await getApplicationDocumentsDirectory();
+
+              // Tạo file mới với tên History_<millisecondsSinceEpoch>.png
+              File imageFile = File(
+                  "${dir?.path}/History_${DateTime.now().millisecondsSinceEpoch}.png");
+
+              // Ghi image vào file
+              await imageFile.writeAsBytes(image);
+
+              // Sử dụng ShareExtend để chia sẻ file
+              ShareExtend.share(
+                imageFile.path,
+                "image",
+                sharePanelTitle: "Share Your History via",
+                subject: "Check out this history!",
+                extraText: "Here is a detailed view of your history.",
+                sharePositionOrigin: const Rect.fromLTWH(100, 200, 50, 50),
               );
 
-              //TODO: Share image
-              final result = await Share.shareXFiles(
-                [xFile],
-                text: 'Share your history with your friends',
-                subject: 'Share your history',
-              );
-
-              if (result.status == ShareResultStatus.success) {
-                log.i('Share success');
-              } else if (result.status == ShareResultStatus.dismissed) {
-                log.e('Share failed');
-              }
+              log.i('Share triggered');
             }
           },
           onCancel: () {

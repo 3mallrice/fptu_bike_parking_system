@@ -2,10 +2,10 @@ import 'package:bai_system/api/model/bai_model/login_model.dart';
 import 'package:bai_system/component/shadow_container.dart';
 import 'package:bai_system/core/helper/local_storage_helper.dart';
 import 'package:bai_system/representation/about_screen.dart';
+import 'package:bai_system/representation/cashless_hero.dart';
 import 'package:bai_system/representation/faq.dart';
 import 'package:bai_system/representation/feedback.dart';
 import 'package:bai_system/representation/settings.dart';
-import 'package:bai_system/representation/support.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
@@ -140,15 +140,15 @@ class _MeScreenState extends State<MeScreen> {
                                 .titleMedium!
                                 .copyWith(fontSize: 16),
                           ),
-                          onTap: () => goToPageHelper(
-                              routeName: SupportScreen.routeName),
+                          onTap: () =>
+                              goToPageHelper(routeName: CashlessHero.routeName),
                         ),
                         Divider(
                           color: Theme.of(context).colorScheme.outlineVariant,
                           thickness: 1,
                         ),
                         _meItem(
-                          Icons.question_mark_sharp,
+                          Icons.help_outlined,
                           Text(
                             'Help Center',
                             style: Theme.of(context)

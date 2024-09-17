@@ -61,9 +61,9 @@ class _SettingScreenState extends State<SettingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppBarCom(
-        leading: true,
-        appBarText: 'Settings & profile',
+      appBar: const MyAppBar(
+        automaticallyImplyLeading: true,
+        title: 'Settings & profile',
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -228,7 +228,7 @@ class _SettingScreenState extends State<SettingScreen> {
                       },
                       elevation: 2,
                       alignment: Alignment.center,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(5),
                       dropdownColor: Theme.of(context).colorScheme.surface,
                       style: Theme.of(context).textTheme.bodyMedium!,
                       underline: Container(),

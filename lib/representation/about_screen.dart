@@ -1,7 +1,8 @@
 import 'package:bai_system/component/app_bar_component.dart';
 import 'package:flutter/material.dart';
+import 'package:info_kit/info_kit.dart';
 import 'package:logger/logger.dart';
-import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../core/helper/asset_helper.dart';
 
@@ -16,34 +17,13 @@ class AboutUs extends StatefulWidget {
 
 class _AboutUsState extends State<AboutUs> {
   final _log = Logger();
-  PackageInfo _packageInfo = PackageInfo(
-    appName: 'Unknown',
-    packageName: 'Unknown',
-    version: 'Unknown',
-    buildNumber: 'Unknown',
-  );
-
-  @override
-  void initState() {
-    super.initState();
-    _initPackageInfo();
-  }
-
-  Future<void> _initPackageInfo() async {
-    try {
-      final info = await PackageInfo.fromPlatform();
-      setState(() => _packageInfo = info);
-    } catch (e) {
-      _log.e('Error initializing package info: $e');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppBarCom(
-        leading: true,
-        appBarText: 'About Bai',
+      appBar: const MyAppBar(
+        automaticallyImplyLeading: true,
+        title: 'About Bai',
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -71,7 +51,7 @@ class _AboutUsState extends State<AboutUs> {
           _buildLogo(context),
           const SizedBox(height: 7),
           Text(
-            'Version ${_packageInfo.version}',
+            'Version ${InfoKit.version}',
             style: Theme.of(context).textTheme.titleSmall!.copyWith(
                   fontWeight: FontWeight.normal,
                   color: Theme.of(context).colorScheme.outline,
@@ -136,9 +116,7 @@ class _AboutUsState extends State<AboutUs> {
           ),
           const SizedBox(height: 10),
           GestureDetector(
-            onTap: () {
-              // TODO: Implement phone call
-            },
+            onTap: () => _launchUrl(Uri.parse('tel:028.73005585')),
             child: Text.rich(
               TextSpan(
                 children: [
@@ -163,9 +141,8 @@ class _AboutUsState extends State<AboutUs> {
             ),
           ),
           GestureDetector(
-            onTap: () {
-              // TODO: Implement phone call
-            },
+            onTap: () => _launchUrl(Uri.parse(
+                'mailto:baiparking.system@gmail.com?subject=[Support Request][]&body=I want to request support for...')),
             child: Text.rich(
               TextSpan(
                 children: [
@@ -214,7 +191,7 @@ class _AboutUsState extends State<AboutUs> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(5),
       ),
       child: child,
     );
@@ -225,7 +202,7 @@ class _AboutUsState extends State<AboutUs> {
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(5),
         boxShadow: [
           BoxShadow(
             color: Theme.of(context).colorScheme.onSecondary.withOpacity(0.2),
@@ -257,6 +234,20 @@ class _AboutUsState extends State<AboutUs> {
       horizontalTitleGap: 25,
       visualDensity: VisualDensity.compact,
     );
+  }
+
+  Future<void> _launchUrl(Uri uri) async {
+    _log.d('Attempting to launch URL: $uri');
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
+        _log.i('Successfully launched URL: $uri');
+      } else {
+        _log.w('Could not launch URL: $uri');
+      }
+    } catch (e) {
+      _log.e('Error launching URL: $uri', error: e);
+    }
   }
 }
 

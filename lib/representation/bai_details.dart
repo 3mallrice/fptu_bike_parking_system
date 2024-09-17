@@ -76,9 +76,9 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppBarCom(
-        appBarText: 'Bai Details',
-        leading: true,
+      appBar: const MyAppBar(
+        title: 'Bai Details',
+        automaticallyImplyLeading: true,
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -266,7 +266,7 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
                             color: Theme.of(context).colorScheme.onSecondary,
                           ),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(5),
                             gapPadding: 2.0,
                           ),
                           focusedBorder: OutlineInputBorder(
@@ -274,14 +274,14 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
                               color: Theme.of(context).colorScheme.primary,
                               width: 2.0,
                             ),
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(5),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(
                               color: Theme.of(context).colorScheme.onSecondary,
                               width: 2.0,
                             ),
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(5),
                           ),
                           fillColor: Theme.of(context).colorScheme.onSecondary,
                           hoverColor: Theme.of(context).colorScheme.primary,
@@ -292,21 +292,21 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
                       DropdownButtonFormField<String>(
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(5),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(
                               color: Theme.of(context).colorScheme.onSecondary,
                               width: 2.0,
                             ),
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(5),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
                               color: Theme.of(context).colorScheme.primary,
                               width: 2.0,
                             ),
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(5),
                           ),
                         ),
                         hint: Text(
@@ -361,7 +361,7 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
                           style: ButtonStyle(
                             shape: MaterialStateProperty.all(
                               RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
+                                borderRadius: BorderRadius.circular(5),
                               ),
                             ),
                             backgroundColor: MaterialStateProperty.all(

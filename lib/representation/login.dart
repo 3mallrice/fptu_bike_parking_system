@@ -9,7 +9,6 @@ import 'package:bai_system/core/helper/local_storage_helper.dart';
 import 'package:bai_system/representation/faq.dart';
 import 'package:bai_system/representation/navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:logger/logger.dart';
 
 import '../api/model/bai_model/login_model.dart';
@@ -52,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> with ApiResponseHandler {
             await _authApi.loginWithGoogle(auth.idToken!);
 
         if (userData.data != null) {
-          await _initializeAfterLogin();
+          await _sendTokenToServer();
           _navigateToHome();
         } else {
           throw userData.statusCode.toString();
@@ -121,18 +120,6 @@ class _LoginScreenState extends State<LoginScreen> with ApiResponseHandler {
         );
       },
     );
-  }
-
-  Future<void> _initializeAfterLogin() async {
-    await _checkLocationPermission();
-    await _sendTokenToServer();
-  }
-
-  Future<void> _checkLocationPermission() async {
-    final permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      await Geolocator.requestPermission();
-    }
   }
 
   void _navigateToHome() {
@@ -204,16 +191,15 @@ class _LoginScreenState extends State<LoginScreen> with ApiResponseHandler {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Icon(
-              Icons.question_mark_sharp,
-              size: 16,
+              Icons.help_outlined,
+              size: 20,
               color: Theme.of(context).colorScheme.surface,
             ),
-            const SizedBox(height: 3),
             Text(
-              'FAQs',
-              style: Theme.of(context).textTheme.displaySmall!.copyWith(
+              'Support',
+              style: Theme.of(context).textTheme.labelSmall!.copyWith(
                     color: Theme.of(context).colorScheme.surface,
-                    fontSize: 9,
+                    fontSize: 10,
                   ),
             ),
           ],

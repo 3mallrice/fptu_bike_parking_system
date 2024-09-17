@@ -186,7 +186,7 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
           title: const Text('Choose image source'),
           surfaceTintColor: Theme.of(context).colorScheme.surface,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(5),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -258,9 +258,9 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppBarCom(
-        leading: true,
-        appBarText: 'Add Bike',
+      appBar: const MyAppBar(
+        automaticallyImplyLeading: true,
+        title: 'Add Bike',
       ),
       body: SingleChildScrollView(
         child: SafeArea(

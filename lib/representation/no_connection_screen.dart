@@ -101,7 +101,7 @@ class NoInternetScreen extends StatelessWidget {
                                   horizontal: 10, vertical: 5),
                               decoration: BoxDecoration(
                                 color: Theme.of(context).colorScheme.surface,
-                                borderRadius: BorderRadius.circular(10),
+                                borderRadius: BorderRadius.circular(5),
                               ),
                               child: Text('FAQ',
                                   style: Theme.of(context)

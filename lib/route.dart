@@ -4,6 +4,7 @@ import 'package:bai_system/api/model/bai_model/wallet_model.dart';
 import 'package:bai_system/representation/about_screen.dart';
 import 'package:bai_system/representation/add_bai_screen.dart';
 import 'package:bai_system/representation/bai_details.dart';
+import 'package:bai_system/representation/cashless_hero.dart';
 import 'package:bai_system/representation/faq.dart';
 import 'package:bai_system/representation/feedback.dart';
 import 'package:bai_system/representation/fundin_screen.dart';
@@ -85,4 +86,5 @@ final Map<String, WidgetBuilder> routes = {
     );
   },
   FAQScreen.routeName: (context) => const FAQScreen(),
+  CashlessHero.routeName: (context) => const CashlessHero(),
 };

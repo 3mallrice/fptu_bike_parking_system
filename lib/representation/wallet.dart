@@ -248,10 +248,10 @@ class _WalletScreenState extends State<WalletScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarCom(
-        leading: true,
+      appBar: MyAppBar(
+        automaticallyImplyLeading: true,
         routeName: MyNavigationBar.routeName,
-        appBarText: 'My Wallet',
+        title: 'My Wallet',
         action: [
           Padding(
             padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),

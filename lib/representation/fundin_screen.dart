@@ -366,9 +366,9 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarCom(
-        leading: true,
-        appBarText: 'Fund in',
+      appBar: MyAppBar(
+        automaticallyImplyLeading: true,
+        title: 'Fund in',
         action: [
           Padding(
             padding: const EdgeInsets.all(8.0),

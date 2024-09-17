@@ -14,6 +14,9 @@ class ColorLightMode {
 
   static const Color darkgreen = Color(0xff2E7D32);
   static const Color backgroundGreen = Color(0xFFEAFBF5);
+
+  static const Color backgroundBlue = Color(0xFFB7D9E4);
+  static const Color primaryBlue = Color(0xFF2975B0);
 }
 
 class ColorDarkMode {

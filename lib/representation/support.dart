@@ -16,9 +16,9 @@ class SupportScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     _log.i('Building SupportScreen');
     return Scaffold(
-      appBar: const AppBarCom(
-        leading: true,
-        appBarText: 'Support 24/7',
+      appBar: const MyAppBar(
+        automaticallyImplyLeading: true,
+        title: 'Support 24/7',
       ),
       body: SafeArea(
         child: SingleChildScrollView(

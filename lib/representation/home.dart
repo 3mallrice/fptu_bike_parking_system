@@ -358,7 +358,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           shape: BoxShape.rectangle,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(5),
         ),
         child: Column(
           children: [

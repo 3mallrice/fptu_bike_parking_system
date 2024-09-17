@@ -147,7 +147,7 @@ class _DatePickerState extends State<DatePicker> {
             ),
             dialogTheme: DialogTheme(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(5),
               ),
             ),
           ),
@@ -155,7 +155,7 @@ class _DatePickerState extends State<DatePicker> {
             builder: (BuildContext context) {
               return Dialog(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(5),
                 ),
                 child: Container(
                   constraints: const BoxConstraints(

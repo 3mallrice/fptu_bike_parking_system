@@ -24,7 +24,7 @@ class OKDialog extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.background,
       surfaceTintColor: Theme.of(context).colorScheme.background,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
+        borderRadius: BorderRadius.circular(5),
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -124,7 +124,7 @@ class ConfirmDialog extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.surface,
       surfaceTintColor: Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
+        borderRadius: BorderRadius.circular(5),
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {

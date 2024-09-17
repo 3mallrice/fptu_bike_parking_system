@@ -42,8 +42,8 @@ class _UpdateProfileState extends State<UpdateProfile> with ApiResponseHandler {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppBarCom(
-        leading: true,
+      appBar: const MyAppBar(
+        automaticallyImplyLeading: true,
       ),
       body: SafeArea(
         child: Column(
@@ -89,11 +89,11 @@ class _UpdateProfileState extends State<UpdateProfile> with ApiResponseHandler {
                     textAlign: TextAlign.center,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(5),
                         borderSide: BorderSide.none,
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(5),
                         borderSide: BorderSide.none,
                       ),
                     ),
@@ -118,7 +118,7 @@ class _UpdateProfileState extends State<UpdateProfile> with ApiResponseHandler {
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     backgroundColor: Theme.of(context).colorScheme.outline,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(5),
                     ),
                   ),
                   child: Text(

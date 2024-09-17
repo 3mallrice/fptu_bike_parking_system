@@ -50,9 +50,9 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppBarCom(
-        leading: true,
-        appBarText: 'Payment',
+      appBar: const MyAppBar(
+        automaticallyImplyLeading: true,
+        title: 'Payment',
       ),
       body: PopScope(
         onPopInvoked: (didPop) {
@@ -103,7 +103,7 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.outline,
               borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(10)),
+                  const BorderRadius.vertical(top: Radius.circular(5)),
             ),
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Row(
@@ -309,7 +309,7 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.primary,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
+                  borderRadius: BorderRadius.circular(5)),
               padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 10),
             ),
             child: Text(

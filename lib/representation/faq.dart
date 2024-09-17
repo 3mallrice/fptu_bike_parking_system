@@ -49,9 +49,9 @@ class _FAQScreenState extends State<FAQScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppBarCom(
-        leading: true,
-        appBarText: 'FAQs',
+      appBar: const MyAppBar(
+        automaticallyImplyLeading: true,
+        title: 'FAQs',
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -67,17 +67,17 @@ class _FAQScreenState extends State<FAQScreen> {
                     color: Theme.of(context).colorScheme.primary,
                   ),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(5),
                     borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.outline),
+                        color: Theme.of(context).colorScheme.onSecondary),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(5),
                     borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.outline),
+                        color: Theme.of(context).colorScheme.onSecondary),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(5),
                     borderSide: BorderSide(
                         color: Theme.of(context).colorScheme.outline, width: 2),
                   ),
@@ -99,13 +99,18 @@ class _FAQScreenState extends State<FAQScreen> {
                   color: Theme.of(context).colorScheme.surface,
                   surfaceTintColor: Theme.of(context).colorScheme.surface,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(5),
                   ),
                   child: Theme(
                     data: Theme.of(context).copyWith(
                       dividerColor: Colors.transparent,
                     ),
                     child: ExpansionTile(
+                      initiallyExpanded: true,
+                      dense: true,
+                      visualDensity: VisualDensity.compact,
+                      iconColor: Theme.of(context).colorScheme.outline,
+                      collapsedIconColor: Theme.of(context).colorScheme.outline,
                       title: Text(
                         category.title,
                         style: Theme.of(context).textTheme.titleMedium,
@@ -208,6 +213,8 @@ class _CustomFAQ extends StatelessWidget {
               )),
       onExpansionChanged: onExpansionChanged,
       initiallyExpanded: isExpanded,
+      iconColor: Theme.of(context).colorScheme.outline,
+      collapsedIconColor: Theme.of(context).colorScheme.outline,
       children: [
         Container(
           alignment: Alignment.centerLeft,

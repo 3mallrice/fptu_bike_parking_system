@@ -164,9 +164,9 @@ class _FeedbackScreenState extends State<FeedbackScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppBarCom(
-        leading: true,
-        appBarText: 'Feedback',
+      appBar: const MyAppBar(
+        automaticallyImplyLeading: true,
+        title: 'Feedback',
       ),
       body: _isLoading
           ? const Center(child: LoadingCircle())
