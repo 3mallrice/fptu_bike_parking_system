@@ -53,6 +53,9 @@ class _WalletScreenState extends State<WalletScreen>
   DateTime from = DateTime.now().subtract(const Duration(days: 7));
   DateTime to = DateTime.now();
 
+  DateTime extraFrom = DateTime.now().subtract(const Duration(days: 7));
+  DateTime extraTo = DateTime.now();
+
   int totalMainTransactions = 0;
   int totalExtraTransactions = 0;
 
@@ -170,6 +173,7 @@ class _WalletScreenState extends State<WalletScreen>
     try {
       final APIResponse<List<WalletModel>> result = await callWalletApi
           .getMainWalletTransactions(mainPageIndex, _pageSize, from, to);
+      log.d('Main transactions: ${result.data}');
       _catchError(result);
       if (!mounted) return;
       setState(() {
@@ -198,8 +202,9 @@ class _WalletScreenState extends State<WalletScreen>
       });
     }
     try {
-      final APIResponse<List<WalletModel>> result = await callWalletApi
-          .getExtraWalletTransactions(extraPageIndex, _pageSize, from, to);
+      final APIResponse<List<WalletModel>> result =
+          await callWalletApi.getExtraWalletTransactions(
+              extraPageIndex, _pageSize, extraFrom, extraTo);
       _catchError(result);
       if (!mounted) return;
       setState(() {
@@ -326,7 +331,9 @@ class _WalletScreenState extends State<WalletScreen>
             );
           } else if (mode == LoadStatus.failed) {
             body = const Text('Load Failed!Click retry!');
-          } else if (mode == LoadStatus.canLoading) {
+          } else if (mode == LoadStatus.canLoading &&
+              (isMain ? mainPageIndex : extraPageIndex) * _pageSize <
+                  (isMain ? totalMainTransactions : totalExtraTransactions)) {
             body = const Text('release to load more');
           } else {
             body = const Text('No more Data');
@@ -398,7 +405,7 @@ class _WalletScreenState extends State<WalletScreen>
                 padding:
                     const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                 child: GestureDetector(
-                  onTap: showFilterDialog,
+                  onTap: () => showFilterDialog(isMain: isMain),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: Row(
@@ -531,31 +538,33 @@ class _WalletScreenState extends State<WalletScreen>
           );
   }
 
-  void showFilterDialog() {
+  void showFilterDialog({required bool isMain}) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return OKDialog(
+        return ConfirmDialog(
           title: 'Filter by period',
-          content: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(context).size.width * 0.9,
-              maxHeight: MediaQuery.of(context).size.height * 0.9,
-            ),
-            child: DatePicker(
-              fromDate: from,
-              toDate: to,
-              onDateSelected: (startDate, endDate) {
-                setState(() {
+          content: DatePicker(
+            fromDate: isMain ? from : extraFrom,
+            toDate: isMain ? to : extraTo,
+            onDateSelected: (startDate, endDate) {
+              log.d('Selected date: $startDate - $endDate');
+              setState(() {
+                if (isMain) {
                   from = startDate;
                   to = endDate;
-                });
-              },
-            ),
+                  log.d('From: $from - To: $to');
+                } else {
+                  extraFrom = startDate;
+                  extraTo = endDate;
+                  log.d('Extra from: $extraFrom - Extra to: $extraTo');
+                }
+              });
+            },
           ),
-          onClick: () {
+          onConfirm: () {
             Navigator.of(context).pop();
-            _tabController.index == 0 ? _onMainRefresh() : _onExtraRefresh();
+            isMain ? _onMainRefresh() : _onExtraRefresh();
           },
         );
       },

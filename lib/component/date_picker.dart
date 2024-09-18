@@ -7,6 +7,7 @@ class DatePicker extends StatefulWidget {
   final DateTime fromDate;
   final DateTime toDate;
   final Function(DateTime, DateTime) onDateSelected;
+
   const DatePicker({
     super.key,
     required this.fromDate,
@@ -29,11 +30,10 @@ class _DatePickerState extends State<DatePicker> {
   }
 
   var log = Logger();
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.9,
-      height: MediaQuery.of(context).size.height * 0.15,
       padding: const EdgeInsets.only(top: 15),
       child: Column(
         children: [
@@ -46,8 +46,6 @@ class _DatePickerState extends State<DatePicker> {
                     isSelectingFromDate = true;
                     _selectDate(context, true);
                   });
-
-                  _updateDate();
                 },
                 child: datePickerWidget(
                   'From date',
@@ -67,8 +65,6 @@ class _DatePickerState extends State<DatePicker> {
                     isSelectingFromDate = false;
                     _selectDate(context, false);
                   });
-
-                  _updateDate();
                 },
                 child: datePickerWidget(
                   'To date',
@@ -87,14 +83,16 @@ class _DatePickerState extends State<DatePicker> {
             ),
           ),
           ListTile(
-            title:
-                const Text('The date range you want to view, maximum 30 days.'),
+            title: const Text(
+              'The date range you want to view, maximum 30 days.',
+              textAlign: TextAlign.center,
+            ),
             horizontalTitleGap: 5,
             titleTextStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
                   color: Theme.of(context).colorScheme.onSecondary,
                   fontSize: 12,
                 ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 40),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 20),
             minVerticalPadding: 0,
           )
         ],
@@ -137,6 +135,12 @@ class _DatePickerState extends State<DatePicker> {
               secondary: Theme.of(context).colorScheme.outlineVariant,
               onSecondary: Theme.of(context).colorScheme.outlineVariant,
               surfaceTint: Theme.of(context).colorScheme.surface,
+            ),
+            textTheme: Theme.of(context).textTheme,
+            textSelectionTheme: TextSelectionThemeData(
+              cursorColor: Theme.of(context).colorScheme.primary,
+              selectionColor: Theme.of(context).colorScheme.primary,
+              selectionHandleColor: Theme.of(context).colorScheme.primary,
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
@@ -186,6 +190,8 @@ class _DatePickerState extends State<DatePicker> {
           }
         }
       });
+
+      _updateDate();
     }
   }
 
