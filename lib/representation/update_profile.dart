@@ -12,6 +12,7 @@ import '../core/helper/loading_overlay_helper.dart';
 
 class UpdateProfile extends StatefulWidget {
   final String name;
+
   const UpdateProfile({super.key, required this.name});
 
   static const String routeName = '/update_profile';
@@ -24,6 +25,7 @@ class _UpdateProfileState extends State<UpdateProfile> with ApiResponseHandler {
   late TextEditingController textController;
   bool isSuccessful = false;
   bool isUpdating = false;
+  final _overlayHelper = LoadingOverlayHelper();
 
   final callCustomerApi = CallCustomerApi();
 
@@ -36,6 +38,7 @@ class _UpdateProfileState extends State<UpdateProfile> with ApiResponseHandler {
   @override
   void dispose() {
     textController.dispose();
+    _overlayHelper.dispose();
     super.dispose();
   }
 
@@ -141,7 +144,7 @@ class _UpdateProfileState extends State<UpdateProfile> with ApiResponseHandler {
   // Cập nhật dữ liệu người dùng
   Future<bool> updateUserData() async {
     try {
-      LoadingOverlayHelper.show(context);
+      _overlayHelper.show(context);
 
       final response =
           await callCustomerApi.updateCustomerInfo(textController.text);
@@ -168,7 +171,7 @@ class _UpdateProfileState extends State<UpdateProfile> with ApiResponseHandler {
     } catch (e) {
       return false;
     } finally {
-      LoadingOverlayHelper.hide();
+      _overlayHelper.hide();
     }
   }
 

@@ -32,6 +32,7 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
   String? _imageUrl;
   String? _selectedVehicleTypeId;
   final TextEditingController _plateNumberController = TextEditingController();
+  final _overlayHelper = LoadingOverlayHelper();
   final CallBikeApi _api = CallBikeApi();
   List<VehicleTypeModel> _vehicleTypes = [];
   String? _errorMessage;
@@ -102,12 +103,12 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
 
   Future<void> _detectPlateNumber(File imageFile) async {
     try {
-      LoadingOverlayHelper.show(context);
+      _overlayHelper.show(context);
 
       final PlateNumberResponse? plateNumberResponse =
           await _api.detectPlateNumber(imageFile);
 
-      LoadingOverlayHelper.hide();
+      _overlayHelper.hide();
 
       if (plateNumberResponse?.data?.plateNumber != null) {
         if (mounted) {
@@ -124,7 +125,7 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
         });
       }
     } catch (e) {
-      LoadingOverlayHelper.hide();
+      _overlayHelper.hide();
       _log.e('Error detecting plate number: $e');
       setState(() {
         _errorMessage =
@@ -152,10 +153,10 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
 
       _log.i('Saving vehicle registration: $addBaiModel');
 
-      LoadingOverlayHelper.show(context);
+      _overlayHelper.show(context);
       final APIResponse<AddBaiRespModel> result =
           await _api.createBai(addBaiModel);
-      LoadingOverlayHelper.hide();
+      _overlayHelper.hide();
 
       if (result.statusCode == 409) {
         setState(() {
@@ -513,6 +514,7 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
   @override
   void dispose() {
     _plateNumberController.dispose();
+    _overlayHelper.dispose();
     super.dispose();
   }
 }

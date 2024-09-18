@@ -40,12 +40,19 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
   late final CoinPackage _package = widget.package;
   final log = Logger();
   final CallPaymentApi paymentApi = CallPaymentApi();
+  final _overlayHelper = LoadingOverlayHelper();
   late ZaloPayModel zaloPayModel;
   String payResult = "";
   int type = 0;
   bool isOverload = false;
   String paymentUrl = '';
   bool isCanPop = true;
+
+  @override
+  void dispose() {
+    super.dispose();
+    _overlayHelper.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +64,7 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
       body: PopScope(
         onPopInvoked: (didPop) {
           if (isOverload) {
-            LoadingOverlayHelper.hide();
+            _overlayHelper.hide();
           }
           if (!isCanPop) {
             return;
@@ -331,7 +338,7 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
       return;
     }
 
-    LoadingOverlayHelper.show(context);
+    _overlayHelper.show(context);
     setState(() => isOverload = true);
 
     try {
@@ -345,7 +352,7 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
       showSnackBar('An error occurred during payment. Please try again.');
     } finally {
       if (isOverload) {
-        LoadingOverlayHelper.hide();
+        _overlayHelper.hide();
         setState(() => isOverload = false);
       }
     }
@@ -365,7 +372,7 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
     await getPaymentUrl(_package.id, vnpBankCode);
 
     if (isOverload) {
-      LoadingOverlayHelper.hide();
+      _overlayHelper.hide();
       setState(() => isOverload = false);
     }
 

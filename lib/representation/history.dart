@@ -1,3 +1,4 @@
+import 'package:bai_system/core/helper/loading_overlay_helper.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -34,6 +35,7 @@ class HistoryScreen extends StatefulWidget {
 class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
   final ScrollController _scrollController = ScrollController();
   late final WidgetsToImageController _controller;
+  final LoadingOverlayHelper _loadingOverlayHelper = LoadingOverlayHelper();
   late int _pageSize = 10;
   int pageIndex = 1;
   bool _hasNextPage = true;
@@ -105,8 +107,10 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
 
   @override
   void dispose() {
+    log.i('Dispose history screen');
     _scrollController.removeListener(_loadMore);
     _scrollController.dispose();
+    _loadingOverlayHelper.dispose();
     super.dispose();
   }
 
@@ -509,73 +513,70 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
       builder: (context) {
         return ConfirmDialog(
           title: LabelMessage.add(message: ListName.feedback),
-          content: SizedBox(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  padding: const EdgeInsets.only(top: 25),
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  alignment: Alignment.center,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      feedbackItem(
-                        'Title',
-                        TextField(
-                          controller: titleController,
-                          maxLength: 50,
-                          maxLengthEnforcement: MaxLengthEnforcement.none,
-                          inputFormatters: [
-                            LengthLimitingTextInputFormatter(50),
-                          ],
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: 'Enter your title here',
-                            hintStyle: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(
-                                  color:
-                                      Theme.of(context).colorScheme.onSecondary,
-                                ),
-                          ),
+          content: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.only(top: 25),
+                width: MediaQuery.of(context).size.width * 0.9,
+                alignment: Alignment.center,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    feedbackItem(
+                      'Title',
+                      TextField(
+                        controller: titleController,
+                        maxLength: 50,
+                        maxLengthEnforcement: MaxLengthEnforcement.none,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(50),
+                        ],
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Enter your title here',
+                          hintStyle: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(
+                                color:
+                                    Theme.of(context).colorScheme.onSecondary,
+                              ),
                         ),
                       ),
-                      SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.02),
-                      feedbackItem(
-                        'Description',
-                        TextField(
-                          keyboardType: TextInputType.multiline,
-                          inputFormatters: [
-                            LengthLimitingTextInputFormatter(100),
-                          ],
-                          maxLines: 6,
-                          minLines: 6,
-                          maxLength: 100,
-                          controller: descriptionController,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: 'Enter your feedback here',
-                            hintStyle: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(
-                                  color:
-                                      Theme.of(context).colorScheme.onSecondary,
-                                ),
-                          ),
+                    ),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                    feedbackItem(
+                      'Description',
+                      TextField(
+                        keyboardType: TextInputType.multiline,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(100),
+                        ],
+                        maxLines: 6,
+                        minLines: 6,
+                        maxLength: 100,
+                        controller: descriptionController,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Enter your feedback here',
+                          hintStyle: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(
+                                color:
+                                    Theme.of(context).colorScheme.onSecondary,
+                              ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
           onConfirm: () async {
-            log.i('Feedback submitted');
+            _loadingOverlayHelper.show(context);
 
             if (titleController.text.trim().isEmpty ||
                 descriptionController.text.trim().isEmpty) {
@@ -591,7 +592,7 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
 
             //refresh history list
             await getCustomerHistories();
-
+            _loadingOverlayHelper.hide();
             gotoScreen(routeName: FeedbackScreen.routeName);
           },
           onCancel: () {

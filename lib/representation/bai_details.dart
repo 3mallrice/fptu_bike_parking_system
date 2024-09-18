@@ -40,6 +40,7 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
   final callVehicleApi = CallBikeApi();
 
   final plateNumberController = TextEditingController();
+  final _overlayHelper = LoadingOverlayHelper();
 
   var log = Logger();
 
@@ -59,6 +60,7 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
   @override
   void dispose() {
     widget.onPopCallback();
+    _overlayHelper.dispose();
     super.dispose();
   }
 
@@ -253,7 +255,7 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
   // edit Bai
   Future<void> editBai(UpdateBaiModel baiModel) async {
     try {
-      LoadingOverlayHelper.show(context);
+      _overlayHelper.show(context);
       APIResponse response = await callVehicleApi.updateBai(baiModel);
 
       if (!mounted) return;
@@ -290,7 +292,7 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
           message: Message.editUnSuccess(message: ListName.bai),
           isSuccessful: false);
     } finally {
-      LoadingOverlayHelper.hide();
+      _overlayHelper.hide();
     }
   }
 
@@ -298,7 +300,7 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
   Future<void> deleteBai(String id) async {
     try {
       Navigator.of(context).pop();
-      LoadingOverlayHelper.show(context);
+      _overlayHelper.show(context);
       APIResponse response = await callVehicleApi.deleteBai(bai.id);
 
       if (!mounted) return;
@@ -322,7 +324,7 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
           message: Message.deleteUnSuccess(message: ListName.bai),
           isSuccessful: false);
     } finally {
-      LoadingOverlayHelper.hide();
+      _overlayHelper.hide();
     }
   }
 
