@@ -20,7 +20,8 @@ class SettingScreen extends StatefulWidget {
 class _SettingScreenState extends State<SettingScreen> {
   bool _hideBalance = false;
   late int _pageSize = 10;
-  late final UserData? userData = GetLocalHelper.getUserData();
+  late final _currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? '';
+  late final UserData? userData = GetLocalHelper.getUserData(_currentEmail);
   var log = Logger();
 
   Future<void> _toggleHideBalance() async {
@@ -29,7 +30,7 @@ class _SettingScreenState extends State<SettingScreen> {
       _hideBalance = !_hideBalance;
     });
     await LocalStorageHelper.setValue(
-        LocalStorageKey.isHiddenBalance, _hideBalance);
+        LocalStorageKey.isHiddenBalance, _hideBalance, _currentEmail);
   }
 
   Future<void> _updatePageSize(int pageSize) async {
@@ -37,12 +38,13 @@ class _SettingScreenState extends State<SettingScreen> {
       log.i('Update page size: $pageSize');
       _pageSize = pageSize;
     });
-    await LocalStorageHelper.setValue(LocalStorageKey.pageSize, _pageSize);
+    await LocalStorageHelper.setValue(
+        LocalStorageKey.pageSize, _pageSize, _currentEmail);
   }
 
   //log out
   Future<void> _logout() async {
-    await LocalStorageHelper.setValue(LocalStorageKey.userData, null);
+    await LocalStorageHelper.clearCurrentUser();
     await GoogleAuthApi.signOut();
     log.i('Logout success: ${LocalStorageKey.userData}');
 
@@ -54,8 +56,8 @@ class _SettingScreenState extends State<SettingScreen> {
   @override
   void initState() {
     super.initState();
-    _hideBalance = GetLocalHelper.getHideBalance();
-    _pageSize = GetLocalHelper.getPageSize();
+    _hideBalance = GetLocalHelper.getHideBalance(_currentEmail);
+    _pageSize = GetLocalHelper.getPageSize(_currentEmail);
   }
 
   @override
@@ -173,7 +175,7 @@ class _SettingScreenState extends State<SettingScreen> {
                         height: 1,
                         color: Theme.of(context).colorScheme.outlineVariant)),
                 _settingItem(
-                  _hideBalance
+                  !_hideBalance
                       ? Icons.visibility_off_outlined
                       : Icons.visibility_outlined,
                   Column(
@@ -181,14 +183,14 @@ class _SettingScreenState extends State<SettingScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Hide Balance',
+                        !_hideBalance ? 'Hide Balance' : 'Show Balance',
                         style: Theme.of(context)
                             .textTheme
                             .titleMedium!
                             .copyWith(fontSize: 15),
                       ),
                       Text(
-                        '- Your balances on home screen will appear as ******\n- To reveal, hold on your balance',
+                        '\u2022 Your balances on home screen will appear as ${_hideBalance ? '12345' : '*****'}\n\u2022 To reveal, hold on your balance',
                         style: Theme.of(context).textTheme.bodySmall!.copyWith(
                               color: Theme.of(context).colorScheme.onSecondary,
                               fontSize: 12,

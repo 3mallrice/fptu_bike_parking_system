@@ -27,8 +27,7 @@ class HttpErrorMapper {
         },
       500 => "Internal server error. Please try again later.",
       503 => "Service unavailable. Please try again later.",
-      _ =>
-        "An error occurred. Status code: $statusCode. Message: $serverMessage",
+      _ => "An error occurred. Status code: $statusCode.",
     };
   }
 }

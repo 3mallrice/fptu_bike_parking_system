@@ -21,7 +21,8 @@ class FeedbackApi {
   // Send feedback to Bai Be
   Future<APIResponse> sendFeedback(SendFeedbackModel sendFeedback) async {
     try {
-      token = GetLocalHelper.getBearerToken() ?? "";
+      String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+      token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
 
       if (token == "") {
         log.e('Token is empty');
@@ -69,7 +70,8 @@ class FeedbackApi {
   Future<APIResponse<List<FeedbackModel>>> getFeedbacks(
       int pageIndex, int pageSize) async {
     try {
-      token = GetLocalHelper.getBearerToken() ?? "";
+      String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+      token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
 
       if (token == "") {
         log.e('Token is empty');

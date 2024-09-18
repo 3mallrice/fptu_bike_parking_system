@@ -42,6 +42,7 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
   bool _isLoading = true;
   List<CoinPackage> _packages = [];
 
+  late String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
   int _currentPage = 1;
   bool _hasNextPage = true;
   final ScrollController _scrollController = ScrollController();
@@ -99,8 +100,8 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
   }
 
   Future<void> _loadHideBalance() async {
-    bool? hideBalance =
-        await LocalStorageHelper.getValue(LocalStorageKey.isHiddenBalance);
+    bool? hideBalance = await LocalStorageHelper.getValue(
+        LocalStorageKey.isHiddenBalance, currentEmail);
     _logger.i('Hide balance: $hideBalance');
     setState(() {
       _hideBalance = hideBalance ?? false;
@@ -111,7 +112,7 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
     setState(() {
       _hideBalance = !_hideBalance;
       LocalStorageHelper.setValue(
-          LocalStorageKey.isHiddenBalance, _hideBalance);
+          LocalStorageKey.isHiddenBalance, _hideBalance, currentEmail);
       _logger.i('Toggle hide balance: $_hideBalance');
     });
   }

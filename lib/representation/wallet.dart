@@ -40,6 +40,8 @@ class _WalletScreenState extends State<WalletScreen>
   bool _hideBalance = false;
   var log = Logger();
   final CallWalletApi callWalletApi = CallWalletApi();
+  late final String _currentEmail =
+      LocalStorageHelper.getCurrentUserEmail() ?? '';
   late int mainBalance = 0;
   late int extraBalance = 0;
   DateTime? expiredDate;
@@ -50,11 +52,13 @@ class _WalletScreenState extends State<WalletScreen>
   String? mainErrorMessage;
   String? extraErrorMessage;
 
-  DateTime from = DateTime.now().subtract(const Duration(days: 7));
-  DateTime to = DateTime.now();
+  DateTime? from;
+  DateTime? to;
+  DateTime? extraFrom;
+  DateTime? extraTo;
 
-  DateTime extraFrom = DateTime.now().subtract(const Duration(days: 7));
-  DateTime extraTo = DateTime.now();
+  bool isMainFiltered = false;
+  bool isExtraFiltered = false;
 
   int totalMainTransactions = 0;
   int totalExtraTransactions = 0;
@@ -77,8 +81,8 @@ class _WalletScreenState extends State<WalletScreen>
         vsync: this,
         initialIndex: walletType,
         animationDuration: const Duration(milliseconds: 300));
-    _hideBalance = GetLocalHelper.getHideBalance();
-    _pageSize = GetLocalHelper.getPageSize();
+    _hideBalance = GetLocalHelper.getHideBalance(_currentEmail);
+    _pageSize = GetLocalHelper.getPageSize(_currentEmail);
     _initializeData();
   }
 
@@ -422,29 +426,7 @@ class _WalletScreenState extends State<WalletScreen>
                                     fontWeight: FontWeight.bold,
                                   ),
                         ),
-                        Row(
-                          children: [
-                            Text(
-                              'FILTER',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall!
-                                  .copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .outline
-                                        .withOpacity(0.5),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                            ),
-                            const SizedBox(width: 5),
-                            Icon(
-                              Icons.filter_alt_outlined,
-                              color: Theme.of(context).colorScheme.onSecondary,
-                              size: 15,
-                            ),
-                          ],
-                        )
+                        _buildFilterIndicator(isMain: isMain),
                       ],
                     ),
                   ),
@@ -539,35 +521,93 @@ class _WalletScreenState extends State<WalletScreen>
   }
 
   void showFilterDialog({required bool isMain}) {
+    DateTime? tempFrom = isMain ? from : extraFrom;
+    DateTime? tempTo = isMain ? to : extraTo;
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return ConfirmDialog(
           title: 'Filter by period',
           content: DatePicker(
-            fromDate: isMain ? from : extraFrom,
-            toDate: isMain ? to : extraTo,
+            fromDate:
+                tempFrom ?? DateTime.now().subtract(const Duration(days: 7)),
+            toDate: tempTo ?? DateTime.now(),
             onDateSelected: (startDate, endDate) {
-              log.d('Selected date: $startDate - $endDate');
-              setState(() {
-                if (isMain) {
-                  from = startDate;
-                  to = endDate;
-                  log.d('From: $from - To: $to');
-                } else {
-                  extraFrom = startDate;
-                  extraTo = endDate;
-                  log.d('Extra from: $extraFrom - Extra to: $extraTo');
-                }
-              });
+              tempFrom = startDate;
+              tempTo = endDate;
             },
           ),
           onConfirm: () {
+            setState(() {
+              if (isMain) {
+                from = tempFrom;
+                to = tempTo;
+                isMainFiltered = true;
+              } else {
+                extraFrom = tempFrom;
+                extraTo = tempTo;
+                isExtraFiltered = true;
+              }
+            });
             Navigator.of(context).pop();
             isMain ? _onMainRefresh() : _onExtraRefresh();
           },
+          onCancel: () {
+            Navigator.of(context).pop();
+          },
         );
       },
+    );
+  }
+
+  void clearFilter({required bool isMain}) {
+    setState(() {
+      if (isMain) {
+        from = null;
+        to = null;
+        isMainFiltered = false;
+      } else {
+        extraFrom = null;
+        extraTo = null;
+        isExtraFiltered = false;
+      }
+    });
+    isMain ? _onMainRefresh() : _onExtraRefresh();
+  }
+
+  Widget _buildFilterIndicator({required bool isMain}) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'FILTER',
+          style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+                fontWeight: FontWeight.bold,
+              ),
+        ),
+        const SizedBox(width: 5),
+        Icon(
+          Icons.filter_alt_outlined,
+          color: Theme.of(context).colorScheme.onSecondary,
+          size: 15,
+        ),
+        if (isMain ? isMainFiltered : isExtraFiltered)
+          Padding(
+            padding: const EdgeInsets.only(left: 5),
+            child: GestureDetector(
+              onTap: () => clearFilter(isMain: isMain),
+              child: Text(
+                'Clear',
+                style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 

@@ -51,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> with ApiResponseHandler {
             await _authApi.loginWithGoogle(auth.idToken!);
 
         if (userData.data != null) {
-          await _sendTokenToServer();
+          await _sendTokenToServer(userData.data!.email);
           _navigateToHome();
         } else {
           throw userData.statusCode.toString();
@@ -82,8 +82,8 @@ class _LoginScreenState extends State<LoginScreen> with ApiResponseHandler {
   }
 
   //send FCM token to server
-  Future<void> _sendTokenToServer() async {
-    final fcmToken = GetLocalHelper.getFCMToken();
+  Future<void> _sendTokenToServer(String currentEmail) async {
+    final fcmToken = GetLocalHelper.getFCMToken(currentEmail);
 
     if (fcmToken != null) {
       final APIResponse<dynamic> response =

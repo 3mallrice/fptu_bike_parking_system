@@ -34,6 +34,7 @@ class HomeAppScreen extends StatefulWidget {
 }
 
 class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
+  late final _currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
   bool _hideBalance = false;
   bool isAllowLocation = false;
   bool isReloading = false;
@@ -82,8 +83,8 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
   }
 
   Future<void> _loadHideBalance() async {
-    bool? hideBalance =
-        await LocalStorageHelper.getValue(LocalStorageKey.isHiddenBalance);
+    bool? hideBalance = await LocalStorageHelper.getValue(
+        LocalStorageKey.isHiddenBalance, _currentEmail);
     setState(() {
       _hideBalance = hideBalance ?? false;
     });

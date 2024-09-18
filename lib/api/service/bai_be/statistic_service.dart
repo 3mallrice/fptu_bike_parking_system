@@ -21,7 +21,8 @@ class StatisticApi {
   // How did you park in this month
   Future<APIResponse<HowDidYouParkAndSpend>> getHowDidYouPark() async {
     try {
-      token = GetLocalHelper.getBearerToken() ?? "";
+      String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+      token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
 
       if (token == "") {
         log.e('Token is empty');
@@ -68,7 +69,8 @@ class StatisticApi {
   // How did you pay in this month
   Future<APIResponse<List<PaymentMethodUsage>>> getHowDidYouPay() async {
     try {
-      token = GetLocalHelper.getBearerToken() ?? "";
+      String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+      token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
 
       if (token == "") {
         log.e('Token is empty');

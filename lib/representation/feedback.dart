@@ -28,6 +28,7 @@ class _FeedbackScreenState extends State<FeedbackScreen>
   final RefreshController _refreshController =
       RefreshController(initialRefresh: false);
   late int _pageSize = 10;
+  late String _currentEmail;
   int _pageIndex = 1;
   bool _hasNextPage = true;
   bool _isLoading = true;
@@ -39,7 +40,8 @@ class _FeedbackScreenState extends State<FeedbackScreen>
   @override
   void initState() {
     super.initState();
-    _pageSize = GetLocalHelper.getPageSize();
+    _currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+    _pageSize = GetLocalHelper.getPageSize(_currentEmail);
     _getFeedbacks();
   }
 

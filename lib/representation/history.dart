@@ -36,7 +36,8 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
   final ScrollController _scrollController = ScrollController();
   late final WidgetsToImageController _controller;
   final LoadingOverlayHelper _loadingOverlayHelper = LoadingOverlayHelper();
-  late int _pageSize = 10;
+  late final _currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+  late final int _pageSize = GetLocalHelper.getPageSize(_currentEmail);
   int pageIndex = 1;
   bool _hasNextPage = true;
   bool _isLoadMoreRunning = false;
@@ -98,7 +99,6 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
   void initState() {
     _controller = WidgetsToImageController();
     super.initState();
-    _pageSize = GetLocalHelper.getPageSize();
     getCustomerHistories();
     _scrollController.addListener(_loadMore);
     isLoading = true;

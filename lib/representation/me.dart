@@ -22,6 +22,7 @@ class _MeScreenState extends State<MeScreen> {
   var log = Logger();
 
   late final UserData? userData;
+  late final _currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? '';
 
   void goToPageHelper({String? routeName}) {
     routeName != null
@@ -32,7 +33,7 @@ class _MeScreenState extends State<MeScreen> {
   @override
   void initState() {
     super.initState();
-    userData = GetLocalHelper.getUserData();
+    userData = GetLocalHelper.getUserData(_currentEmail);
   }
 
   @override

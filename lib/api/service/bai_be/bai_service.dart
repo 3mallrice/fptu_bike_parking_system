@@ -29,8 +29,8 @@ class CallBikeApi {
         log.e('Bai model is null');
         return APIResponse(message: 'Bai model is null');
       }
-
-      token = GetLocalHelper.getBearerToken() ?? "";
+      String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+      token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
 
       if (token.isEmpty) {
         log.e('Token is empty');
@@ -124,7 +124,8 @@ class CallBikeApi {
 
   Future<APIResponse<List<BaiModel>>> getBai() async {
     try {
-      token = GetLocalHelper.getBearerToken() ?? "";
+      String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+      token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
 
       if (token == "") {
         log.e('Token is empty');
@@ -210,7 +211,8 @@ class CallBikeApi {
   // Delete vehicle
   Future<APIResponse> deleteBai(String id) async {
     try {
-      token = GetLocalHelper.getBearerToken() ?? "";
+      String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+      token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
       if (token == "") {
         log.e('Token is empty');
         return APIResponse(
@@ -250,7 +252,8 @@ class CallBikeApi {
   // Update vehicle
   Future<APIResponse> updateBai(UpdateBaiModel updateBaiModel) async {
     try {
-      token = GetLocalHelper.getBearerToken() ?? "";
+      String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+      token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
       if (token == "") {
         log.e('Token is empty');
         return APIResponse(
@@ -297,7 +300,8 @@ class CallBikeApi {
   // Get vehicle by id
   Future<APIResponse<BaiModel>> getCustomerBaiById(String id) async {
     try {
-      token = GetLocalHelper.getBearerToken() ?? "";
+      String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+      token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
       if (token == "") {
         log.e('Token is empty');
         return APIResponse(

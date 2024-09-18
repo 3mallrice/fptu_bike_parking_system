@@ -5,7 +5,9 @@ import 'package:logger/logger.dart';
 
 class LocalStorageHelper {
   var log = Logger();
+
   LocalStorageHelper._internal();
+
   static final LocalStorageHelper _shared = LocalStorageHelper._internal();
 
   factory LocalStorageHelper() {
@@ -16,20 +18,50 @@ class LocalStorageHelper {
 
   static initLocalStorageHelper() async {
     try {
-      _shared.hiveBox = await Hive.openBox('Bai');
+      _shared.hiveBox = await Hive.openBox('Bai System');
     } catch (e) {
       _shared.log.e('Failed to open hive box: $e');
     }
   }
 
-  static dynamic getValue(String key) {
-    dynamic value = _shared.hiveBox?.get(key);
-    _shared.log.i(value);
+  // Create a namespaced key for each user
+  static String _getNamespacedKey(String key, String email) {
+    return '${email}_$key';
+  }
+
+  // Get value from local storage
+  static dynamic getValue(String key, String email) {
+    String namespacedKey = _getNamespacedKey(key, email);
+    dynamic value = _shared.hiveBox?.get(namespacedKey);
+    _shared.log.i('Get value for key: $namespacedKey -> $value');
     return value;
   }
 
-  static setValue(String key, dynamic val) {
-    _shared.hiveBox?.put(key, val);
+  // Set value to local storage
+  static setValue(String key, dynamic val, String email) {
+    String namespacedKey = _getNamespacedKey(key, email);
+    _shared.hiveBox?.put(namespacedKey, val);
+    _shared.log.i('Set value for key: $namespacedKey -> $val');
+  }
+
+  // save current email to local storage
+  static Future<void> setCurrentUserEmail(String email) async {
+    await _shared.hiveBox?.put(LocalStorageKey.currentUserEmailKey, email);
+    _shared.log.i('Set current user email: $email');
+  }
+
+  // get current email from local storage
+  static String? getCurrentUserEmail() {
+    String? email = _shared.hiveBox?.get(LocalStorageKey.currentUserEmailKey);
+    _shared.log.i('Get current user email: $email');
+    return email;
+  }
+
+  static Future<void> clearCurrentUser() async {
+    await _shared.hiveBox?.delete(LocalStorageKey.currentUserEmailKey);
+    await _shared.hiveBox?.delete(LocalStorageKey.userData);
+    await _shared.hiveBox?.delete(LocalStorageKey.fcmToken);
+    _shared.log.i('Clear current user data');
   }
 }
 
@@ -40,37 +72,54 @@ class LocalStorageKey {
   static const String fcmToken = 'fcmToken';
   static const String pageSize = 'pageSize';
   static const String storageKey = 'notifications';
+  static const String currentUserEmailKey = 'currentUserEmail';
 }
 
 class GetLocalHelper {
-  static UserData? getUserData() {
-    return LocalStorageHelper.getValue(LocalStorageKey.userData) != null
+  static UserData? getUserData(String email) {
+    return LocalStorageHelper.getValue(LocalStorageKey.userData, email) != null
         ? UserData.fromJson(
-            LocalStorageHelper.getValue(LocalStorageKey.userData))
+            LocalStorageHelper.getValue(LocalStorageKey.userData, email))
         : null;
   }
 
-  static String? getBearerToken() {
-    UserData? userData = getUserData();
-    return userData != null ? 'Bearer ${userData.bearerToken ?? ""}' : null;
+  static String? getBearerToken(String email) {
+    UserData? userData = getUserData(email);
+    return userData != null ? 'Bearer ${userData.bearerToken}' : null;
   }
 
-  static String? getFCMToken() =>
-      LocalStorageHelper.getValue(LocalStorageKey.fcmToken);
+  static String? getFCMToken(String email) =>
+      LocalStorageHelper.getValue(LocalStorageKey.fcmToken, email);
 
-  static int getPageSize() =>
-      LocalStorageHelper.getValue(LocalStorageKey.pageSize) ?? 10;
+  static int getPageSize(String email) =>
+      LocalStorageHelper.getValue(LocalStorageKey.pageSize, email) ?? 10;
 
-  static bool getHideBalance() =>
-      LocalStorageHelper.getValue(LocalStorageKey.isHiddenBalance) ?? false;
+  static bool getHideBalance(String email) =>
+      LocalStorageHelper.getValue(LocalStorageKey.isHiddenBalance, email) ??
+      false;
 }
 
 class SetLocalHelper {
-  static Future<void> setUserData(String username) async {
-    UserData? userData = GetLocalHelper.getUserData();
+  static Future<void> setUserData(String email, String username) async {
+    UserData? userData = GetLocalHelper.getUserData(email);
 
     userData?.name = username;
     await LocalStorageHelper.setValue(
-        LocalStorageKey.userData, userData?.toJson());
+        LocalStorageKey.userData, userData?.toJson(), email);
+  }
+
+  static Future<void> setFCMToken(String email, String fcmToken) async {
+    await LocalStorageHelper.setValue(
+        LocalStorageKey.fcmToken, fcmToken, email);
+  }
+
+  static Future<void> setPageSize(String email, int pageSize) async {
+    await LocalStorageHelper.setValue(
+        LocalStorageKey.pageSize, pageSize, email);
+  }
+
+  static Future<void> setHideBalance(String email, bool isHidden) async {
+    await LocalStorageHelper.setValue(
+        LocalStorageKey.isHiddenBalance, isHidden, email);
   }
 }

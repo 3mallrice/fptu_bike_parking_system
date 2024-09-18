@@ -28,6 +28,8 @@ class _UpdateProfileState extends State<UpdateProfile> with ApiResponseHandler {
   final _overlayHelper = LoadingOverlayHelper();
 
   final callCustomerApi = CallCustomerApi();
+  late final String _currentEmail =
+      LocalStorageHelper.getCurrentUserEmail() ?? '';
 
   @override
   void initState() {
@@ -165,7 +167,7 @@ class _UpdateProfileState extends State<UpdateProfile> with ApiResponseHandler {
         isSuccessful = true;
       });
 
-      await SetLocalHelper.setUserData(textController.text);
+      await SetLocalHelper.setUserData(textController.text, _currentEmail);
 
       return true;
     } catch (e) {

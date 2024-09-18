@@ -25,7 +25,8 @@ class CallWalletApi {
       DateTime? startDate,
       DateTime? endDate) async {
     try {
-      token = GetLocalHelper.getBearerToken() ?? "";
+      String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+      token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
 
       if (token == "") {
         log.e('Token is empty');
@@ -37,7 +38,7 @@ class CallWalletApi {
 
       final response = await http.get(
         Uri.parse(
-            '$api/transaction/main?pageIndex=$pageIndex&pageSize=$pageSize&StartDate=$startDate&EndDate=$endDate'),
+            '$api/transaction/main?pageIndex=$pageIndex&pageSize=$pageSize&StartDate=${startDate ?? ''}&EndDate=${endDate ?? ''}'),
         headers: {
           'Authorization': token,
           'Content-Type': 'application/json',
@@ -77,7 +78,8 @@ class CallWalletApi {
       DateTime? startDate,
       DateTime? endDate) async {
     try {
-      token = GetLocalHelper.getBearerToken() ?? "";
+      String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+      token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
 
       if (token == "") {
         log.e('Token is empty');
@@ -89,7 +91,7 @@ class CallWalletApi {
 
       final response = await http.get(
         Uri.parse(
-            '$api/transaction/extra?pageIndex=$pageIndex&pageSize=$pageSize&StartDate=$startDate&EndDate=$endDate'),
+            '$api/transaction/extra?pageIndex=$pageIndex&pageSize=$pageSize&StartDate=${startDate ?? ''}&EndDate=${endDate ?? ''}'),
         headers: {
           'Authorization': token,
           'Content-Type': 'application/json',
@@ -127,7 +129,8 @@ class CallWalletApi {
   // Get balance of user's main wallet
   Future<APIResponse<int>> getMainWalletBalance() async {
     try {
-      token = GetLocalHelper.getBearerToken() ?? "";
+      String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+      token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
 
       if (token == "") {
         log.e('Token is empty');
@@ -177,7 +180,8 @@ class CallWalletApi {
   // Get balance of user's extra wallet
   Future<APIResponse<ExtraBalanceModel>> getExtraWalletBalance() async {
     try {
-      token = GetLocalHelper.getBearerToken() ?? "";
+      String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+      token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
 
       if (token == "") {
         log.e('Token is empty');
