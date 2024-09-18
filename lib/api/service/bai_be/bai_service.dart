@@ -267,16 +267,22 @@ class CallBikeApi {
         body: jsonEncode(updateBaiModel.toJson()),
       );
 
+      final responseJson = jsonDecode(response.body);
+
       if (response.statusCode == 200) {
         return APIResponse(
           message: Message.deleteSuccess(message: ListName.vehicle),
         );
       }
 
-      log.e('Failed to delete vehicle: ${response.statusCode}');
+      log.e(
+          'Failed to update vehicle: ${response.statusCode} ${response.body}');
       return APIResponse(
         statusCode: response.statusCode,
-        message: HttpErrorMapper.getErrorMessage(response.statusCode),
+        message: (responseJson['message'] == 'Plate Number is exist in system')
+            ? 'Plate Number is exist in system'
+            : HttpErrorMapper.getErrorMessage(response.statusCode,
+                serverMessage: responseJson['message']),
       );
     } catch (e) {
       log.e('Error during delete bai: $e');

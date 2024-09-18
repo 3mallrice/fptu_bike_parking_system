@@ -1,5 +1,3 @@
-// ignore_for_file: unnecessary_null_comparison
-
 import 'package:bai_system/api/service/bai_be/bai_service.dart';
 import 'package:bai_system/component/dialog.dart';
 import 'package:bai_system/component/response_handler.dart';
@@ -23,10 +21,12 @@ import '../core/const/frontend/message.dart';
 
 class BaiDetails extends StatefulWidget {
   final BaiModel baiModel;
+  final VoidCallback onPopCallback;
 
   const BaiDetails({
     super.key,
     required this.baiModel,
+    required this.onPopCallback,
   });
 
   static String routeName = '/bai_details';
@@ -40,37 +40,45 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
   final callVehicleApi = CallBikeApi();
 
   final plateNumberController = TextEditingController();
-  late String _vehicleTypeId;
 
   var log = Logger();
 
   List<VehicleTypeModel> _vehicleType = [];
 
-  bool isEdit = false;
-
-  late TextStyle titleTextStyle =
-      Theme.of(context).textTheme.displayLarge!.copyWith(
-            color: Theme.of(context).colorScheme.outline,
-            fontSize: 28,
-          );
-
-  late TextStyle contentTextStyle =
-      Theme.of(context).textTheme.bodyLarge!.copyWith(
-            color: Theme.of(context).colorScheme.outline,
-          );
-
-  late final color = switch (bai.status) {
-    'ACTIVE' => Theme.of(context).colorScheme.primary,
-    'PENDING' => Theme.of(context).colorScheme.onError,
-    'REJECTED' => Theme.of(context).colorScheme.error,
-    'INACTIVE' => Theme.of(context).colorScheme.outline,
-    _ => contentTextStyle.color,
-  };
+  late TextStyle titleTextStyle;
+  late TextStyle contentTextStyle;
+  late Color color;
 
   @override
   void initState() {
     super.initState();
+    plateNumberController.text = bai.plateNumber;
     getVehicleType();
+  }
+
+  @override
+  void dispose() {
+    widget.onPopCallback();
+    super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    titleTextStyle = Theme.of(context).textTheme.displayLarge!.copyWith(
+          color: Theme.of(context).colorScheme.outline,
+          fontSize: 28,
+        );
+    contentTextStyle = Theme.of(context).textTheme.bodyMedium!.copyWith(
+          color: Theme.of(context).colorScheme.outline,
+        );
+    color = switch (bai.status) {
+      'ACTIVE' => Theme.of(context).colorScheme.primary,
+      'PENDING' => Theme.of(context).colorScheme.onError,
+      'REJECTED' => Theme.of(context).colorScheme.error,
+      'INACTIVE' => Theme.of(context).colorScheme.outline,
+      _ => contentTextStyle.color!,
+    };
   }
 
   @override
@@ -85,27 +93,24 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
           padding: const EdgeInsets.symmetric(vertical: 10),
           child: Column(
             children: [
-              (bai.plateImage == null)
-                  ? const ImageNotFound()
-                  : ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        maxHeight: 300,
-                        minHeight: 200,
-                      ),
-                      child: CachedNetworkImage(
-                        width: double.infinity,
-                        imageUrl: bai.plateImage,
-                        fit: BoxFit.fill,
-                        placeholder: (context, url) => Shimmer.fromColors(
-                          baseColor: Theme.of(context).colorScheme.background,
-                          highlightColor:
-                              Theme.of(context).colorScheme.outlineVariant,
-                          child: Container(color: Colors.grey),
-                        ),
-                        errorWidget: (context, url, error) =>
-                            const ImageNotFound(),
-                      ),
-                    ),
+              ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxHeight: 300,
+                  minHeight: 200,
+                ),
+                child: CachedNetworkImage(
+                  width: double.infinity,
+                  imageUrl: bai.plateImage,
+                  fit: BoxFit.fill,
+                  placeholder: (context, url) => Shimmer.fromColors(
+                    baseColor: Theme.of(context).colorScheme.background,
+                    highlightColor:
+                        Theme.of(context).colorScheme.outlineVariant,
+                    child: Container(color: Colors.grey),
+                  ),
+                  errorWidget: (context, url, error) => const ImageNotFound(),
+                ),
+              ),
               const SizedBox(height: 30),
               ShadowContainer(
                 width: MediaQuery.of(context).size.width * 0.9,
@@ -217,12 +222,7 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
                           visible: bai.status == 'PENDING' ||
                               bai.status == 'REJECTED',
                           child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                isEdit = !isEdit;
-                                log.d('Edit status: $isEdit');
-                              });
-                            },
+                            onTap: _showEditDialog,
                             child: Container(
                               padding: const EdgeInsets.all(10),
                               margin: const EdgeInsets.only(left: 10),
@@ -232,7 +232,7 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
                                 borderRadius: BorderRadius.circular(14),
                               ),
                               child: Icon(
-                                Icons.edit_document,
+                                Icons.edit,
                                 color: Theme.of(context).colorScheme.surface,
                               ),
                             ),
@@ -241,147 +241,6 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
                       ],
                     ),
                   ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              Visibility(
-                visible: isEdit,
-                child: ShadowContainer(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-                  margin: const EdgeInsets.only(bottom: 20),
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      TextField(
-                        controller: plateNumberController,
-                        textInputAction: TextInputAction.next,
-                        inputFormatters: [
-                          LengthLimitingTextInputFormatter(10),
-                        ],
-                        decoration: InputDecoration(
-                          hintText: 'Enter plate number',
-                          hintStyle: contentTextStyle.copyWith(
-                            color: Theme.of(context).colorScheme.onSecondary,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5),
-                            gapPadding: 2.0,
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.primary,
-                              width: 2.0,
-                            ),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.onSecondary,
-                              width: 2.0,
-                            ),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          fillColor: Theme.of(context).colorScheme.onSecondary,
-                          hoverColor: Theme.of(context).colorScheme.primary,
-                          focusColor: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      DropdownButtonFormField<String>(
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.onSecondary,
-                              width: 2.0,
-                            ),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.primary,
-                              width: 2.0,
-                            ),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                        ),
-                        hint: Text(
-                          bai.vehicleType,
-                          style: contentTextStyle.copyWith(
-                              color: Theme.of(context).colorScheme.onSecondary),
-                        ),
-                        items: _vehicleType
-                            .map(
-                              (e) => DropdownMenuItem<String>(
-                                value: e.id,
-                                child: Text(
-                                  bai.vehicleType == e.name
-                                      ? '${e.name} (Current)'
-                                      : e.name,
-                                  style: contentTextStyle,
-                                ),
-                              ),
-                            )
-                            .toSet()
-                            .toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            _vehicleTypeId = value!;
-                          });
-                          log.d('Selected vehicle type: $_vehicleTypeId');
-                        },
-                      ),
-                      const SizedBox(height: 5),
-                      Container(
-                        alignment: Alignment.centerRight,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            String plateNumber =
-                                plateNumberController.text.trim().toUpperCase();
-                            bool isValid =
-                                _isInputInvalid(plateNumber, _vehicleTypeId);
-                            isValid
-                                ? showSnackBar(
-                                    message: ErrorMessage.inputInvalid(
-                                        message:
-                                            'Plate number or Vehicle type'),
-                                    isSuccessful: false)
-                                : editBaiDialog(
-                                    UpdateBaiModel(
-                                      vehicleId: bai.id,
-                                      plateNumber: plateNumber,
-                                      vehicleTypeId: _vehicleTypeId,
-                                    ),
-                                  );
-                          },
-                          style: ButtonStyle(
-                            shape: MaterialStateProperty.all(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                            ),
-                            backgroundColor: MaterialStateProperty.all(
-                              Theme.of(context).colorScheme.outline,
-                            ),
-                            overlayColor: MaterialStateProperty.all(
-                              Theme.of(context).colorScheme.primary,
-                            ),
-                          ),
-                          child: Text(
-                            LabelMessage.save,
-                            style: contentTextStyle.copyWith(
-                              color: Theme.of(context).colorScheme.surface,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
               ),
             ],
@@ -394,6 +253,7 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
   // edit Bai
   Future<void> editBai(UpdateBaiModel baiModel) async {
     try {
+      LoadingOverlayHelper.show(context);
       APIResponse response = await callVehicleApi.updateBai(baiModel);
 
       if (!mounted) return;
@@ -406,20 +266,35 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
 
       if (!isResponseValid) return;
 
-      goToPage(routeName: MyNavigationBar.routeName, arguments: 1);
+      setState(() {
+        bai = BaiModel(
+          id: bai.id,
+          plateNumber: baiModel.plateNumber,
+          vehicleType: _vehicleType
+              .firstWhere((element) => element.id == baiModel.vehicleTypeId)
+              .name,
+          status: bai.status,
+          createDate: bai.createDate,
+          plateImage: bai.plateImage,
+        );
+      });
+
+      widget.onPopCallback();
+
       showSnackBar(
           message: Message.editSuccess(message: ListName.bai),
           isSuccessful: true);
-      return;
     } catch (e) {
       log.e('Error during edit Bai: $e');
       showSnackBar(
           message: Message.editUnSuccess(message: ListName.bai),
           isSuccessful: false);
+    } finally {
+      LoadingOverlayHelper.hide();
     }
   }
 
-  // Delete Bai
+// Delete Bai
   Future<void> deleteBai(String id) async {
     try {
       Navigator.of(context).pop();
@@ -435,7 +310,7 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
       );
 
       if (!isResponseValid) return;
-
+      widget.onPopCallback();
       goToPage(routeName: MyNavigationBar.routeName, arguments: 1);
       showSnackBar(
         message: Message.deleteSuccess(message: ListName.bai),
@@ -500,20 +375,6 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
     }
   }
 
-  //Edit Bai Dialog
-  Future<void> editBaiDialog(UpdateBaiModel baiModel) async {
-    showDialog(
-      context: context,
-      builder: (context) => ConfirmDialog(
-        title: Message.confirmTitle,
-        content: Text(Message.editConfirmation, style: contentTextStyle),
-        positiveLabel: LabelMessage.yes,
-        onConfirm: () => editBai(baiModel),
-        onCancel: () => Navigator.of(context).pop(),
-      ),
-    );
-  }
-
   //Delete Bai Dialog
   Future<void> deleteBaiDialog() async {
     showDialog(
@@ -527,6 +388,22 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
         onCancel: () => Navigator.of(context).pop(),
         maxHeight: MediaQuery.of(context).size.height * 0.7,
       ),
+    );
+  }
+
+  //Edit bai Dialog
+  void _showEditDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return _EditBaiDialog(
+          bai: bai,
+          vehicleTypes: _vehicleType,
+          onSave: (UpdateBaiModel updatedBai) {
+            editBai(updatedBai);
+          },
+        );
+      },
     );
   }
 
@@ -571,19 +448,6 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
     );
   }
 
-  bool _isInputInvalid(String plateNumber, String vehicleTypeId) {
-    if (plateNumber.isEmpty || !Regex.plateRegExp.hasMatch(plateNumber)) {
-      log.d('Plate number: $plateNumber');
-      log.e('Plate number is empty or invalid');
-      return true;
-    }
-    if (vehicleTypeId.isEmpty || vehicleTypeId == bai.vehicleType) {
-      log.e('Vehicle type is empty or unchanged');
-      return true;
-    }
-    return false;
-  }
-
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
@@ -597,5 +461,208 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
         );
       },
     );
+  }
+}
+
+class _EditBaiDialog extends StatefulWidget {
+  final BaiModel bai;
+  final List<VehicleTypeModel> vehicleTypes;
+  final Function(UpdateBaiModel) onSave;
+
+  const _EditBaiDialog({
+    required this.bai,
+    required this.vehicleTypes,
+    required this.onSave,
+  });
+
+  @override
+  _EditBaiDialogState createState() => _EditBaiDialogState();
+}
+
+class _EditBaiDialogState extends State<_EditBaiDialog> {
+  late TextEditingController _plateNumberController;
+  String? _selectedVehicleTypeId;
+  String _errorMessage = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _plateNumberController =
+        TextEditingController(text: widget.bai.plateNumber);
+    _selectedVehicleTypeId = widget.vehicleTypes
+        .firstWhere((vt) => vt.name == widget.bai.vehicleType)
+        .id;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ConfirmDialog(
+        title: 'Edit Bai',
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _plateNumberController,
+              textInputAction: TextInputAction.done,
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(10),
+              ],
+              decoration: _buildInputDecoration(
+                labelText: 'Plate Number',
+                hintText: 'Enter plate number',
+              ),
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    color: Theme.of(context).colorScheme.outline,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              value: _selectedVehicleTypeId,
+              items: widget.vehicleTypes
+                  .map((vt) => DropdownMenuItem(
+                        value: vt.id,
+                        child: Text(
+                          vt.name,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge!
+                              .copyWith(
+                                color: Theme.of(context).colorScheme.outline,
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                              ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ))
+                  .toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedVehicleTypeId = value;
+                });
+              },
+              decoration: _buildInputDecoration(
+                labelText: 'Vehicle Type',
+                hintText: 'Select vehicle type',
+                icon: Icons.motorcycle_sharp,
+              ),
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    color: Theme.of(context).colorScheme.onSecondary,
+                    fontSize: 13,
+                  ),
+              dropdownColor: Theme.of(context).colorScheme.surface,
+            ),
+            const SizedBox(height: 16),
+            Visibility(
+              visible: _errorMessage.isNotEmpty,
+              child: Text(
+                _errorMessage,
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+              ),
+            ),
+          ],
+        ),
+        contentPadding: const EdgeInsets.all(20),
+        positiveLabel: LabelMessage.save,
+        negativeLabel: LabelMessage.cancel,
+        onConfirm: () {
+          String currentValue = _plateNumberController.text
+              .trim()
+              .replaceAll('-', '')
+              .replaceAll('.', '')
+              .replaceAll(' ', '')
+              .toUpperCase();
+
+          String currentType = widget.vehicleTypes
+              .firstWhere((vt) => vt.id == _selectedVehicleTypeId)
+              .name;
+          String? errorMessage = _isInputValid(currentValue, currentType);
+          if (errorMessage == null) {
+            final updatedBai = UpdateBaiModel(
+              vehicleId: widget.bai.id,
+              plateNumber: _plateNumberController.text,
+              vehicleTypeId: _selectedVehicleTypeId!,
+            );
+            widget.onSave(updatedBai);
+            Navigator.of(context).pop();
+          } else {
+            setState(() {
+              _errorMessage = errorMessage;
+            });
+          }
+        });
+  }
+
+  InputDecoration _buildInputDecoration(
+      {String labelText = '',
+      String hintText = '',
+      IconData icon = Icons.numbers_sharp}) {
+    return InputDecoration(
+      labelText: labelText,
+      labelStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
+            color: Theme.of(context).colorScheme.outline,
+          ),
+      hintText: hintText,
+      hintStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
+            color: Theme.of(context).colorScheme.onSecondary,
+          ),
+      filled: true,
+      fillColor: Theme.of(context).colorScheme.surface,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(5),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(5),
+        borderSide: BorderSide(
+          color: Theme.of(context).colorScheme.outline,
+          width: 2,
+        ),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(5),
+        borderSide: BorderSide(
+          color: Theme.of(context).colorScheme.outline,
+          width: 1,
+        ),
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      prefixIcon: Icon(
+        icon,
+        size: 20,
+        color: Theme.of(context).colorScheme.onSecondary,
+      ),
+    );
+  }
+
+  String? _isInputValid(String currentValue, String currentType) {
+    if (currentValue.isEmpty) {
+      return 'Please enter a plate number.';
+    }
+
+    if (_selectedVehicleTypeId == null) {
+      return 'Please select a vehicle type.';
+    }
+
+    if (!Regex.plateRegExp.hasMatch(currentValue)) {
+      return 'Invalid plate number format. Please enter a correct plate number.';
+    }
+
+    if (currentValue == widget.bai.plateNumber &&
+        currentType == widget.bai.vehicleType) {
+      return 'No changes detected in plate number or vehicle type.';
+    }
+
+    return null;
+  }
+
+  @override
+  void dispose() {
+    _plateNumberController.dispose();
+    super.dispose();
   }
 }

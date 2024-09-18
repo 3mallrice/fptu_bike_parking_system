@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 //OKDialog
 class OKDialog extends StatelessWidget {
   final String title;
+  final TextStyle? titleStyle;
   final Widget? content;
   final Function? onClick;
   final EdgeInsetsGeometry? contentPadding;
@@ -12,6 +13,7 @@ class OKDialog extends StatelessWidget {
   const OKDialog({
     super.key,
     required this.title,
+    this.titleStyle,
     this.content,
     this.onClick,
     this.contentPadding,
@@ -53,10 +55,13 @@ class OKDialog extends StatelessWidget {
                         alignment: Alignment.center,
                         child: Text(
                           title,
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium!
-                              .copyWith(fontSize: 20),
+                          style: titleStyle ??
+                              Theme.of(context).textTheme.titleMedium!.copyWith(
+                                    fontSize: 20,
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
+                                  ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                       const SizedBox(height: 15),
@@ -152,6 +157,7 @@ class ConfirmDialog extends StatelessWidget {
                         style: Theme.of(context).textTheme.titleLarge!.copyWith(
                               fontWeight: FontWeight.w700,
                               fontSize: 20,
+                              color: Theme.of(context).colorScheme.outline,
                             ),
                         textAlign: TextAlign.center,
                       ),

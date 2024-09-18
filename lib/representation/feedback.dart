@@ -118,33 +118,29 @@ class _FeedbackScreenState extends State<FeedbackScreen>
   }
 
   Widget _buildFeedbackItem(FeedbackModel feedback) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: ShadowContainer(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              feedback.title,
-              style: Theme.of(context).textTheme.headlineMedium,
-              textAlign: TextAlign.center,
+    return ShadowContainer(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            feedback.title,
+            style: Theme.of(context).textTheme.headlineMedium,
+            textAlign: TextAlign.center,
+          ),
+          _buildInfoRow(Icons.local_parking_rounded, feedback.parkingAreaName),
+          _buildInfoRow(Icons.calendar_month_rounded,
+              UltilHelper.formatDateMMMddyyyy(feedback.createdDate)),
+          Container(
+            alignment: Alignment.centerLeft,
+            padding: const EdgeInsets.only(left: 3),
+            child: Text(
+              feedback.description,
+              style: Theme.of(context).textTheme.bodyMedium,
+              textAlign: TextAlign.justify,
             ),
-            _buildInfoRow(
-                Icons.local_parking_rounded, feedback.parkingAreaName),
-            _buildInfoRow(Icons.calendar_month_rounded,
-                UltilHelper.formatDateMMMddyyyy(feedback.createdDate)),
-            Container(
-              alignment: Alignment.centerLeft,
-              padding: const EdgeInsets.only(left: 3),
-              child: Text(
-                feedback.description,
-                style: Theme.of(context).textTheme.bodyMedium,
-                textAlign: TextAlign.justify,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

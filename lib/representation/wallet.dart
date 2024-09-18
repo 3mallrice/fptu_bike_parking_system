@@ -21,6 +21,7 @@ import 'navigation_bar.dart';
 
 class WalletScreen extends StatefulWidget {
   final int? walletType;
+
   const WalletScreen({
     super.key,
     this.walletType,
@@ -302,7 +303,16 @@ class _WalletScreenState extends State<WalletScreen>
     return SmartRefresher(
       enablePullDown: true,
       enablePullUp: true,
-      header: const ClassicHeader(),
+      header: ClassicHeader(
+        refreshingText: 'Refreshing...',
+        idleText: 'Pull down to refresh',
+        releaseText: 'Release to refresh',
+        completeText: 'Refreshed',
+        failedText: 'Failed to refresh',
+        textStyle: TextStyle(
+          color: Theme.of(context).colorScheme.onSecondary,
+        ),
+      ),
       footer: CustomFooter(
         builder: (BuildContext context, LoadStatus? mode) {
           Widget body;
@@ -480,6 +490,7 @@ class _WalletScreenState extends State<WalletScreen>
                           transactions[index].type == 'IN'
                               ? Icons.attach_money_rounded
                               : Icons.local_parking_rounded,
+                          color: Theme.of(context).colorScheme.surface,
                         ),
                       ),
                       title: Text(

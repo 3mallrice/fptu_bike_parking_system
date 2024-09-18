@@ -12,17 +12,23 @@ class UserFriendErrMess {
 }
 
 class HttpErrorMapper {
-  static String getErrorMessage(int statusCode) {
-    // Return user-friendly messages based on status code
+  static String getErrorMessage(int statusCode, {String? serverMessage}) {
     return switch (statusCode) {
       400 => "Bad request. Please try again.",
       401 => "Unauthorized. Please check your credentials.",
       403 => "Forbidden. You don't have permission.",
       404 => "Resource not found.",
-      409 => "Conflict occurred. Please try again.",
+      409 => switch (serverMessage) {
+          "This Image not contain any plate number" =>
+            "Conflict: The image does not contain any plate number.",
+          "Plate Number is exist in system" =>
+            "Conflict: The plate number already exists in the system.",
+          _ => "Conflict occurred. Please try again."
+        },
       500 => "Internal server error. Please try again later.",
       503 => "Service unavailable. Please try again later.",
-      _ => "An error occurred. Status code: $statusCode",
+      _ =>
+        "An error occurred. Status code: $statusCode. Message: $serverMessage",
     };
   }
 }

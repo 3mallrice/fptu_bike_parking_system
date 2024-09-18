@@ -63,9 +63,11 @@ final Map<String, WidgetBuilder> routes = {
     );
   },
   BaiDetails.routeName: (context) {
-    final args = ModalRoute.of(context)!.settings.arguments as BaiModel;
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     return BaiDetails(
-      baiModel: args,
+      baiModel: args['baiModel'],
+      onPopCallback: args['onPopCallback'],
     );
   },
   InsightScreen.routeName: (context) => const InsightScreen(),

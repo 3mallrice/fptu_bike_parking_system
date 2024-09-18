@@ -1,28 +1,26 @@
-import 'dart:io';
-
-import 'package:bai_system/api/model/bai_model/api_response.dart';
-import 'package:bai_system/api/model/bai_model/history_model.dart';
-import 'package:bai_system/api/service/bai_be/feedback_service.dart';
-import 'package:bai_system/api/service/bai_be/history_service.dart';
-import 'package:bai_system/component/dialog.dart';
-import 'package:bai_system/component/response_handler.dart';
-import 'package:bai_system/core/const/utilities/util_helper.dart';
-import 'package:bai_system/core/helper/asset_helper.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share_extend/share_extend.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:widgets_to_image/widgets_to_image.dart';
 
+import '../api/model/bai_model/api_response.dart';
 import '../api/model/bai_model/feedback_model.dart';
+import '../api/model/bai_model/history_model.dart';
+import '../api/service/bai_be/feedback_service.dart';
+import '../api/service/bai_be/history_service.dart';
+import '../component/dialog.dart';
 import '../component/empty_box.dart';
 import '../component/loading_component.dart';
+import '../component/response_handler.dart';
 import '../component/snackbar.dart';
 import '../component/widget_to_image_template.dart';
 import '../core/const/frontend/message.dart';
+import '../core/const/utilities/util_helper.dart';
+import '../core/helper/asset_helper.dart';
 import '../core/helper/local_storage_helper.dart';
+import '../representation/feedback.dart';
 
 class HistoryScreen extends StatefulWidget {
   static String routeName = '/history_screen';
@@ -47,10 +45,14 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
 
   List<HistoryModel> histories = [];
 
-  Future<void> getCustomerHistories() async {
+  Future<void> getCustomerHistories({bool isRefresh = false}) async {
     setState(() {
       isLoading = true;
     });
+
+    if (isRefresh) {
+      pageIndex = 1;
+    }
 
     try {
       final APIResponse<List<HistoryModel>> result =
@@ -78,6 +80,7 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
           _hasNextPage = result.data!.length == _pageSize;
         });
       }
+      log.f('Histories: $histories', time: DateTime.now());
     } catch (e) {
       log.e('Error during get customer histories: $e');
       setState(() {
@@ -167,7 +170,7 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: () async {
-          await getCustomerHistories();
+          await getCustomerHistories(isRefresh: true);
         },
         child: isLoading
             ? const Center(
@@ -187,7 +190,6 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
                         itemBuilder: (context, index) {
                           if (index < histories.length) {
                             final history = histories[index];
-                            log.d('History: $history');
                             return GestureDetector(
                               onTap: () {
                                 if (!history.isFeedback) {
@@ -590,8 +592,7 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
             //refresh history list
             await getCustomerHistories();
 
-            //close dialog
-            gotoScreen();
+            gotoScreen(routeName: FeedbackScreen.routeName);
           },
           onCancel: () {
             log.i('Feedback canceled');
@@ -607,61 +608,20 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
     showDialog(
       context: context,
       builder: (context) {
-        return Dialog(
-          backgroundColor: Theme.of(context).colorScheme.background,
-          surfaceTintColor: Theme.of(context).colorScheme.background,
-          child: LayoutBuilder(
+        return OKDialog(
+          title: title ?? '',
+          titleStyle: Theme.of(context).textTheme.titleMedium,
+          content: LayoutBuilder(
             builder: (context, constraints) {
               return Container(
                 constraints: BoxConstraints(
                   maxHeight: constraints.maxHeight * 0.8,
                   minWidth: constraints.minWidth * 0.9,
                 ),
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.all(25),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: double.infinity,
-                          alignment: Alignment.center,
-                          child: Text(
-                            'Feedback',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium!
-                                .copyWith(
-                                  fontSize: 20,
-                                ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Text(
-                          'Title: $title',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyLarge!
-                              .copyWith(
-                                color: Theme.of(context).colorScheme.outline,
-                                fontSize: 14,
-                              ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          'Description: $description',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyLarge!
-                              .copyWith(
-                                color: Theme.of(context).colorScheme.outline,
-                                fontSize: 14,
-                              ),
-                        ),
-                      ],
-                    ),
-                  ),
+                child: Text(
+                  description ?? '',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                  textAlign: TextAlign.justify,
                 ),
               );
             },
@@ -712,7 +672,6 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
   Widget toImageWidget(WidgetsToImageController controller,
       HistoryModel history, BuildContext context) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.46,
       width: MediaQuery.of(context).size.width * 0.9,
       child: WidgetsToImage(
         controller: controller,
@@ -741,28 +700,17 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
           positiveLabel: LabelMessage.share,
           onConfirm: () async {
             var image = await controller.capture();
-
             if (image != null) {
-              // Get directory to save image
-              Directory? dir = Platform.isAndroid
-                  ? await getExternalStorageDirectory()
-                  : await getApplicationDocumentsDirectory();
+              XFile xImageFile = XFile.fromData(
+                image,
+                mimeType: 'image/png',
+                name: 'History_${DateTime.now().millisecondsSinceEpoch}.png',
+              );
 
-              // Tạo file mới với tên History_<millisecondsSinceEpoch>.png
-              File imageFile = File(
-                  "${dir?.path}/History_${DateTime.now().millisecondsSinceEpoch}.png");
-
-              // Ghi image vào file
-              await imageFile.writeAsBytes(image);
-
-              // Sử dụng ShareExtend để chia sẻ file
-              ShareExtend.share(
-                imageFile.path,
-                "image",
-                sharePanelTitle: "Share Your History via",
-                subject: "Check out this history!",
-                extraText: "Here is a detailed view of your history.",
-                sharePositionOrigin: const Rect.fromLTWH(100, 200, 50, 50),
+              // Sử dụng share_plus để chia sẻ hình ảnh
+              await Share.shareXFiles(
+                [xImageFile],
+                text: 'Check out my history!',
               );
 
               log.i('Share triggered');

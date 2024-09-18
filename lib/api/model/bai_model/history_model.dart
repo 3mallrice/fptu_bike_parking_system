@@ -45,8 +45,8 @@ class HistoryModel {
       parkingArea: json['parkingArea'],
       isFeedback: json['isFeedback'],
       moneyEstimated: json['moneyEstimated'],
-      title: json['title'],
-      description: json['description'],
+      title: json['feedbackTitle'],
+      description: json['feedbackDescription'],
     );
   }
 

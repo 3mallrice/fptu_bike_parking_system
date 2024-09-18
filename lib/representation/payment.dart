@@ -534,23 +534,31 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 15),
-        ExpansionTile(
-          title: const Text('Package Information'),
-          tilePadding: const EdgeInsets.all(0),
-          visualDensity: VisualDensity.comfortable,
-          childrenPadding: const EdgeInsets.only(bottom: 10),
-          children: [
-            _buildReceiptInfoRow('Package', package.packageName),
-            _buildReceiptInfoRow('Amount',
-                '${UltilHelper.formatMoney(int.parse(package.amount))} coins'),
-            _buildReceiptInfoRow(
-              'Extra',
-              package.extraCoin != null
-                  ? '${UltilHelper.formatMoney(package.extraCoin ?? 0)} coins'
-                  : null,
+        Theme(
+          data: ThemeData(
+            dividerColor: Colors.transparent,
+          ),
+          child: ExpansionTile(
+            title: Text(
+              'Package Information',
+              style: Theme.of(context).textTheme.titleMedium,
             ),
-            _buildReceiptInfoRow('EXP Date', '${package.extraEXP} days'),
-          ],
+            tilePadding: const EdgeInsets.all(0),
+            visualDensity: VisualDensity.comfortable,
+            childrenPadding: const EdgeInsets.only(bottom: 10),
+            children: [
+              _buildReceiptInfoRow('Package', package.packageName),
+              _buildReceiptInfoRow('Amount',
+                  '${UltilHelper.formatMoney(int.parse(package.amount))} coins'),
+              _buildReceiptInfoRow(
+                'Extra',
+                package.extraCoin != null
+                    ? '${UltilHelper.formatMoney(package.extraCoin ?? 0)} coins'
+                    : null,
+              ),
+              _buildReceiptInfoRow('EXP Date', '${package.extraEXP} days'),
+            ],
+          ),
         ),
         const SizedBox(height: 5),
         const Divider(),

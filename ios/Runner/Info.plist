@@ -56,6 +56,20 @@
        <array>
            <string>sms</string>
            <string>tel</string>
+           <string>fb</string>
+           <string>fb-messenger</string>
+           <string>instagram</string>
+           <string>line</string>
+           <string>linkedin</string>
+           <string>reddit</string>
+           <string>skype</string>
+           <string>slack</string>
+           <string>snapchat</string>
+           <string>tg</string>
+           <string>twitter</string>
+           <string>viber</string>
+           <string>weixin</string>
+           <string>whatsapp</string>
        </array>
        <key>CFBundleURLTypes</key>
        <array>

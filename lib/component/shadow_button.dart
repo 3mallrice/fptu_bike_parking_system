@@ -55,7 +55,10 @@ class ShadowButton extends StatelessWidget {
       ),
       child: Text(
         buttonTitle,
-        style: textStyle ?? Theme.of(context).textTheme.displayLarge,
+        style: textStyle ??
+            Theme.of(context).textTheme.titleMedium!.copyWith(
+                  color: titleColor ?? Theme.of(context).colorScheme.surface,
+                ),
         textAlign: TextAlign.center,
       ),
     );
