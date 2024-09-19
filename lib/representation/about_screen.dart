@@ -4,6 +4,7 @@ import 'package:info_kit/info_kit.dart';
 import 'package:logger/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../component/internet_connection_wrapper.dart';
 import '../core/helper/asset_helper.dart';
 
 class AboutUs extends StatefulWidget {
@@ -20,23 +21,25 @@ class _AboutUsState extends State<AboutUs> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const MyAppBar(
-        automaticallyImplyLeading: true,
-        title: 'About Bai',
-      ),
-      body: SingleChildScrollView(
-        child: Container(
-          alignment: Alignment.center,
-          height: MediaQuery.of(context).size.height * 0.9,
-          color: Theme.of(context).colorScheme.outlineVariant,
-          child: Column(
-            children: [
-              SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-              _buildInfoSection(context),
-              _buildLinksSection(context),
-              _buildFooterSection(context),
-            ],
+    return InternetConnectionWrapper(
+      child: Scaffold(
+        appBar: const MyAppBar(
+          automaticallyImplyLeading: true,
+          title: 'About Bai',
+        ),
+        body: SingleChildScrollView(
+          child: Container(
+            alignment: Alignment.center,
+            height: MediaQuery.of(context).size.height * 0.9,
+            color: Theme.of(context).colorScheme.outlineVariant,
+            child: Column(
+              children: [
+                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                _buildInfoSection(context),
+                _buildLinksSection(context),
+                _buildFooterSection(context),
+              ],
+            ),
           ),
         ),
       ),

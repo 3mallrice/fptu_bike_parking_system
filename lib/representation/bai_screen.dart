@@ -309,6 +309,7 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
           content: Text(
             message,
             style: Theme.of(context).textTheme.bodySmall,
+            textAlign: TextAlign.justify,
           ),
           onClick: () {
             Navigator.of(context).pop();

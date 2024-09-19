@@ -4,6 +4,7 @@ import 'package:logger/logger.dart';
 
 import '../api/model/bai_model/login_model.dart';
 import '../component/app_bar_component.dart';
+import '../component/internet_connection_wrapper.dart';
 import '../core/helper/google_auth.dart';
 import '../core/helper/local_storage_helper.dart';
 import 'login.dart';
@@ -62,225 +63,238 @@ class _SettingScreenState extends State<SettingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const MyAppBar(
-        automaticallyImplyLeading: true,
-        title: 'Settings & profile',
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Container(
-            alignment: Alignment.center,
-            padding: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width * 0.05),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  margin: const EdgeInsets.symmetric(vertical: 10),
-                  height: MediaQuery.of(context).size.width * 0.25,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.primary,
-                      width: 2,
+    return InternetConnectionWrapper(
+      child: Scaffold(
+        appBar: const MyAppBar(
+          automaticallyImplyLeading: true,
+          title: 'Settings & profile',
+        ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Container(
+              alignment: Alignment.center,
+              padding: EdgeInsets.symmetric(
+                  horizontal: MediaQuery.of(context).size.width * 0.05),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    margin: const EdgeInsets.symmetric(vertical: 10),
+                    height: MediaQuery.of(context).size.width * 0.25,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.primary,
+                        width: 2,
+                      ),
+                      color: Theme.of(context).colorScheme.outline,
                     ),
-                    color: Theme.of(context).colorScheme.outline,
-                  ),
-                  child: userData == null
-                      ? Text(
-                          getInitials(userData?.name ?? 'Anonymous User'),
-                          style: Theme.of(context)
-                              .textTheme
-                              .displayLarge!
-                              .copyWith(
-                                fontSize: 64,
-                                fontWeight: FontWeight.w900,
-                                color: Theme.of(context).colorScheme.background,
-                              ),
-                        )
-                      : ClipOval(
-                          child: Image.network(
-                            userData?.avatar ?? '',
-                            fit: BoxFit.fill,
-                          ),
-                        ),
-                ),
-                Container(
-                    margin: const EdgeInsets.symmetric(vertical: 10),
-                    child: Divider(
-                        height: 1,
-                        color: Theme.of(context).colorScheme.outlineVariant)),
-                _settingItem(
-                    Icons.person_outline_outlined,
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "How would you like to addressed?",
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall!
-                              .copyWith(
-                                fontSize: 12,
-                                color:
-                                    Theme.of(context).colorScheme.onSecondary,
-                              ),
-                        ),
-                        Text(
-                          userData?.name ?? "",
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium!
-                              .copyWith(fontSize: 15),
-                        ),
-                      ],
-                    ), onTap: () {
-                  log.i('Update profile');
-                  Navigator.of(context).pushNamed(UpdateProfile.routeName,
-                      arguments: userData?.name);
-                }),
-                _settingItem(
-                    Icons.alternate_email_outlined,
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Email",
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall!
-                              .copyWith(
-                                fontSize: 12,
-                                color:
-                                    Theme.of(context).colorScheme.onSecondary,
-                              ),
-                        ),
-                        Text(
-                          userData?.email ?? "",
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium!
-                              .copyWith(fontSize: 15),
-                        ),
-                      ],
-                    )),
-
-                // Settings
-                Container(
-                    margin: const EdgeInsets.symmetric(vertical: 10),
-                    child: Divider(
-                        height: 1,
-                        color: Theme.of(context).colorScheme.outlineVariant)),
-                _settingItem(
-                  !_hideBalance
-                      ? Icons.visibility_off_outlined
-                      : Icons.visibility_outlined,
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        !_hideBalance ? 'Hide Balance' : 'Show Balance',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium!
-                            .copyWith(fontSize: 15),
-                      ),
-                      Text(
-                        '\u2022 Your balances on home screen will appear as ${_hideBalance ? '12345' : '*****'}\n\u2022 To reveal, hold on your balance',
-                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                              color: Theme.of(context).colorScheme.onSecondary,
-                              fontSize: 12,
-                            ),
-                      ),
-                    ],
-                  ),
-                  onTap: _toggleHideBalance,
-                ),
-                _settingItem(
-                  Icons.pageview_outlined,
-                  trailing: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 15, vertical: 10),
-                    color: Theme.of(context).colorScheme.surface,
-                    child: DropdownButton<int>(
-                      value: _pageSize,
-                      items: [10, 15, 20].map((int value) {
-                        return DropdownMenuItem<int>(
-                          value: value,
-                          child: Text(
-                            '$value',
+                    child: userData == null
+                        ? Text(
+                            getInitials(userData?.name ?? 'Anonymous User'),
                             style: Theme.of(context)
                                 .textTheme
-                                .bodyMedium!
+                                .displayLarge!
                                 .copyWith(
-                                  color: Theme.of(context).colorScheme.outline,
+                                  fontSize: 64,
+                                  fontWeight: FontWeight.w900,
+                                  color:
+                                      Theme.of(context).colorScheme.background,
+                                ),
+                          )
+                        : ClipOval(
+                            child: Image.network(
+                              userData?.avatar ?? '',
+                              fit: BoxFit.fill,
+                            ),
+                          ),
+                  ),
+                  Container(
+                      margin: const EdgeInsets.symmetric(vertical: 10),
+                      child: Divider(
+                          height: 1,
+                          color: Theme.of(context).colorScheme.outlineVariant)),
+                  _settingItem(
+                      Icons.person_outline_outlined,
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "How would you like to addressed?",
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall!
+                                .copyWith(
+                                  fontSize: 12,
+                                  color:
+                                      Theme.of(context).colorScheme.onSecondary,
                                 ),
                           ),
-                        );
-                      }).toList(),
-                      onChanged: (int? newValue) {
-                        setState(() {
-                          _pageSize = newValue!;
-                        });
-                        _updatePageSize(_pageSize);
-                      },
-                      elevation: 2,
-                      alignment: Alignment.center,
-                      borderRadius: BorderRadius.circular(5),
-                      dropdownColor: Theme.of(context).colorScheme.surface,
-                      style: Theme.of(context).textTheme.bodyMedium!,
-                      underline: Container(),
+                          Text(
+                            userData?.name ?? "",
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(fontSize: 15),
+                          ),
+                        ],
+                      ), onTap: () {
+                    log.i('Update profile');
+                    Navigator.of(context).pushNamed(UpdateProfile.routeName,
+                        arguments: userData?.name);
+                  }),
+                  _settingItem(
+                      Icons.alternate_email_outlined,
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Email",
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall!
+                                .copyWith(
+                                  fontSize: 12,
+                                  color:
+                                      Theme.of(context).colorScheme.onSecondary,
+                                ),
+                          ),
+                          Text(
+                            userData?.email ?? "",
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(fontSize: 15),
+                          ),
+                        ],
+                      )),
+
+                  // Settings
+                  Container(
+                      margin: const EdgeInsets.symmetric(vertical: 10),
+                      child: Divider(
+                          height: 1,
+                          color: Theme.of(context).colorScheme.outlineVariant)),
+                  _settingItem(
+                    !_hideBalance
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          !_hideBalance ? 'Hide Balance' : 'Show Balance',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium!
+                              .copyWith(fontSize: 15),
+                        ),
+                        Text(
+                          '\u2022 Your balances on home screen will appear as ${_hideBalance ? '12345' : '*****'}\n\u2022 To reveal, hold on your balance',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall!
+                              .copyWith(
+                                color:
+                                    Theme.of(context).colorScheme.onSecondary,
+                                fontSize: 12,
+                              ),
+                        ),
+                      ],
+                    ),
+                    onTap: _toggleHideBalance,
+                  ),
+                  _settingItem(
+                    Icons.pageview_outlined,
+                    trailing: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 10),
+                      color: Theme.of(context).colorScheme.surface,
+                      child: DropdownButton<int>(
+                        value: _pageSize,
+                        items: [10, 15, 20].map((int value) {
+                          return DropdownMenuItem<int>(
+                            value: value,
+                            child: Text(
+                              '$value',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
+                                  ),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (int? newValue) {
+                          setState(() {
+                            _pageSize = newValue!;
+                          });
+                          _updatePageSize(_pageSize);
+                        },
+                        elevation: 2,
+                        alignment: Alignment.center,
+                        borderRadius: BorderRadius.circular(5),
+                        dropdownColor: Theme.of(context).colorScheme.surface,
+                        style: Theme.of(context).textTheme.bodyMedium!,
+                        underline: Container(),
+                      ),
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Page Size',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium!
+                              .copyWith(fontSize: 15),
+                        ),
+                        Text(
+                          'Set the number of items per page',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall!
+                              .copyWith(
+                                color:
+                                    Theme.of(context).colorScheme.onSecondary,
+                                fontSize: 12,
+                              ),
+                        )
+                      ],
                     ),
                   ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Page Size',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium!
-                            .copyWith(fontSize: 15),
-                      ),
-                      Text(
-                        'Set the number of items per page',
-                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                              color: Theme.of(context).colorScheme.onSecondary,
-                              fontSize: 12,
-                            ),
-                      )
-                    ],
-                  ),
-                ),
 
-                Container(
-                    margin: const EdgeInsets.symmetric(vertical: 10),
-                    child: Divider(
-                      height: 1,
-                      color: Theme.of(context).colorScheme.outlineVariant,
-                    )),
-                _settingItem(
-                  Icons.logout_outlined,
-                  iconColor: Theme.of(context).colorScheme.outline,
-                  iconBackgroundColor: Theme.of(context).colorScheme.secondary,
-                  Text(
-                    'Logout',
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium!
-                        .copyWith(fontSize: 15),
+                  Container(
+                      margin: const EdgeInsets.symmetric(vertical: 10),
+                      child: Divider(
+                        height: 1,
+                        color: Theme.of(context).colorScheme.outlineVariant,
+                      )),
+                  _settingItem(
+                    Icons.logout_outlined,
+                    iconColor: Theme.of(context).colorScheme.outline,
+                    iconBackgroundColor:
+                        Theme.of(context).colorScheme.secondary,
+                    Text(
+                      'Logout',
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium!
+                          .copyWith(fontSize: 15),
+                    ),
+                    onTap: () {
+                      log.i('Logout');
+                      _logout();
+                    },
                   ),
-                  onTap: () {
-                    log.i('Logout');
-                    _logout();
-                  },
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

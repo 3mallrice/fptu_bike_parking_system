@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
+import '../component/internet_connection_wrapper.dart';
 import '../core/helper/local_storage_helper.dart';
 
 class FeedbackScreen extends StatefulWidget {
@@ -113,7 +114,11 @@ class _FeedbackScreenState extends State<FeedbackScreen>
       builder: (BuildContext context) {
         return OKDialog(
           title: ErrorMessage.error,
-          content: Text(message, style: Theme.of(context).textTheme.bodySmall),
+          content: Text(
+            message,
+            style: Theme.of(context).textTheme.bodySmall,
+            textAlign: TextAlign.justify,
+          ),
         );
       },
     );
@@ -161,53 +166,56 @@ class _FeedbackScreenState extends State<FeedbackScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const MyAppBar(
-        automaticallyImplyLeading: true,
-        title: 'Feedback',
+    return InternetConnectionWrapper(
+      child: Scaffold(
+        appBar: const MyAppBar(
+          automaticallyImplyLeading: true,
+          title: 'Feedback',
+        ),
+        body: _isLoading
+            ? const Center(child: LoadingCircle())
+            : _feedbacks.isEmpty
+                ? EmptyBox(
+                    message:
+                        EmptyBoxMessage.emptyList(label: ListName.feedback))
+                : SmartRefresher(
+                    enablePullDown: true,
+                    enablePullUp: true,
+                    header: const ClassicHeader(),
+                    footer: CustomFooter(
+                      builder: (BuildContext context, LoadStatus? mode) {
+                        Widget body;
+                        if (mode == LoadStatus.idle && !_hasNextPage) {
+                          body = const Text("Pull up to load");
+                        } else if (mode == LoadStatus.loading) {
+                          body = const LoadingCircle(size: 30, isHeight: false);
+                        } else if (mode == LoadStatus.failed) {
+                          body = const Text("Load Failed! Click retry!");
+                        } else if (mode == LoadStatus.canLoading) {
+                          body = const Text("Release to load more");
+                        } else {
+                          body = const Text("No more Data");
+                        }
+                        return SizedBox(
+                          height: 55.0,
+                          child: Center(child: body),
+                        );
+                      },
+                    ),
+                    controller: _refreshController,
+                    onRefresh: _onRefresh,
+                    onLoading: _onLoading,
+                    child: ListView.separated(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      itemCount: _feedbacks.length,
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 10),
+                      itemBuilder: (context, index) {
+                        return _buildFeedbackItem(_feedbacks[index]);
+                      },
+                    ),
+                  ),
       ),
-      body: _isLoading
-          ? const Center(child: LoadingCircle())
-          : _feedbacks.isEmpty
-              ? EmptyBox(
-                  message: EmptyBoxMessage.emptyList(label: ListName.feedback))
-              : SmartRefresher(
-                  enablePullDown: true,
-                  enablePullUp: true,
-                  header: const ClassicHeader(),
-                  footer: CustomFooter(
-                    builder: (BuildContext context, LoadStatus? mode) {
-                      Widget body;
-                      if (mode == LoadStatus.idle && !_hasNextPage) {
-                        body = const Text("Pull up to load");
-                      } else if (mode == LoadStatus.loading) {
-                        body = const LoadingCircle(size: 30, isHeight: false);
-                      } else if (mode == LoadStatus.failed) {
-                        body = const Text("Load Failed! Click retry!");
-                      } else if (mode == LoadStatus.canLoading) {
-                        body = const Text("Release to load more");
-                      } else {
-                        body = const Text("No more Data");
-                      }
-                      return SizedBox(
-                        height: 55.0,
-                        child: Center(child: body),
-                      );
-                    },
-                  ),
-                  controller: _refreshController,
-                  onRefresh: _onRefresh,
-                  onLoading: _onLoading,
-                  child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    itemCount: _feedbacks.length,
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 10),
-                    itemBuilder: (context, index) {
-                      return _buildFeedbackItem(_feedbacks[index]);
-                    },
-                  ),
-                ),
     );
   }
 }

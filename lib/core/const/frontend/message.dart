@@ -69,7 +69,7 @@ class LabelMessage {
 }
 
 class ErrorMessage {
-  static String error = "Action Error!!";
+  static String error = "Got an error!";
   static String somethingWentWrong =
       "Something went wrong, please try again later!";
   static String errorWhileLoading =

@@ -33,4 +33,6 @@ class AssetHelper {
   static const String walletScreen = 'assets/imgs/wallet.jpg';
   static const String patnerAtm = 'assets/imgs/partner_atm_acc.png';
   static const String partnerCard = 'assets/imgs/partnerCard.png';
+  static const String notiAndroid = 'assets/imgs/noti_android.jpg';
+  static const String notiIos = 'assets/imgs/noti_ios.png';
 }

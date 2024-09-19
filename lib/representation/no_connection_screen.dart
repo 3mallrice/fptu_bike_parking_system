@@ -1,17 +1,15 @@
+import 'package:bai_system/representation/faq.dart';
 import 'package:flutter/material.dart';
-import 'package:logger/logger.dart';
-
-import '../core/const/frontend/message.dart';
 
 class NoInternetScreen extends StatelessWidget {
   final String? goToPageRouteName;
+
   const NoInternetScreen({super.key, this.goToPageRouteName});
 
   static String routeName = '/exception_screen';
 
   @override
   Widget build(BuildContext context) {
-    var log = Logger();
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.outline.withOpacity(0.9),
       body: PopScope(
@@ -33,8 +31,8 @@ class NoInternetScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.background,
                       borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(10),
-                        topRight: Radius.circular(10),
+                        topLeft: Radius.circular(5),
+                        topRight: Radius.circular(5),
                       ),
                     ),
                     child: Column(
@@ -79,8 +77,8 @@ class NoInternetScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.secondary,
                       borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(10),
-                        bottomRight: Radius.circular(10),
+                        bottomLeft: Radius.circular(5),
+                        bottomRight: Radius.circular(5),
                       ),
                     ),
                     child: Row(
@@ -92,10 +90,8 @@ class NoInternetScreen extends StatelessWidget {
                           style: Theme.of(context).textTheme.bodyLarge,
                         ),
                         GestureDetector(
-                          onTap: () {
-                            //TODO: Implement FAQ
-                            log.d('FAQ is clicked');
-                          },
+                          onTap: () => Navigator.of(context)
+                              .pushNamed(FAQScreen.routeName),
                           child: Container(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 10, vertical: 5),
@@ -120,22 +116,20 @@ class NoInternetScreen extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: GestureDetector(
-        onTap: () => goToPageRouteName != null
-            ? Navigator.of(context).pushReplacementNamed(goToPageRouteName!)
-            : Navigator.of(context).pop(),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Text(
-            LabelMessage.ok,
-            style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                fontWeight: FontWeight.w500,
-                color: Theme.of(context).colorScheme.background,
-                fontSize: 18),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ),
+      // bottomNavigationBar: GestureDetector(
+      //   onTap: () => Navigator.of(context).pop(),
+      //   child: Padding(
+      //     padding: const EdgeInsets.all(20),
+      //     child: Text(
+      //       LabelMessage.ok,
+      //       style: Theme.of(context).textTheme.titleMedium!.copyWith(
+      //           fontWeight: FontWeight.w500,
+      //           color: Theme.of(context).colorScheme.background,
+      //           fontSize: 18),
+      //       textAlign: TextAlign.center,
+      //     ),
+      //   ),
+      // ),
     );
   }
 }

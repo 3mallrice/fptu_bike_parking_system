@@ -16,6 +16,7 @@ import 'package:vnpay_client/vnpay_client.dart';
 
 import '../api/model/bai_model/payment_model.dart';
 import '../component/dialog.dart';
+import '../component/internet_connection_wrapper.dart';
 import '../component/snackbar.dart';
 import '../core/const/utilities/util_helper.dart';
 import '../core/helper/asset_helper.dart';
@@ -56,44 +57,46 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const MyAppBar(
-        automaticallyImplyLeading: true,
-        title: 'Payment',
-      ),
-      body: PopScope(
-        onPopInvoked: (didPop) {
-          if (isOverload) {
-            _overlayHelper.hide();
-          }
-          if (!isCanPop) {
-            return;
-          }
-        },
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildTransactionDetails(),
-                      const SizedBox(height: 30),
-                      Text(
-                        'Select your payment options',
-                        style: Theme.of(context).textTheme.titleSmall,
-                      ),
-                      const SizedBox(height: 10),
-                      _buildPaymentOptions(),
-                    ],
+    return InternetConnectionWrapper(
+      child: Scaffold(
+        appBar: const MyAppBar(
+          automaticallyImplyLeading: true,
+          title: 'Payment',
+        ),
+        body: PopScope(
+          onPopInvoked: (didPop) {
+            if (isOverload) {
+              _overlayHelper.hide();
+            }
+            if (!isCanPop) {
+              return;
+            }
+          },
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildTransactionDetails(),
+                        const SizedBox(height: 30),
+                        Text(
+                          'Select your payment options',
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                        const SizedBox(height: 10),
+                        _buildPaymentOptions(),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            _buildBottomButtons(),
-          ],
+              _buildBottomButtons(),
+            ],
+          ),
         ),
       ),
     );
@@ -655,6 +658,7 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
           content: Text(
             message,
             style: Theme.of(context).textTheme.bodySmall,
+            textAlign: TextAlign.justify,
           ),
         );
       },

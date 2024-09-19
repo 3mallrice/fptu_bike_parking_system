@@ -11,6 +11,7 @@ import '../component/app_bar_component.dart';
 import '../component/date_picker.dart';
 import '../component/dialog.dart';
 import '../component/empty_box.dart';
+import '../component/internet_connection_wrapper.dart';
 import '../component/loading_component.dart';
 import '../component/shadow_container.dart';
 import '../core/const/frontend/message.dart';
@@ -130,6 +131,7 @@ class _WalletScreenState extends State<WalletScreen>
           content: Text(
             message,
             style: Theme.of(context).textTheme.bodySmall,
+            textAlign: TextAlign.justify,
           ),
         );
       },
@@ -257,53 +259,55 @@ class _WalletScreenState extends State<WalletScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: MyAppBar(
-        automaticallyImplyLeading: true,
-        routeName: MyNavigationBar.routeName,
-        title: 'My Wallet',
-        action: [
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
-            child: IconButton(
-              onPressed: () =>
-                  Navigator.of(context).pushNamed(FundinScreen.routeName),
-              icon: Icon(
-                Icons.input_rounded,
-                color: Theme.of(context).colorScheme.onSecondary,
+    return InternetConnectionWrapper(
+      child: Scaffold(
+        appBar: MyAppBar(
+          automaticallyImplyLeading: true,
+          routeName: MyNavigationBar.routeName,
+          title: 'My Wallet',
+          action: [
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
+              child: IconButton(
+                onPressed: () =>
+                    Navigator.of(context).pushNamed(FundinScreen.routeName),
+                icon: Icon(
+                  Icons.input_rounded,
+                  color: Theme.of(context).colorScheme.onSecondary,
+                ),
+                iconSize: 21,
               ),
-              iconSize: 21,
-            ),
-          )
-        ],
-      ),
-      body: Column(
-        children: [
-          TabBar(
-            controller: _tabController,
-            unselectedLabelColor: Theme.of(context).colorScheme.onSecondary,
-            tabAlignment: TabAlignment.fill,
-            automaticIndicatorColorAdjustment: true,
-            splashFactory: InkSparkle.constantTurbulenceSeedSplashFactory,
-            splashBorderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-            tabs: const [
-              Tab(text: 'Main Wallet'),
-              Tab(text: 'Extra Wallet'),
-            ],
-          ),
-          Expanded(
-            child: TabBarView(
+            )
+          ],
+        ),
+        body: Column(
+          children: [
+            TabBar(
               controller: _tabController,
-              children: [
-                _buildWalletContent(isMain: true),
-                _buildWalletContent(isMain: false),
+              unselectedLabelColor: Theme.of(context).colorScheme.onSecondary,
+              tabAlignment: TabAlignment.fill,
+              automaticIndicatorColorAdjustment: true,
+              splashFactory: InkSparkle.constantTurbulenceSeedSplashFactory,
+              splashBorderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+              tabs: const [
+                Tab(text: 'Main Wallet'),
+                Tab(text: 'Extra Wallet'),
               ],
             ),
-          ),
-        ],
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildWalletContent(isMain: true),
+                  _buildWalletContent(isMain: false),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

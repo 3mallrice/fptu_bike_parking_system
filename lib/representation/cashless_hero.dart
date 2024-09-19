@@ -9,6 +9,7 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../api/model/bai_model/statistic.dart';
 import '../api/service/bai_be/statistic_service.dart';
 import '../component/dialog.dart';
+import '../component/internet_connection_wrapper.dart';
 import '../core/const/frontend/heroic_achivement.dart';
 import '../core/const/frontend/message.dart';
 import '../core/helper/asset_helper.dart';
@@ -116,40 +117,42 @@ class _CashlessHeroState extends State<CashlessHero> with ApiResponseHandler {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const MyAppBar(
-        automaticallyImplyLeading: true,
-        title: 'Heroic Achievements',
-      ),
-      body: isLoading
-          ? const LoadingCircle()
-          : SingleChildScrollView(
-              child: Column(
-                children: [
-                  _buildCashlessHero(),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: MediaQuery.of(context).size.width * 0.05),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildDayProgressBar(),
-                        const SizedBox(height: 20),
-                        _buildHeroCard(),
-                        const SizedBox(height: 20),
-                        _whatIsThis(),
-                        const SizedBox(height: 10),
-                        _heroLevels(),
-                        const SizedBox(height: 10),
-                        _tipsToAdvance(),
-                        const SizedBox(height: 10),
-                        _rewards(),
-                      ],
+    return InternetConnectionWrapper(
+      child: Scaffold(
+        appBar: const MyAppBar(
+          automaticallyImplyLeading: true,
+          title: 'Heroic Achievements',
+        ),
+        body: isLoading
+            ? const LoadingCircle()
+            : SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _buildCashlessHero(),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: MediaQuery.of(context).size.width * 0.05),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildDayProgressBar(),
+                          const SizedBox(height: 20),
+                          _buildHeroCard(),
+                          const SizedBox(height: 20),
+                          _whatIsThis(),
+                          const SizedBox(height: 10),
+                          _heroLevels(),
+                          const SizedBox(height: 10),
+                          _tipsToAdvance(),
+                          const SizedBox(height: 10),
+                          _rewards(),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
+      ),
     );
   }
 
@@ -496,6 +499,7 @@ class _CashlessHeroState extends State<CashlessHero> with ApiResponseHandler {
           content: Text(
             message,
             style: Theme.of(context).textTheme.bodySmall,
+            textAlign: TextAlign.justify,
           ),
         );
       },

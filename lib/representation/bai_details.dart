@@ -17,6 +17,7 @@ import '../api/model/bai_model/api_response.dart';
 import '../api/model/bai_model/bai_model.dart';
 import '../component/app_bar_component.dart';
 import '../component/image_not_found_component.dart';
+import '../component/internet_connection_wrapper.dart';
 import '../core/const/frontend/message.dart';
 
 class BaiDetails extends StatefulWidget {
@@ -85,167 +86,170 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const MyAppBar(
-        title: 'Bai Details',
-        automaticallyImplyLeading: true,
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          child: Column(
-            children: [
-              ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxHeight: 300,
-                  minHeight: 200,
-                ),
-                child: CachedNetworkImage(
-                  width: double.infinity,
-                  imageUrl: bai.plateImage,
-                  fit: BoxFit.fill,
-                  placeholder: (context, url) => Shimmer.fromColors(
-                    baseColor: Theme.of(context).colorScheme.background,
-                    highlightColor:
-                        Theme.of(context).colorScheme.outlineVariant,
-                    child: Container(color: Colors.grey),
+    return InternetConnectionWrapper(
+      child: Scaffold(
+        appBar: const MyAppBar(
+          title: 'Bai Details',
+          automaticallyImplyLeading: true,
+        ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Column(
+              children: [
+                ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxHeight: 300,
+                    minHeight: 200,
                   ),
-                  errorWidget: (context, url, error) => const ImageNotFound(),
+                  child: CachedNetworkImage(
+                    width: double.infinity,
+                    imageUrl: bai.plateImage,
+                    fit: BoxFit.fill,
+                    placeholder: (context, url) => Shimmer.fromColors(
+                      baseColor: Theme.of(context).colorScheme.background,
+                      highlightColor:
+                          Theme.of(context).colorScheme.outlineVariant,
+                      child: Container(color: Colors.grey),
+                    ),
+                    errorWidget: (context, url, error) => const ImageNotFound(),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 30),
-              ShadowContainer(
-                width: MediaQuery.of(context).size.width * 0.9,
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      UltilHelper.formatPlateNumber(bai.plateNumber),
-                      style: titleTextStyle,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Created at:',
-                          style: contentTextStyle,
-                          textAlign: TextAlign.center,
-                        ),
-                        Text(
-                          UltilHelper.formatDateMMMddyyyy(bai.createDate),
-                          style: contentTextStyle,
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 5),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Vehicle type:',
-                          style: contentTextStyle,
-                          textAlign: TextAlign.center,
-                        ),
-                        Text(
-                          bai.vehicleType,
-                          style: contentTextStyle,
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 5),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Status:',
-                          style: contentTextStyle,
-                          textAlign: TextAlign.center,
-                        ),
-                        Text(
-                          bai.status,
-                          style: contentTextStyle.copyWith(
-                              color: color, fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 5),
-                    if (bai.status == 'REJECTED')
-                      SizedBox(
-                        child: Text(
-                          'Wrong information. Please check again.',
-                          style: contentTextStyle.copyWith(
-                            color: Theme.of(context).colorScheme.error,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                          textAlign: TextAlign.justify,
-                        ),
+                const SizedBox(height: 30),
+                ShadowContainer(
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        UltilHelper.formatPlateNumber(bai.plateNumber),
+                        style: titleTextStyle,
+                        textAlign: TextAlign.center,
                       ),
-                    if (bai.status == 'PENDING')
-                      SizedBox(
-                        child: Text(
-                          'Please park your vehicle in our facility for the first time to activate it.',
-                          style: contentTextStyle.copyWith(
-                            color: Theme.of(context).colorScheme.primary,
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Created at:',
+                            style: contentTextStyle,
+                            textAlign: TextAlign.center,
                           ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                          textAlign: TextAlign.justify,
-                        ),
+                          Text(
+                            UltilHelper.formatDateMMMddyyyy(bai.createDate),
+                            style: contentTextStyle,
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            deleteBaiDialog();
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.onSecondary,
-                              borderRadius: BorderRadius.circular(14),
+                      const SizedBox(height: 5),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Vehicle type:',
+                            style: contentTextStyle,
+                            textAlign: TextAlign.center,
+                          ),
+                          Text(
+                            bai.vehicleType,
+                            style: contentTextStyle,
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 5),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Status:',
+                            style: contentTextStyle,
+                            textAlign: TextAlign.center,
+                          ),
+                          Text(
+                            bai.status,
+                            style: contentTextStyle.copyWith(
+                                color: color, fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 5),
+                      if (bai.status == 'REJECTED')
+                        SizedBox(
+                          child: Text(
+                            'Wrong information. Please check again.',
+                            style: contentTextStyle.copyWith(
+                              color: Theme.of(context).colorScheme.error,
                             ),
-                            child: Icon(
-                              Icons.delete,
-                              color: Theme.of(context).colorScheme.surface,
-                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                            textAlign: TextAlign.justify,
                           ),
                         ),
-                        Visibility(
-                          visible: bai.status == 'PENDING' ||
-                              bai.status == 'REJECTED',
-                          child: GestureDetector(
-                            onTap: _showEditDialog,
+                      if (bai.status == 'PENDING')
+                        SizedBox(
+                          child: Text(
+                            'Please park your vehicle in our facility for the first time to activate it.',
+                            style: contentTextStyle.copyWith(
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                            textAlign: TextAlign.justify,
+                          ),
+                        ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              deleteBaiDialog();
+                            },
                             child: Container(
                               padding: const EdgeInsets.all(10),
-                              margin: const EdgeInsets.only(left: 10),
                               decoration: BoxDecoration(
                                 color:
                                     Theme.of(context).colorScheme.onSecondary,
                                 borderRadius: BorderRadius.circular(14),
                               ),
                               child: Icon(
-                                Icons.edit,
+                                Icons.delete,
                                 color: Theme.of(context).colorScheme.surface,
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                          Visibility(
+                            visible: bai.status == 'PENDING' ||
+                                bai.status == 'REJECTED',
+                            child: GestureDetector(
+                              onTap: _showEditDialog,
+                              child: Container(
+                                padding: const EdgeInsets.all(10),
+                                margin: const EdgeInsets.only(left: 10),
+                                decoration: BoxDecoration(
+                                  color:
+                                      Theme.of(context).colorScheme.onSecondary,
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                child: Icon(
+                                  Icons.edit,
+                                  color: Theme.of(context).colorScheme.surface,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -459,6 +463,7 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
           content: Text(
             message,
             style: Theme.of(context).textTheme.bodySmall,
+            textAlign: TextAlign.justify,
           ),
         );
       },

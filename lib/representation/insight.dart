@@ -13,6 +13,7 @@ import 'package:logger/logger.dart';
 import '../api/model/bai_model/statistic.dart';
 import '../api/service/bai_be/statistic_service.dart';
 import '../component/dialog.dart';
+import '../component/internet_connection_wrapper.dart';
 import '../core/const/frontend/message.dart';
 
 class InsightScreen extends StatefulWidget {
@@ -124,46 +125,48 @@ class _InsightScreenState extends State<InsightScreen> with ApiResponseHandler {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const MyAppBar(
-        title: 'Insight',
-        automaticallyImplyLeading: true,
-      ),
-      body: _isLoading
-          ? const LoadingCircle()
-          : RefreshIndicator(
-              onRefresh: _fetchStatisticData,
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: MediaQuery.of(context).size.width * 0.05),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSectionTitle('How did you park this month?'),
-                      _buildParkingStats(),
-                      SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.03),
-                      _buildSectionTitle('How did you pay this month?'),
-                      _buildPaymentMethodChart(),
-                      const SizedBox(height: 20),
-                      _buildTipWidget(),
-                      SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.03),
-                      _tooltip(
-                        'Your hero level is determined by the number of transactions you made with your wallet. '
-                        'The more transactions you make, the higher your hero level will be.',
-                        _buildSectionTitle('Heroic Achievements',
-                            icon: Icons.info_outline),
-                      ),
-                      _buildCashlessHero(),
-                      SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.05),
-                    ],
+    return InternetConnectionWrapper(
+      child: Scaffold(
+        appBar: const MyAppBar(
+          title: 'Insight',
+          automaticallyImplyLeading: true,
+        ),
+        body: _isLoading
+            ? const LoadingCircle()
+            : RefreshIndicator(
+                onRefresh: _fetchStatisticData,
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: MediaQuery.of(context).size.width * 0.05),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildSectionTitle('How did you park this month?'),
+                        _buildParkingStats(),
+                        SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.03),
+                        _buildSectionTitle('How did you pay this month?'),
+                        _buildPaymentMethodChart(),
+                        const SizedBox(height: 20),
+                        _buildTipWidget(),
+                        SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.03),
+                        _tooltip(
+                          'Your hero level is determined by the number of transactions you made with your wallet. '
+                          'The more transactions you make, the higher your hero level will be.',
+                          _buildSectionTitle('Heroic Achievements',
+                              icon: Icons.info_outline),
+                        ),
+                        _buildCashlessHero(),
+                        SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.05),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
+      ),
     );
   }
 
@@ -392,6 +395,7 @@ class _InsightScreenState extends State<InsightScreen> with ApiResponseHandler {
           content: Text(
             message,
             style: Theme.of(context).textTheme.bodySmall,
+            textAlign: TextAlign.justify,
           ),
         );
       },

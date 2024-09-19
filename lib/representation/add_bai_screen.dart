@@ -11,6 +11,7 @@ import 'package:logger/logger.dart';
 import '../api/model/bai_model/api_response.dart';
 import '../component/app_bar_component.dart';
 import '../component/dialog.dart';
+import '../component/internet_connection_wrapper.dart';
 import '../component/response_handler.dart';
 import '../component/shadow_button.dart';
 import '../component/snackbar.dart';
@@ -278,6 +279,7 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
           content: Text(
             message,
             style: Theme.of(context).textTheme.bodySmall,
+            textAlign: TextAlign.justify,
           ),
         );
       },
@@ -293,30 +295,32 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const MyAppBar(
-        automaticallyImplyLeading: true,
-        title: 'Add Bike',
-      ),
-      body: SingleChildScrollView(
-        child: SafeArea(
-          child: Center(
-            child: Container(
-              padding: const EdgeInsets.only(top: 25),
-              width: MediaQuery.of(context).size.width * 0.9,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildImagePicker(),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.04,
-                  ),
-                  _buildVehicleTypeDropdown(),
-                  const SizedBox(height: 20),
-                  _buildPlateNumberInput(),
-                  const SizedBox(height: 20),
-                  _buildAddButton(),
-                ],
+    return InternetConnectionWrapper(
+      child: Scaffold(
+        appBar: const MyAppBar(
+          automaticallyImplyLeading: true,
+          title: 'Add Bike',
+        ),
+        body: SingleChildScrollView(
+          child: SafeArea(
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.only(top: 25),
+                width: MediaQuery.of(context).size.width * 0.9,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildImagePicker(),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.04,
+                    ),
+                    _buildVehicleTypeDropdown(),
+                    const SizedBox(height: 20),
+                    _buildPlateNumberInput(),
+                    const SizedBox(height: 20),
+                    _buildAddButton(),
+                  ],
+                ),
               ),
             ),
           ),

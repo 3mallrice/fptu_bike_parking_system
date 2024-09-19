@@ -25,7 +25,6 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
 late AndroidNotificationChannel androidChannel;
-final _currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? '';
 bool isInitialized = false;
 
 // create a new instance of firebase messaging
@@ -43,8 +42,7 @@ Future<void> getFcmToken() async {
     return;
   }
   //save token to local storage
-  await LocalStorageHelper.setValue(
-      LocalStorageKey.fcmToken, fCMToken, _currentEmail);
+  await LocalStorageHelper.setFCMTokenValue(fCMToken);
 
   // print the token (normally you would send this to your server)
   log.i('fcmToken: $fCMToken');

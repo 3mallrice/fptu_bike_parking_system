@@ -44,6 +44,17 @@ class LocalStorageHelper {
     _shared.log.i('Set value for key: $namespacedKey -> $val');
   }
 
+  static Future<void> setFCMTokenValue(String fcmToken) async {
+    await _shared.hiveBox?.put(LocalStorageKey.fcmToken, fcmToken);
+    _shared.log.i('Set FCM token: $fcmToken');
+  }
+
+  static String? getFCMTokenValue() {
+    String? fcmToken = _shared.hiveBox?.get(LocalStorageKey.fcmToken);
+    _shared.log.i('Get FCM token: $fcmToken');
+    return fcmToken;
+  }
+
   // save current email to local storage
   static Future<void> setCurrentUserEmail(String email) async {
     await _shared.hiveBox?.put(LocalStorageKey.currentUserEmailKey, email);
@@ -88,9 +99,6 @@ class GetLocalHelper {
     return userData != null ? 'Bearer ${userData.bearerToken}' : null;
   }
 
-  static String? getFCMToken(String email) =>
-      LocalStorageHelper.getValue(LocalStorageKey.fcmToken, email);
-
   static int getPageSize(String email) =>
       LocalStorageHelper.getValue(LocalStorageKey.pageSize, email) ?? 10;
 
@@ -106,11 +114,6 @@ class SetLocalHelper {
     userData?.name = username;
     await LocalStorageHelper.setValue(
         LocalStorageKey.userData, userData?.toJson(), email);
-  }
-
-  static Future<void> setFCMToken(String email, String fcmToken) async {
-    await LocalStorageHelper.setValue(
-        LocalStorageKey.fcmToken, fcmToken, email);
   }
 
   static Future<void> setPageSize(String email, int pageSize) async {

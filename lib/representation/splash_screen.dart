@@ -55,7 +55,9 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            Image.asset(AssetHelper.imgLogo),
+            Image.asset(
+              AssetHelper.imgLogo,
+            ),
             const SizedBox(height: 20),
             Text(
               'Bai',

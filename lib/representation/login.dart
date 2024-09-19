@@ -83,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> with ApiResponseHandler {
 
   //send FCM token to server
   Future<void> _sendTokenToServer(String currentEmail) async {
-    final fcmToken = GetLocalHelper.getFCMToken(currentEmail);
+    final fcmToken = LocalStorageHelper.getFCMTokenValue();
 
     if (fcmToken != null) {
       final APIResponse<dynamic> response =
@@ -116,6 +116,7 @@ class _LoginScreenState extends State<LoginScreen> with ApiResponseHandler {
           content: Text(
             message,
             style: Theme.of(context).textTheme.bodySmall,
+            textAlign: TextAlign.justify,
           ),
         );
       },

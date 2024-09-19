@@ -735,6 +735,7 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
           content: Text(
             message,
             style: Theme.of(context).textTheme.bodySmall,
+            textAlign: TextAlign.justify,
           ),
           onClick: () {
             Navigator.of(context).pop();
