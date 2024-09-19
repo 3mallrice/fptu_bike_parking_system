@@ -62,7 +62,7 @@ class _FeedbackScreenState extends State<FeedbackScreen>
       final response = await _feedbackApi.getFeedbacks(_pageIndex, _pageSize);
       if (!mounted) return;
 
-      final bool isResponseValid = await handleApiResponse(
+      final bool isResponseValid = await handleApiResponseBool(
         context: context,
         response: response,
         showErrorDialog: _showErrorDialog,

@@ -10,11 +10,14 @@ import 'package:bai_system/representation/cashless_hero.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
+import '../api/model/bai_model/api_response.dart';
 import '../api/model/bai_model/statistic.dart';
 import '../api/service/bai_be/statistic_service.dart';
 import '../component/dialog.dart';
 import '../component/internet_connection_wrapper.dart';
+import '../component/snackbar.dart';
 import '../core/const/frontend/message.dart';
+import 'login.dart';
 
 class InsightScreen extends StatefulWidget {
   const InsightScreen({super.key});
@@ -47,25 +50,57 @@ class _InsightScreenState extends State<InsightScreen> with ApiResponseHandler {
   Future<void> _fetchStatisticData() async {
     setState(() => _isLoading = true);
     try {
+      Set<String> errorMessages = {};
+
       final parkResponse = await _statisticApi.getHowDidYouPark();
       final payResponse = await _statisticApi.getHowDidYouPay();
 
       if (!mounted) return;
 
-      final isParkResValid = await handleApiResponse(
-        context: context,
-        response: parkResponse,
-        showErrorDialog: _showErrorDialog,
-      );
+      final parkError = await _catchError(parkResponse);
+      if (parkError != null) {
+        if (parkError == ApiResponseHandler.invalidToken) {
+          _goToPage(routeName: LoginScreen.routeName);
+          _showSnackBar(
+            message: ErrorMessage.tokenInvalid,
+            isSuccessful: false,
+          );
 
-      if (!mounted) return;
-      final isPayResValid = await handleApiResponse(
-        context: context,
-        response: payResponse,
-        showErrorDialog: _showErrorDialog,
-      );
+          return;
+        }
 
-      if (!isParkResValid || !isPayResValid) return;
+        errorMessages.add(parkError);
+        return;
+      }
+
+      final payError = await _catchError(payResponse);
+      if (payError != null) {
+        if (payError == ApiResponseHandler.invalidToken) {
+          _goToPage(routeName: LoginScreen.routeName);
+          _showSnackBar(
+            message: ErrorMessage.tokenInvalid,
+            isSuccessful: false,
+          );
+
+          return;
+        }
+
+        errorMessages.add(payError);
+        return;
+      }
+
+      if (errorMessages.isNotEmpty) {
+        String errorMessage;
+
+        if (errorMessages.length > 1) {
+          errorMessage = errorMessages.map((e) => '\u2022 $e').join('\n');
+        } else {
+          errorMessage = errorMessages.first;
+        }
+
+        _showErrorDialog(errorMessage);
+        return;
+      }
 
       setState(() {
         _howDidYouParkAndSpend = parkResponse.data;
@@ -82,6 +117,23 @@ class _InsightScreenState extends State<InsightScreen> with ApiResponseHandler {
         setState(() => _isLoading = false);
       }
     }
+  }
+
+  Future<String?> _catchError(APIResponse response) async {
+    final String? errorMessage = await handleApiResponse(
+      context: context,
+      response: response,
+    );
+
+    if (errorMessage == ApiResponseHandler.invalidToken) {
+      _goToPage(routeName: LoginScreen.routeName);
+      _showSnackBar(
+        message: ErrorMessage.tokenInvalid,
+        isSuccessful: false,
+      );
+    }
+
+    return errorMessage;
   }
 
   void _calculateHeroLevel() {
@@ -399,6 +451,39 @@ class _InsightScreenState extends State<InsightScreen> with ApiResponseHandler {
           ),
         );
       },
+    );
+  }
+
+  void _goToPage({String? routeName}) {
+    routeName != null
+        ? Navigator.of(context).pushNamed(routeName)
+        : Navigator.of(context).pop();
+  }
+
+  void _showSnackBar({required String message, required bool isSuccessful}) {
+    Color background = Theme.of(context).colorScheme.surface;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: MySnackBar(
+          prefix: isSuccessful
+              ? Icon(
+                  Icons.check_circle_rounded,
+                  color: background,
+                )
+              : Icon(
+                  Icons.cancel_rounded,
+                  color: background,
+                ),
+          message: message,
+          backgroundColor: isSuccessful
+              ? Theme.of(context).colorScheme.onError
+              : Theme.of(context).colorScheme.error,
+        ),
+        backgroundColor: Colors.transparent,
+        behavior: SnackBarBehavior.floating,
+        elevation: 0,
+        padding: const EdgeInsets.all(10),
+      ),
     );
   }
 }

@@ -91,7 +91,7 @@ class _LoginScreenState extends State<LoginScreen> with ApiResponseHandler {
 
       if (!mounted) return;
 
-      final bool isResponseValid = await handleApiResponse(
+      final bool isResponseValid = await handleApiResponseBool(
         context: context,
         response: response,
         showErrorDialog: _showErrorDialog,

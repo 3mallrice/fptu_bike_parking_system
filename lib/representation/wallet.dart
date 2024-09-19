@@ -1,4 +1,5 @@
 import 'package:bai_system/component/response_handler.dart';
+import 'package:bai_system/component/snackbar.dart';
 import 'package:bai_system/representation/receipt.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -18,6 +19,7 @@ import '../core/const/frontend/message.dart';
 import '../core/const/utilities/util_helper.dart';
 import '../core/helper/local_storage_helper.dart';
 import 'fundin_screen.dart';
+import 'login.dart';
 import 'navigation_bar.dart';
 
 class WalletScreen extends StatefulWidget {
@@ -96,12 +98,30 @@ class _WalletScreenState extends State<WalletScreen>
   }
 
   Future<void> _initializeData() async {
+    Set<String> errorMessages = {};
+
     await Future.wait([
-      getMainBalance(),
-      getExtraBalance(),
-      getMainTransactions(),
-      getExtraTransactions(),
+      getMainBalance(errors: errorMessages, isAlone: false),
+      getExtraBalance(errors: errorMessages, isAlone: false),
+      getMainTransactions(errors: errorMessages, isAlone: false),
+      getExtraTransactions(errors: errorMessages, isAlone: false),
     ]);
+
+    if (errorMessages.isNotEmpty) {
+      setState(() {
+        mainTransactionsLoading = false;
+        extraTransactionsLoading = false;
+      });
+      String errorMessage;
+
+      if (errorMessages.length > 1) {
+        errorMessage = errorMessages.map((e) => '\u2022 $e').join('\n');
+      } else {
+        errorMessage = errorMessages.first;
+      }
+
+      _showErrorDialog(errorMessage);
+    }
   }
 
   void _toggleHideBalance() {
@@ -110,16 +130,21 @@ class _WalletScreenState extends State<WalletScreen>
     });
   }
 
-  void _catchError(APIResponse response) async {
-    if (!mounted) return;
-
-    final bool isResponseValid = await handleApiResponse(
+  Future<String?> _catchError(APIResponse response) async {
+    final String? errorMessage = await handleApiResponse(
       context: context,
       response: response,
-      showErrorDialog: _showErrorDialog,
     );
 
-    if (!isResponseValid) return;
+    if (errorMessage == ApiResponseHandler.invalidToken) {
+      _goToPage(routeName: LoginScreen.routeName);
+      _showSnackBar(
+        message: ErrorMessage.tokenInvalid,
+        isSuccessful: false,
+      );
+    }
+
+    return errorMessage;
   }
 
   void _showErrorDialog(String message) {
@@ -138,27 +163,50 @@ class _WalletScreenState extends State<WalletScreen>
     );
   }
 
-  Future<void> getMainBalance() async {
+  Future<void> getMainBalance(
+      {Set<String>? errors, bool isAlone = false}) async {
     try {
       final APIResponse<int> result =
           await callWalletApi.getMainWalletBalance();
-      _catchError(result);
-      if (!mounted) return;
-      setState(() {
-        mainBalance = result.data ?? 0;
-      });
+      final error = await _catchError(result);
+
+      if (error != null) {
+        if (isAlone) {
+          _showErrorDialog(error);
+        }
+        errors?.add(error);
+      }
+
+      if (mounted) {
+        setState(() {
+          mainBalance = result.data ?? 0;
+        });
+      }
     } catch (e) {
-      log.e('Error during get main wallet balance: $e');
+      log.e('Error during get main balance: $e');
+      if (isAlone) {
+        _showErrorDialog(
+            'Load Main Balance: ${ErrorMessage.somethingWentWrong}');
+      }
+      errors?.add('Load Main Balance: ${ErrorMessage.somethingWentWrong}');
     }
   }
 
-  Future<void> getExtraBalance() async {
+  Future<void> getExtraBalance(
+      {Set<String>? errors, bool isAlone = false}) async {
     try {
       APIResponse<ExtraBalanceModel> extraBalanceModel =
           await callWalletApi.getExtraWalletBalance();
-      _catchError(extraBalanceModel);
-      if (!mounted) return;
-      if (extraBalanceModel.data != null) {
+      final error = await _catchError(extraBalanceModel);
+
+      if (error != null) {
+        if (isAlone) {
+          _showErrorDialog(error);
+        }
+        errors?.add(error);
+      }
+
+      if (mounted && extraBalanceModel.data != null) {
         setState(() {
           extraBalance = extraBalanceModel.data!.balance;
           expiredDate = extraBalanceModel.data!.expiredDate;
@@ -166,94 +214,167 @@ class _WalletScreenState extends State<WalletScreen>
       }
     } catch (e) {
       log.e('Error during get extra balance: $e');
+      if (isAlone) {
+        _showErrorDialog(
+            'Load Extra Balance: ${ErrorMessage.somethingWentWrong}');
+      }
+      errors?.add('Load Extra Balance: ${ErrorMessage.somethingWentWrong}');
     }
   }
 
-  Future<void> getMainTransactions({bool isLoadMore = false}) async {
+  Future<void> getMainTransactions(
+      {Set<String>? errors,
+      bool isLoadMore = false,
+      bool isAlone = false}) async {
     if (!isLoadMore) {
       setState(() {
         mainTransactionsLoading = true;
         mainErrorMessage = null;
       });
     }
+
     try {
       final APIResponse<List<WalletModel>> result = await callWalletApi
           .getMainWalletTransactions(mainPageIndex, _pageSize, from, to);
-      log.d('Main transactions: ${result.data}');
-      _catchError(result);
-      if (!mounted) return;
-      setState(() {
-        if (isLoadMore) {
-          mainTransactions.addAll(result.data ?? []);
-        } else {
-          mainTransactions = result.data ?? [];
+      final error = await _catchError(result);
+
+      if (error != null) {
+        if (isAlone) {
+          _showErrorDialog(error);
         }
-        totalMainTransactions = result.totalRecord ?? 0;
-        mainTransactionsLoading = false;
-      });
+        errors?.add(error);
+        if (!isAlone) return;
+      }
+
+      if (mounted) {
+        setState(() {
+          if (isLoadMore) {
+            mainTransactions.addAll(result.data ?? []);
+          } else {
+            mainTransactions = result.data ?? [];
+          }
+          totalMainTransactions = result.totalRecord ?? 0;
+          mainTransactionsLoading = false;
+        });
+      }
     } catch (e) {
       log.e('Error during get main wallet transactions: $e');
+      if (isAlone) {
+        _showErrorDialog(
+            'Load Main Transactions: ${ErrorMessage.somethingWentWrong}');
+      }
+      errors?.add('Load Main Transactions: ${ErrorMessage.somethingWentWrong}');
       setState(() {
         mainTransactionsLoading = false;
         mainErrorMessage = 'Error loading data: $e';
       });
+      if (!isAlone) return;
     }
   }
 
-  Future<void> getExtraTransactions({bool isLoadMore = false}) async {
+  Future<void> getExtraTransactions(
+      {Set<String>? errors,
+      bool isLoadMore = false,
+      bool isAlone = false}) async {
     if (!isLoadMore) {
       setState(() {
         extraTransactionsLoading = true;
         extraErrorMessage = null;
       });
     }
+
     try {
       final APIResponse<List<WalletModel>> result =
           await callWalletApi.getExtraWalletTransactions(
               extraPageIndex, _pageSize, extraFrom, extraTo);
-      _catchError(result);
-      if (!mounted) return;
-      setState(() {
-        if (isLoadMore) {
-          extraTransactions.addAll(result.data ?? []);
-        } else {
-          extraTransactions = result.data ?? [];
+      final error = await _catchError(result);
+
+      if (error != null) {
+        if (isAlone) {
+          _showErrorDialog(error);
         }
-        totalExtraTransactions = result.totalRecord ?? 0;
-        extraTransactionsLoading = false;
-      });
+        errors?.add(error);
+        if (!isAlone) return;
+      }
+
+      if (mounted) {
+        setState(() {
+          if (isLoadMore) {
+            extraTransactions.addAll(result.data ?? []);
+          } else {
+            extraTransactions = result.data ?? [];
+          }
+          totalExtraTransactions = result.totalRecord ?? 0;
+          extraTransactionsLoading = false;
+        });
+      }
     } catch (e) {
       log.e('Error during get extra wallet transactions: $e');
+      if (isAlone) {
+        _showErrorDialog(
+            'Load Extra Transactions: ${ErrorMessage.somethingWentWrong}');
+      }
+      errors
+          ?.add('Load Extra Transactions: ${ErrorMessage.somethingWentWrong}');
       setState(() {
         extraTransactionsLoading = false;
         extraErrorMessage = 'Error loading data: $e';
       });
+      if (!isAlone) return;
     }
   }
 
   void _onMainRefresh() async {
+    Set<String> errorMessages = {};
+
     mainPageIndex = 1;
-    await getMainBalance();
-    await getMainTransactions();
+    await getMainBalance(errors: errorMessages, isAlone: false);
+    await getMainTransactions(errors: errorMessages, isAlone: false);
     _mainRefreshController.refreshCompleted();
+
+    if (errorMessages.isNotEmpty) {
+      String errorMessage;
+
+      if (errorMessages.length > 1) {
+        errorMessage = errorMessages.map((e) => '\u2022 $e').join('\n');
+      } else {
+        errorMessage = errorMessages.first;
+      }
+
+      _showErrorDialog(errorMessage);
+    }
   }
 
   void _onMainLoading() async {
     mainPageIndex++;
-    await getMainTransactions(isLoadMore: true);
+    await getMainTransactions(isLoadMore: true, isAlone: true);
     _mainRefreshController.loadComplete();
   }
 
   void _onExtraRefresh() async {
+    Set<String> errorMessages = {};
+
     extraPageIndex = 1;
     await getExtraBalance();
     await getExtraTransactions();
     _extraRefreshController.refreshCompleted();
+
+    if (errorMessages.isNotEmpty) {
+      String errorMessage;
+
+      if (errorMessages.length > 1) {
+        errorMessage = errorMessages.map((e) => '\u2022 $e').join('\n');
+      } else {
+        errorMessage = errorMessages.first;
+      }
+
+      _showErrorDialog(errorMessage);
+    }
   }
 
   void _onExtraLoading() async {
     extraPageIndex++;
-    await getExtraTransactions(isLoadMore: true);
+    await getExtraTransactions(isLoadMore: true, isAlone: true);
     _extraRefreshController.loadComplete();
   }
 
@@ -635,6 +756,39 @@ class _WalletScreenState extends State<WalletScreen>
           contentPadding: const EdgeInsets.all(20),
         );
       },
+    );
+  }
+
+  void _goToPage({String? routeName}) {
+    routeName != null
+        ? Navigator.of(context).pushNamed(routeName)
+        : Navigator.of(context).pop();
+  }
+
+  void _showSnackBar({required String message, required bool isSuccessful}) {
+    Color background = Theme.of(context).colorScheme.surface;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: MySnackBar(
+          prefix: isSuccessful
+              ? Icon(
+                  Icons.check_circle_rounded,
+                  color: background,
+                )
+              : Icon(
+                  Icons.cancel_rounded,
+                  color: background,
+                ),
+          message: message,
+          backgroundColor: isSuccessful
+              ? Theme.of(context).colorScheme.onError
+              : Theme.of(context).colorScheme.error,
+        ),
+        backgroundColor: Colors.transparent,
+        behavior: SnackBarBehavior.floating,
+        elevation: 0,
+        padding: const EdgeInsets.all(10),
+      ),
     );
   }
 }

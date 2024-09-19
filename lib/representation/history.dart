@@ -22,6 +22,7 @@ import '../core/const/utilities/util_helper.dart';
 import '../core/helper/asset_helper.dart';
 import '../core/helper/local_storage_helper.dart';
 import '../representation/feedback.dart';
+import 'login.dart';
 
 class HistoryScreen extends StatefulWidget {
   static String routeName = '/history_screen';
@@ -48,6 +49,20 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
 
   List<HistoryModel> histories = [];
 
+  Future<String?> _catchError(APIResponse response) async {
+    final String? errorMessage = await handleApiResponse(
+      context: context,
+      response: response,
+    );
+
+    if (errorMessage == ApiResponseHandler.invalidToken) {
+      _goToPage(routeName: LoginScreen.routeName);
+      showErrorSnackBar(ErrorMessage.tokenInvalid);
+    }
+
+    return errorMessage;
+  }
+
   Future<void> getCustomerHistories({bool isRefresh = false}) async {
     setState(() {
       isLoading = true;
@@ -63,26 +78,23 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
 
       if (!mounted) return;
 
-      final bool isResponseValid = await handleApiResponse(
-        context: context,
-        response: result,
-        showErrorDialog: _showErrorDialog,
-      );
-
-      if (!isResponseValid) {
+      final error = await _catchError(result);
+      if (error != null) {
+        if (error == ApiResponseHandler.invalidToken) {
+          _goToPage(routeName: LoginScreen.routeName);
+          showErrorSnackBar(ErrorMessage.tokenInvalid);
+        }
         setState(() {
           isLoading = false;
         });
         return;
       }
 
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-          histories = result.data ?? [];
-          _hasNextPage = result.data!.length == _pageSize;
-        });
-      }
+      setState(() {
+        isLoading = false;
+        histories = result.data ?? [];
+        _hasNextPage = result.data!.length == _pageSize;
+      });
       log.f('Histories: $histories', time: DateTime.now());
     } catch (e) {
       log.e('Error during get customer histories: $e');
@@ -128,15 +140,12 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
         final result =
             await callHistoryAPI.getCustomerHistories(_pageSize, pageIndex + 1);
 
-        if (!mounted) return;
-
-        final bool isResponseValid = await handleApiResponse(
-          context: context,
-          response: result,
-          showErrorDialog: _showErrorDialog,
-        );
-
-        if (!isResponseValid || result.data == null) {
+        final error = await _catchError(result);
+        if (error != null) {
+          if (error == ApiResponseHandler.invalidToken) {
+            _goToPage(routeName: LoginScreen.routeName);
+            showErrorSnackBar(ErrorMessage.tokenInvalid);
+          }
           setState(() {
             _hasNextPage = false;
           });
@@ -160,11 +169,9 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
           _showErrorDialog('Failed to load more histories. Please try again.');
         }
       } finally {
-        if (mounted) {
-          setState(() {
-            _isLoadMoreRunning = false;
-          });
-        }
+        setState(() {
+          _isLoadMoreRunning = false;
+        });
       }
     }
   }
@@ -456,6 +463,12 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
     );
   }
 
+  void _goToPage({String? routeName}) {
+    routeName != null
+        ? Navigator.of(context).pushNamed(routeName)
+        : Navigator.of(context).pop();
+  }
+
   void showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -492,16 +505,16 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
 
         if (!mounted) return;
 
-        final bool isResponseValid = await handleApiResponse(
-          context: context,
-          response: response,
-          showErrorDialog: showErrorSnackBar,
-        );
-
-        if (!isResponseValid) return;
+        final error = await _catchError(response);
+        if (error != null) {
+          if (error == ApiResponseHandler.invalidToken) {
+            _goToPage(routeName: LoginScreen.routeName);
+            showErrorSnackBar(ErrorMessage.tokenInvalid);
+          }
+          return;
+        }
 
         log.i('Feedback sent successfully');
-        return;
       } catch (e) {
         log.e('Error during sending feedback: $e');
         showErrorSnackBar(ErrorMessage.somethingWentWrong);

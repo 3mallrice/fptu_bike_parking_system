@@ -19,14 +19,15 @@ import '../component/app_bar_component.dart';
 import '../component/image_not_found_component.dart';
 import '../component/internet_connection_wrapper.dart';
 import '../core/const/frontend/message.dart';
+import 'login.dart';
 
 class BaiDetails extends StatefulWidget {
-  final BaiModel baiModel;
+  final String baiId;
   final VoidCallback onPopCallback;
 
   const BaiDetails({
     super.key,
-    required this.baiModel,
+    required this.baiId,
     required this.onPopCallback,
   });
 
@@ -37,7 +38,9 @@ class BaiDetails extends StatefulWidget {
 }
 
 class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
-  late BaiModel bai = widget.baiModel;
+  late String baiId = widget.baiId;
+
+  late BaiModel bai;
   final callVehicleApi = CallBikeApi();
 
   final plateNumberController = TextEditingController();
@@ -54,8 +57,7 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
   @override
   void initState() {
     super.initState();
-    plateNumberController.text = bai.plateNumber;
-    getVehicleType();
+    _initData();
   }
 
   @override
@@ -63,6 +65,19 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
     widget.onPopCallback();
     _overlayHelper.dispose();
     super.dispose();
+  }
+
+  Future<void> _initData() async {
+    Set<String> errors = {};
+
+    await fetchBaiDetail(baiId, errors: errors, isAlone: false);
+    await getVehicleType(errors: errors, isAlone: false);
+
+    plateNumberController.text = bai.plateNumber;
+
+    if (errors.isNotEmpty) {
+      _showErrorDialog(errors.map((e) => '\u2022 $e').join('\n'));
+    }
   }
 
   @override
@@ -82,6 +97,23 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
       'INACTIVE' => Theme.of(context).colorScheme.outline,
       _ => contentTextStyle.color!,
     };
+  }
+
+  Future<String?> _catchError(APIResponse response) async {
+    final String? errorMessage = await handleApiResponse(
+      context: context,
+      response: response,
+    );
+
+    if (errorMessage == ApiResponseHandler.invalidToken) {
+      goToPage(routeName: LoginScreen.routeName);
+      showSnackBar(
+        message: ErrorMessage.tokenInvalid,
+        isSuccessful: false,
+      );
+    }
+
+    return errorMessage;
   }
 
   @override
@@ -262,39 +294,34 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
       _overlayHelper.show(context);
       APIResponse response = await callVehicleApi.updateBai(baiModel);
 
-      if (!mounted) return;
+      final error = await _catchError(response);
+      if (error != null) {
+        _showErrorDialog(error);
+        return;
+      }
 
-      final bool isResponseValid = await handleApiResponse(
-        context: context,
-        response: response,
-        showErrorDialog: _showErrorDialog,
-      );
+      if (mounted) {
+        setState(() {
+          bai = BaiModel(
+            id: bai.id,
+            plateNumber: baiModel.plateNumber,
+            vehicleType: _vehicleType
+                .firstWhere((element) => element.id == baiModel.vehicleTypeId)
+                .name,
+            status: bai.status,
+            createDate: bai.createDate,
+            plateImage: bai.plateImage,
+          );
+        });
 
-      if (!isResponseValid) return;
-
-      setState(() {
-        bai = BaiModel(
-          id: bai.id,
-          plateNumber: baiModel.plateNumber,
-          vehicleType: _vehicleType
-              .firstWhere((element) => element.id == baiModel.vehicleTypeId)
-              .name,
-          status: bai.status,
-          createDate: bai.createDate,
-          plateImage: bai.plateImage,
-        );
-      });
-
-      widget.onPopCallback();
-
-      showSnackBar(
-          message: Message.editSuccess(message: ListName.bai),
-          isSuccessful: true);
+        widget.onPopCallback();
+        showSnackBar(
+            message: Message.editSuccess(message: ListName.bai),
+            isSuccessful: true);
+      }
     } catch (e) {
       log.e('Error during edit Bai: $e');
-      showSnackBar(
-          message: Message.editUnSuccess(message: ListName.bai),
-          isSuccessful: false);
+      _showErrorDialog(Message.editUnSuccess(message: ListName.bai));
     } finally {
       _overlayHelper.hide();
     }
@@ -307,77 +334,81 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
       _overlayHelper.show(context);
       APIResponse response = await callVehicleApi.deleteBai(bai.id);
 
-      if (!mounted) return;
+      final error = await _catchError(response);
+      if (error != null) {
+        _showErrorDialog(error);
+        return;
+      }
 
-      final bool isResponseValid = await handleApiResponse(
-        context: context,
-        response: response,
-        showErrorDialog: _showErrorDialog,
-      );
-
-      if (!isResponseValid) return;
       widget.onPopCallback();
       goToPage(routeName: MyNavigationBar.routeName, arguments: 1);
       showSnackBar(
-        message: Message.deleteSuccess(message: ListName.bai),
-        isSuccessful: true,
-      );
+          message: Message.deleteSuccess(message: ListName.bai),
+          isSuccessful: true);
     } catch (e) {
       log.e('Error during delete Bai: $e');
-      showSnackBar(
-          message: Message.deleteUnSuccess(message: ListName.bai),
-          isSuccessful: false);
+      _showErrorDialog(Message.deleteUnSuccess(message: ListName.bai));
     } finally {
       _overlayHelper.hide();
     }
   }
 
-  Future<void> fetchBaiDetail(String id) async {
+  Future<void> fetchBaiDetail(String id,
+      {Set<String>? errors, bool isAlone = false}) async {
     try {
       APIResponse<BaiModel> response =
           await callVehicleApi.getCustomerBaiById(id);
 
-      if (!mounted) return;
+      final error = await _catchError(response);
+      if (error != null) {
+        errors?.add(error);
+        if (isAlone) {
+          _showErrorDialog(error);
+        }
+        return;
+      }
 
-      final bool isResponseValid = await handleApiResponse(
-        context: context,
-        response: response,
-        showErrorDialog: _showErrorDialog,
-      );
-
-      if (!isResponseValid) return;
-
-      setState(() {
-        bai = response.data!;
-      });
+      if (mounted) {
+        setState(() {
+          bai = response.data!;
+        });
+      }
     } catch (e) {
       log.e('Error during fetch Bai details: $e');
-      _showErrorDialog(ErrorMessage.somethingWentWrong);
+      errors?.add(ErrorMessage.somethingWentWrong);
+      if (isAlone) {
+        _showErrorDialog(ErrorMessage.somethingWentWrong);
+      }
     }
   }
 
   //Get Vehicle Type
-  Future<void> getVehicleType() async {
+  Future<void> getVehicleType(
+      {Set<String>? errors, bool isAlone = false}) async {
     try {
       APIResponse<List<VehicleTypeModel>> response =
           await callVehicleApi.getVehicleType();
 
-      if (!mounted) return;
+      final error = await _catchError(response);
+      if (error != null) {
+        errors?.add(error);
+        if (isAlone) {
+          _showErrorDialog(error);
+        }
+        return;
+      }
 
-      final bool isResponseValid = await handleApiResponse(
-        context: context,
-        response: response,
-        showErrorDialog: _showErrorDialog,
-      );
-
-      if (!isResponseValid) return;
-
-      setState(() {
-        _vehicleType = response.data!;
-      });
+      if (mounted) {
+        setState(() {
+          _vehicleType = response.data!;
+        });
+      }
     } catch (e) {
       log.e('Error during fetch Vehicle Type: $e');
-      _showErrorDialog(ErrorMessage.somethingWentWrong);
+      errors?.add(ErrorMessage.somethingWentWrong);
+      if (isAlone) {
+        _showErrorDialog(ErrorMessage.somethingWentWrong);
+      }
     }
   }
 

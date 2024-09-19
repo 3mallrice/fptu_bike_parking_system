@@ -21,7 +21,9 @@ import '../component/app_bar_component.dart';
 import '../component/dialog.dart';
 import '../component/internet_connection_wrapper.dart';
 import '../component/shadow_container.dart';
+import '../component/snackbar.dart';
 import '../core/helper/asset_helper.dart';
+import 'login.dart';
 
 class FundinScreen extends StatefulWidget {
   const FundinScreen({super.key});
@@ -49,21 +51,6 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
   final ScrollController _scrollController = ScrollController();
   bool _isLoadingMore = false;
 
-  //Fake coin package data
-  List<CoinPackage> coins = [
-    CoinPackage(id: '1', packageName: 'Package 1', amount: '1000', price: 1000),
-    CoinPackage(id: '2', packageName: 'Package 2', amount: '2000', price: 2000),
-    CoinPackage(id: '3', packageName: 'Package 3', amount: '3000', price: 3000),
-    CoinPackage(id: '4', packageName: 'Package 4', amount: '4000', price: 4000),
-    CoinPackage(id: '5', packageName: 'Package 5', amount: '5000', price: 5000),
-    CoinPackage(id: '6', packageName: 'Package 6', amount: '6000', price: 6000),
-    CoinPackage(id: '7', packageName: 'Package 7', amount: '7000', price: 7000),
-    CoinPackage(id: '8', packageName: 'Package 8', amount: '8000', price: 8000),
-    CoinPackage(id: '9', packageName: 'Package 9', amount: '9000', price: 9000),
-    CoinPackage(
-        id: '10', packageName: 'Package 10', amount: '10000', price: 10000),
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -89,12 +76,27 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
   }
 
   Future<void> _initializeData() async {
-    await _loadHideBalance();
+    Set<String> errorMessages = {};
+
     await Future.wait([
-      getBalance(),
-      getExtraBalance(),
-      _loadPackages(),
+      _loadHideBalance(),
+      getBalance(errors: errorMessages, isAlone: false),
+      getExtraBalance(errors: errorMessages, isAlone: false),
+      _loadPackages(errors: errorMessages, isAlone: false),
     ]);
+
+    if (errorMessages.isNotEmpty) {
+      String errorMessage;
+
+      if (errorMessages.length > 1) {
+        errorMessage = errorMessages.map((e) => '\u2022 $e').join('\n');
+      } else {
+        errorMessage = errorMessages.first;
+      }
+
+      _showErrorDialog(errorMessage);
+    }
+
     setState(() {
       _isLoading = false;
     });
@@ -118,78 +120,92 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
     });
   }
 
-  Future<void> getBalance() async {
+  Future<void> getBalance({Set<String>? errors, bool isAlone = false}) async {
     try {
       final APIResponse<int> result = await _walletApi.getMainWalletBalance();
 
-      if (!mounted) return;
+      final error = await _catchError(result);
+      if (error != null) {
+        errors?.add(error);
+        if (isAlone) {
+          _showErrorDialog(error);
+        }
+        return;
+      }
 
-      final bool isResponseValid = await handleApiResponse(
-        context: context,
-        response: result,
-        showErrorDialog: _showErrorDialog,
-      );
-
-      if (!isResponseValid) return;
-
-      setState(() {
-        _balance = result.data ?? 0;
-        _logger.i('Main wallet balance: $_balance');
-      });
+      if (mounted) {
+        setState(() {
+          _balance = result.data ?? 0;
+        });
+      }
     } catch (e) {
       _logger.e('Error during get main wallet balance: $e');
+      errors?.add(ErrorMessage.somethingWentWrong);
+      if (isAlone) {
+        _showErrorDialog(ErrorMessage.somethingWentWrong);
+      }
     }
   }
 
-  Future<void> getExtraBalance() async {
+  Future<void> getExtraBalance(
+      {Set<String>? errors, bool isAlone = false}) async {
     try {
       APIResponse<ExtraBalanceModel> extraBalanceModel =
           await _walletApi.getExtraWalletBalance();
 
-      if (!mounted) return;
+      final error = await _catchError(extraBalanceModel);
+      if (error != null) {
+        errors?.add(error);
+        if (isAlone) {
+          _showErrorDialog(error);
+        }
+        return;
+      }
 
-      final bool isResponseValid = await handleApiResponse(
-        context: context,
-        response: extraBalanceModel,
-        showErrorDialog: _showErrorDialog,
-      );
-
-      if (!isResponseValid) return;
-
-      if (extraBalanceModel.data != null) {
+      if (mounted && extraBalanceModel.data != null) {
         setState(() {
           _extraBalance = extraBalanceModel.data!.balance;
         });
       }
     } catch (e) {
       _logger.e('Error during get extra balance: $e');
+      errors?.add(ErrorMessage.somethingWentWrong);
+      if (isAlone) {
+        _showErrorDialog(ErrorMessage.somethingWentWrong);
+      }
     }
   }
 
-  Future<void> _loadPackages() async {
+  Future<void> _loadPackages(
+      {Set<String>? errors, bool isAlone = false}) async {
     try {
       final packages = await _packageApi.getPackages(_currentPage);
 
-      if (!mounted) return;
-
-      final bool isResponseValid = await handleApiResponse(
-        context: context,
-        response: packages,
-        showErrorDialog: _showErrorDialog,
-      );
-
-      if (!isResponseValid) return;
-
-      setState(() {
-        if (_currentPage == 1) {
-          _packages = packages.data ?? [];
-        } else {
-          _packages.addAll(packages.data ?? []);
+      final error = await _catchError(packages);
+      if (error != null) {
+        errors?.add(error);
+        if (isAlone) {
+          _showErrorDialog(error);
         }
-        _hasNextPage = packages.data!.length <= (packages.totalRecord ?? 0);
-      });
+        return;
+      }
+
+      if (mounted) {
+        setState(() {
+          if (_currentPage == 1) {
+            _packages = packages.data ?? [];
+          } else {
+            _packages.addAll(packages.data ?? []);
+          }
+          _hasNextPage = packages.data!.length <= (packages.totalRecord ?? 0);
+        });
+      }
     } catch (e) {
       _logger.e('Error during load packages: $e');
+      errors?.add(ErrorMessage.somethingWentWrong);
+      if (isAlone) {
+        _showErrorDialog(ErrorMessage.somethingWentWrong);
+      }
     }
   }
 
@@ -363,6 +379,23 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
         SizedBox(height: MediaQuery.of(context).size.height * 0.01),
       ],
     );
+  }
+
+  Future<String?> _catchError(APIResponse response) async {
+    final String? errorMessage = await handleApiResponse(
+      context: context,
+      response: response,
+    );
+
+    if (errorMessage == ApiResponseHandler.invalidToken) {
+      _goToPage(routeName: LoginScreen.routeName);
+      _showSnackBar(
+        message: ErrorMessage.tokenInvalid,
+        isSuccessful: false,
+      );
+    }
+
+    return errorMessage;
   }
 
   @override
@@ -601,6 +634,39 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
           ),
         );
       },
+    );
+  }
+
+  void _goToPage({String? routeName}) {
+    routeName != null
+        ? Navigator.of(context).pushNamed(routeName)
+        : Navigator.of(context).pop();
+  }
+
+  void _showSnackBar({required String message, required bool isSuccessful}) {
+    Color background = Theme.of(context).colorScheme.surface;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: MySnackBar(
+          prefix: isSuccessful
+              ? Icon(
+                  Icons.check_circle_rounded,
+                  color: background,
+                )
+              : Icon(
+                  Icons.cancel_rounded,
+                  color: background,
+                ),
+          message: message,
+          backgroundColor: isSuccessful
+              ? Theme.of(context).colorScheme.onError
+              : Theme.of(context).colorScheme.error,
+        ),
+        backgroundColor: Colors.transparent,
+        behavior: SnackBarBehavior.floating,
+        elevation: 0,
+        padding: const EdgeInsets.all(10),
+      ),
     );
   }
 }

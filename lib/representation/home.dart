@@ -19,10 +19,12 @@ import '../api/model/weather/weather.dart';
 import '../api/service/weather/open_weather_api.dart';
 import '../component/dialog.dart';
 import '../component/shadow_container.dart';
+import '../component/snackbar.dart';
 import '../core/const/frontend/message.dart';
 import '../core/helper/asset_helper.dart';
 import '../core/helper/local_storage_helper.dart';
 import 'fundin_screen.dart';
+import 'login.dart';
 
 class HomeAppScreen extends StatefulWidget {
   const HomeAppScreen({super.key});
@@ -72,12 +74,28 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
   }
 
   Future<void> _fetchData() async {
+    Set<String> errorMessages = {};
+
     setState(() => isReloading = true);
+
     await Future.wait([
-      getWeather(),
-      getBalance(),
-      getExtraBalance(),
+      getWeather(errors: errorMessages, isAlone: false),
+      getBalance(errors: errorMessages, isAlone: false),
+      getExtraBalance(errors: errorMessages, isAlone: false),
     ]);
+
+    if (errorMessages.isNotEmpty) {
+      String errorMessage;
+
+      if (errorMessages.length > 1) {
+        errorMessage = errorMessages.map((e) => '\u2022 $e').join('\n');
+      } else {
+        errorMessage = errorMessages.first;
+      }
+
+      _showErrorDialog(errorMessage);
+    }
+
     if (!mounted) return;
     setState(() => isReloading = false);
   }
@@ -115,7 +133,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
     }
   }
 
-  Future<void> getWeather() async {
+  Future<void> getWeather({Set<String>? errors, bool isAlone = false}) async {
     try {
       await getLocation();
       if (!isAllowLocation) return;
@@ -129,62 +147,107 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
       }
     } catch (e) {
       log.e('Error during get weather: $e');
+      errors?.add('Error during get weather');
+      if (isAlone) {
+        _showErrorDialog(
+            'Error during get weather: ${ErrorMessage.somethingWentWrong}');
+      }
     }
   }
 
-  Future<void> getBalance() async {
+  Future<String?> _catchError(APIResponse response) async {
+    final String? errorMessage = await handleApiResponse(
+      context: context,
+      response: response,
+    );
+
+    if (errorMessage == ApiResponseHandler.invalidToken) {
+      _goToPage(routeName: LoginScreen.routeName);
+      _showSnackBar(
+        message: ErrorMessage.tokenInvalid,
+        isSuccessful: false,
+      );
+    }
+
+    return errorMessage;
+  }
+
+  Future<void> getBalance({Set<String>? errors, bool isAlone = false}) async {
     try {
       final APIResponse<int> result = await _walletApi.getMainWalletBalance();
 
-      if (!mounted) return;
-
-      final bool isResponseValid = await handleApiResponse(
-        context: context,
-        response: result,
-        showErrorDialog: _showErrorDialog,
-      );
-
-      if (!isResponseValid) {
+      final error = await _catchError(result);
+      if (error != null) {
+        errors?.add(error);
+        if (isAlone) {
+          _showErrorDialog(error);
+        }
         return;
       }
 
-      setState(() {
-        balance = result.data ?? 0;
-      });
+      if (mounted) {
+        setState(() {
+          balance = result.data ?? 0;
+        });
+      }
     } catch (e) {
       log.e('Error during get main wallet balance: $e');
+      errors?.add('Load Main Balance: ${ErrorMessage.somethingWentWrong}');
+      if (isAlone) {
+        _showErrorDialog(
+            'Load Main Balance: ${ErrorMessage.somethingWentWrong}');
+      }
     }
   }
 
-  Future<void> getExtraBalance() async {
+  Future<void> getExtraBalance(
+      {Set<String>? errors, bool isAlone = false}) async {
     try {
       APIResponse<ExtraBalanceModel> extraBalanceModel =
           await _walletApi.getExtraWalletBalance();
 
-      if (!mounted) return;
+      final error = await _catchError(extraBalanceModel);
+      if (error != null) {
+        errors?.add(error);
+        if (isAlone) {
+          _showErrorDialog(error);
+        }
+        return;
+      }
 
-      final bool isResponseValid = await handleApiResponse(
-        context: context,
-        response: extraBalanceModel,
-        showErrorDialog: _showErrorDialog,
-      );
-
-      if (!isResponseValid) return;
-
-      if (extraBalanceModel.data != null) {
+      if (mounted && extraBalanceModel.data != null) {
         setState(() {
           extraBalance = extraBalanceModel.data!.balance;
         });
       }
     } catch (e) {
       log.e('Error during get extra balance: $e');
+      errors?.add('Load Extra Balance: ${ErrorMessage.somethingWentWrong}');
+      if (isAlone) {
+        _showErrorDialog(
+            'Load Extra Balance: ${ErrorMessage.somethingWentWrong}');
+      }
     }
   }
 
   void _onFocusChange() {
     if (_focusNode.hasFocus) {
-      getBalance();
-      getExtraBalance();
+      Set<String> errorMessages = {};
+
+      getBalance(errors: errorMessages, isAlone: false);
+      getExtraBalance(errors: errorMessages, isAlone: false);
+
+      if (errorMessages.isNotEmpty) {
+        String errorMessage;
+
+        if (errorMessages.length > 1) {
+          errorMessage = errorMessages.map((e) => '\u2022 $e').join('\n');
+        } else {
+          errorMessage = errorMessages.first;
+        }
+
+        _showErrorDialog(errorMessage);
+      }
     }
   }
 
@@ -734,6 +797,39 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
           ),
         );
       },
+    );
+  }
+
+  void _goToPage({String? routeName}) {
+    routeName != null
+        ? Navigator.of(context).pushNamed(routeName)
+        : Navigator.of(context).pop();
+  }
+
+  void _showSnackBar({required String message, required bool isSuccessful}) {
+    Color background = Theme.of(context).colorScheme.surface;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: MySnackBar(
+          prefix: isSuccessful
+              ? Icon(
+                  Icons.check_circle_rounded,
+                  color: background,
+                )
+              : Icon(
+                  Icons.cancel_rounded,
+                  color: background,
+                ),
+          message: message,
+          backgroundColor: isSuccessful
+              ? Theme.of(context).colorScheme.onError
+              : Theme.of(context).colorScheme.error,
+        ),
+        backgroundColor: Colors.transparent,
+        behavior: SnackBarBehavior.floating,
+        elevation: 0,
+        padding: const EdgeInsets.all(10),
+      ),
     );
   }
 }
