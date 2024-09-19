@@ -9,6 +9,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:info_kit/info_kit.dart';
 import 'package:logger/web.dart';
 import 'package:provider/provider.dart';
 
@@ -44,6 +45,12 @@ Future<void> main() async {
 
     await GeoPermission().checkLocationPermission();
 
+    await InfoKit.init(
+      envEnabled: false,
+      envFlavorPerPlatformEnabled: false,
+      envFlavorEnabled: false,
+    );
+
     runApp(
       MultiProvider(
         providers: [
@@ -57,7 +64,7 @@ Future<void> main() async {
       ),
     );
   } catch (error, stack) {
-    log.e('Lỗi khởi tạo: $error');
+    log.e('Initialization error', error: error, stackTrace: stack);
     log.d(stack);
   }
 }

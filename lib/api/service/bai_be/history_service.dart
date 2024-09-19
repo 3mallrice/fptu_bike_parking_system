@@ -22,7 +22,8 @@ class CallHistoryAPI {
   Future<APIResponse<List<HistoryModel>>> getCustomerHistories(
       int pageSize, int pageIndex) async {
     try {
-      token = GetLocalHelper.getBearerToken() ?? "";
+      String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+      token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
 
       if (token == "") {
         log.e('Token is empty');

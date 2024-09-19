@@ -32,9 +32,12 @@ class CallAuthApi {
             apiResponseJson,
             (json) => UserData.fromJson(json as Map<String, dynamic>));
         if (apiResponse.data != null) {
+          String currentEmail = apiResponse.data!.email;
           // Save userDate{token, ...} to shared preferences
-          LocalStorageHelper.setValue(
-              LocalStorageKey.userData, apiResponseJson['data']);
+          await LocalStorageHelper.setCurrentUserEmail(currentEmail);
+
+          await LocalStorageHelper.setValue(
+              LocalStorageKey.userData, apiResponseJson['data'], currentEmail);
           log.i('Login success');
         } else {
           log.e('Login failed. ${apiResponse.message}');

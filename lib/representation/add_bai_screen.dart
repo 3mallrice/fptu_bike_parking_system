@@ -11,6 +11,7 @@ import 'package:logger/logger.dart';
 import '../api/model/bai_model/api_response.dart';
 import '../component/app_bar_component.dart';
 import '../component/dialog.dart';
+import '../component/internet_connection_wrapper.dart';
 import '../component/response_handler.dart';
 import '../component/shadow_button.dart';
 import '../component/snackbar.dart';
@@ -32,9 +33,10 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
   String? _imageUrl;
   String? _selectedVehicleTypeId;
   final TextEditingController _plateNumberController = TextEditingController();
+  final _overlayHelper = LoadingOverlayHelper();
   final CallBikeApi _api = CallBikeApi();
-  bool _isValidInput = true;
   List<VehicleTypeModel> _vehicleTypes = [];
+  String? _errorMessage;
 
   late Color _backgroundColor;
   late Color _onSuccessful;
@@ -75,9 +77,9 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
     }
   }
 
-  Future<void> _selectImage() async {
+  Future<void> _selectImage({String? subTitle}) async {
     try {
-      final ImageSource? source = await _showSourceDialog();
+      final ImageSource? source = await _showSourceDialog(subTitle: subTitle);
       if (source == null) return;
 
       final XFile? imageFile = await ImagePicker().pickImage(source: source);
@@ -102,12 +104,12 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
 
   Future<void> _detectPlateNumber(File imageFile) async {
     try {
-      LoadingOverlayHelper.show(context);
+      _overlayHelper.show(context);
 
       final PlateNumberResponse? plateNumberResponse =
           await _api.detectPlateNumber(imageFile);
 
-      LoadingOverlayHelper.hide();
+      _overlayHelper.hide();
 
       if (plateNumberResponse?.data?.plateNumber != null) {
         if (mounted) {
@@ -118,29 +120,28 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
         }
       } else {
         _log.e('Failed to detect plate number');
-        if (mounted) {
-          setState(() {
-            _imageUrl = null;
-            _plateNumberController.clear();
-          });
-        }
-        _showErrorDialog('Failed to detect plate number. Please try again.');
+        setState(() {
+          _errorMessage =
+              'Failed to detect plate number from image, please enter manually!';
+        });
       }
     } catch (e) {
-      LoadingOverlayHelper.hide();
+      _overlayHelper.hide();
       _log.e('Error detecting plate number: $e');
-      _showErrorDialog('Error detecting plate number. Please try again.');
+      setState(() {
+        _errorMessage =
+            'Failed to detect plate number from image, please enter manually!';
+      });
     }
   }
 
   Future<void> _saveVehicleRegistration() async {
-    if (_imageUrl == null || _selectedVehicleTypeId == null) {
-      _showErrorDialog('Please select an image and vehicle type.');
-      return;
-    }
-
-    if (_plateNumberController.text.isEmpty) {
-      _showErrorDialog('Plate number is required.');
+    if (_imageUrl == null ||
+        _selectedVehicleTypeId == null ||
+        _plateNumberController.text.isEmpty) {
+      setState(() {
+        _errorMessage = 'Please fill in all required fields';
+      });
       return;
     }
 
@@ -153,10 +154,22 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
 
       _log.i('Saving vehicle registration: $addBaiModel');
 
-      LoadingOverlayHelper.show(context);
+      _overlayHelper.show(context);
       final APIResponse<AddBaiRespModel> result =
           await _api.createBai(addBaiModel);
-      LoadingOverlayHelper.hide();
+      _overlayHelper.hide();
+
+      if (result.statusCode == 409) {
+        setState(() {
+          _errorMessage = 'Plate number already exists';
+        });
+        return;
+      } else if (result.statusCode == 404) {
+        setState(() {
+          _errorMessage = 'Vehicle type not found';
+        });
+        return;
+      }
 
       if (!mounted) return;
 
@@ -178,27 +191,51 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
     }
   }
 
-  Future<ImageSource?> _showSourceDialog() async {
+  Future<ImageSource?> _showSourceDialog({String? subTitle}) async {
     return showDialog<ImageSource?>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Choose image source'),
+          title: Column(
+            children: [
+              const Text('Choose image source'),
+              if (subTitle != null) const SizedBox(height: 10),
+              if (subTitle != null)
+                Text(
+                  subTitle,
+                  style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                ),
+            ],
+          ),
           surfaceTintColor: Theme.of(context).colorScheme.surface,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(5),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               ListTile(
-                leading: const Icon(Icons.camera),
-                title: const Text('Camera'),
+                leading: Icon(
+                  Icons.camera,
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+                title: Text(
+                  'Camera',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
                 onTap: () => Navigator.pop(context, ImageSource.camera),
               ),
               ListTile(
-                leading: const Icon(Icons.photo_album),
-                title: const Text('Gallery'),
+                leading: Icon(
+                  Icons.photo_album,
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+                title: Text(
+                  'Gallery',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
                 onTap: () => Navigator.pop(context, ImageSource.gallery),
               ),
             ],
@@ -242,6 +279,7 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
           content: Text(
             message,
             style: Theme.of(context).textTheme.bodySmall,
+            textAlign: TextAlign.justify,
           ),
         );
       },
@@ -257,30 +295,32 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const AppBarCom(
-        leading: true,
-        appBarText: 'Add Bike',
-      ),
-      body: SingleChildScrollView(
-        child: SafeArea(
-          child: Center(
-            child: Container(
-              padding: const EdgeInsets.only(top: 25),
-              width: MediaQuery.of(context).size.width * 0.9,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildImagePicker(),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.04,
-                  ),
-                  _buildVehicleTypeDropdown(),
-                  const SizedBox(height: 20),
-                  _buildPlateNumberInput(),
-                  const SizedBox(height: 20),
-                  _buildAddButton(),
-                ],
+    return InternetConnectionWrapper(
+      child: Scaffold(
+        appBar: const MyAppBar(
+          automaticallyImplyLeading: true,
+          title: 'Add Bike',
+        ),
+        body: SingleChildScrollView(
+          child: SafeArea(
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.only(top: 25),
+                width: MediaQuery.of(context).size.width * 0.9,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildImagePicker(),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.04,
+                    ),
+                    _buildVehicleTypeDropdown(),
+                    const SizedBox(height: 20),
+                    _buildPlateNumberInput(),
+                    const SizedBox(height: 20),
+                    _buildAddButton(),
+                  ],
+                ),
               ),
             ),
           ),
@@ -380,19 +420,6 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
               ),
         ),
         const SizedBox(height: 5),
-        if (!_isValidInput)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 5),
-            child: Text(
-              ErrorMessage.inputInvalid(message: ListName.plateNumber),
-              style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                    color: Theme.of(context).colorScheme.error,
-                  ),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
         ShadowContainer(
           padding: const EdgeInsets.all(10),
           height: MediaQuery.of(context).size.height * 0.065,
@@ -401,27 +428,29 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
             readOnly: _imageUrl == null,
             keyboardType: TextInputType.text,
             textInputAction: TextInputAction.done,
-            onChanged: (value) {
-              String updatedValue = value.toUpperCase();
-              if (mounted) {
-                setState(() {
-                  _plateNumberController.value =
-                      _plateNumberController.value.copyWith(
-                    text: updatedValue,
-                    selection:
-                        TextSelection.collapsed(offset: updatedValue.length),
-                  );
-                });
-              }
-            },
+            onTap: _imageUrl == null
+                ? () => _selectImage(subTitle: 'Select image first')
+                : null,
             onEditingComplete: () {
-              String currentValue = _plateNumberController.text;
+              _plateNumberController.text =
+                  _plateNumberController.text.trim().toUpperCase();
+
+              String currentValue = _plateNumberController.text
+                  .trim()
+                  .replaceAll('-', '')
+                  .replaceAll('.', '')
+                  .replaceAll(' ', '')
+                  .toUpperCase();
               if (mounted) {
                 setState(() {
-                  _isValidInput = Regex.plateRegExp.hasMatch(currentValue);
-                  _plateNumberController.text =
-                      _isValidInput ? currentValue : '';
+                  _errorMessage = Regex.plateRegExp.hasMatch(currentValue)
+                      ? null
+                      : 'Invalid plate number';
+                  if (_errorMessage != null) {
+                    _plateNumberController.text = currentValue;
+                  }
                 });
+                FocusScope.of(context).unfocus();
               }
             },
             style: Theme.of(context).textTheme.bodyMedium,
@@ -438,7 +467,7 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
               hintText: 'ex: 37A012345',
             ),
           ),
-        ),
+        )
       ],
     );
   }
@@ -446,18 +475,29 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
   Widget _buildAddButton() {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 25, bottom: 5),
+        Visibility(
+          visible: _errorMessage != null,
           child: Center(
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.6,
-              child: Text(
-                'By tapping ADD you agree to submit request new bike to your account.',
-                style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                      color: Theme.of(context).colorScheme.onSecondary,
-                    ),
-                textAlign: TextAlign.center,
-              ),
+            child: Text(
+              _errorMessage ?? '',
+              style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+        Center(
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.6,
+            child: Text(
+              'By tapping ADD you agree to submit request new bike to your account.',
+              style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                    color: Theme.of(context).colorScheme.onSecondary,
+                  ),
+              textAlign: TextAlign.center,
             ),
           ),
         ),
@@ -466,6 +506,9 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
           child: const ShadowButton(
             buttonTitle: 'ADD',
             margin: EdgeInsets.symmetric(vertical: 10),
+            padding: EdgeInsets.symmetric(vertical: 10),
+            height: 50,
+            width: 100,
           ),
         ),
       ],
@@ -475,6 +518,7 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
   @override
   void dispose() {
     _plateNumberController.dispose();
+    _overlayHelper.dispose();
     super.dispose();
   }
 }

@@ -20,7 +20,8 @@ class CallCustomerApi {
   // Update customer information
   Future<APIResponse<bool>> updateCustomerInfo(String customerName) async {
     try {
-      token = GetLocalHelper.getBearerToken() ?? "";
+      String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+      token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
 
       if (token.isEmpty) {
         log.e('Token is empty');
@@ -47,7 +48,8 @@ class CallCustomerApi {
           (json) => json as bool,
         );
 
-        log.d('Customer information: ${GetLocalHelper.getUserData()}');
+        log.d(
+            'Customer information: ${GetLocalHelper.getUserData(currentEmail)}');
         return apiResponse;
       } else {
         log.e(

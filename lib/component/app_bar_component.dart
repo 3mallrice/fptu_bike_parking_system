@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 
-class AppBarCom extends StatelessWidget implements PreferredSizeWidget {
-  final String? appBarText;
-  final bool leading;
+class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final String? title;
+  final bool automaticallyImplyLeading;
   final Widget? leftIcon;
   final String? routeName;
   final Color? backgroundColor;
   final TextStyle? titleTextStyle;
   final List<Widget>? action;
 
-  const AppBarCom({
+  const MyAppBar({
     super.key,
-    this.appBarText,
-    required this.leading,
+    this.title,
+    required this.automaticallyImplyLeading,
     this.leftIcon,
     this.backgroundColor,
     this.titleTextStyle,
@@ -27,8 +27,8 @@ class AppBarCom extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: AppBar(
-        automaticallyImplyLeading: leading,
-        leading: leading
+        automaticallyImplyLeading: automaticallyImplyLeading,
+        leading: automaticallyImplyLeading
             ? leftIcon ??
                 IconButton(
                   onPressed: () {
@@ -37,15 +37,16 @@ class AppBarCom extends StatelessWidget implements PreferredSizeWidget {
                         : Navigator.of(context)
                             .pushReplacementNamed(routeName!);
                   },
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.arrow_back_ios_new_rounded,
+                    color: Theme.of(context).colorScheme.outline,
                     size: 16,
                   ),
                 )
             : null,
         backgroundColor:
             backgroundColor ?? Theme.of(context).appBarTheme.backgroundColor,
-        title: Text(appBarText ?? ""),
+        title: Text(title ?? ""),
         titleTextStyle: titleTextStyle ??
             Theme.of(context).textTheme.displayMedium!.copyWith(
                   fontWeight: FontWeight.normal,

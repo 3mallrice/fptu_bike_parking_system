@@ -6,9 +6,9 @@ import 'package:bai_system/component/shadow_container.dart';
 import 'package:bai_system/core/const/frontend/error_catcher.dart';
 import 'package:bai_system/core/helper/asset_helper.dart';
 import 'package:bai_system/core/helper/local_storage_helper.dart';
+import 'package:bai_system/representation/faq.dart';
 import 'package:bai_system/representation/navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:logger/logger.dart';
 
 import '../api/model/bai_model/login_model.dart';
@@ -51,10 +51,10 @@ class _LoginScreenState extends State<LoginScreen> with ApiResponseHandler {
             await _authApi.loginWithGoogle(auth.idToken!);
 
         if (userData.data != null) {
-          await _initializeAfterLogin();
+          await _sendTokenToServer(userData.data!.email);
           _navigateToHome();
         } else {
-          throw Exception(userData.statusCode);
+          throw userData.statusCode.toString();
         }
       } else {
         throw Exception("Login failed: Google authentication failed");
@@ -82,8 +82,8 @@ class _LoginScreenState extends State<LoginScreen> with ApiResponseHandler {
   }
 
   //send FCM token to server
-  Future<void> _sendTokenToServer() async {
-    final fcmToken = GetLocalHelper.getFCMToken();
+  Future<void> _sendTokenToServer(String currentEmail) async {
+    final fcmToken = LocalStorageHelper.getFCMTokenValue();
 
     if (fcmToken != null) {
       final APIResponse<dynamic> response =
@@ -116,22 +116,11 @@ class _LoginScreenState extends State<LoginScreen> with ApiResponseHandler {
           content: Text(
             message,
             style: Theme.of(context).textTheme.bodySmall,
+            textAlign: TextAlign.justify,
           ),
         );
       },
     );
-  }
-
-  Future<void> _initializeAfterLogin() async {
-    await _checkLocationPermission();
-    await _sendTokenToServer();
-  }
-
-  Future<void> _checkLocationPermission() async {
-    final permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      await Geolocator.requestPermission();
-    }
   }
 
   void _navigateToHome() {
@@ -196,23 +185,26 @@ class _LoginScreenState extends State<LoginScreen> with ApiResponseHandler {
     return CircleAvatar(
       backgroundColor: Theme.of(context).colorScheme.outline,
       radius: 25,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.headset_mic_rounded,
-            size: 28,
-            color: Theme.of(context).colorScheme.surface,
-          ),
-          Text(
-            'Support',
-            style: Theme.of(context).textTheme.displaySmall!.copyWith(
-                  color: Theme.of(context).colorScheme.surface,
-                  fontSize: 7,
-                ),
-          ),
-        ],
+      child: GestureDetector(
+        onTap: () => Navigator.of(context).pushNamed(FAQScreen.routeName),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.help_outlined,
+              size: 20,
+              color: Theme.of(context).colorScheme.surface,
+            ),
+            Text(
+              'Support',
+              style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                    color: Theme.of(context).colorScheme.surface,
+                    fontSize: 10,
+                  ),
+            ),
+          ],
+        ),
       ),
     );
   }

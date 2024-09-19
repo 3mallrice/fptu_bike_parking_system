@@ -1,14 +1,14 @@
 class UserData {
-  String? bearerToken;
-  String? name;
-  String? email;
-  String? avatar;
+  String bearerToken;
+  String name;
+  String email;
+  String avatar;
 
   UserData({
-    this.bearerToken,
-    this.name,
-    this.email,
-    this.avatar,
+    required this.bearerToken,
+    required this.name,
+    required this.email,
+    required this.avatar,
   });
 
   factory UserData.fromJson(Map<String, dynamic> json) {

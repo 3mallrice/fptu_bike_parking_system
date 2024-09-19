@@ -19,6 +19,7 @@ import '../api/model/bai_model/api_response.dart';
 import '../api/model/bai_model/coin_package_model.dart';
 import '../component/app_bar_component.dart';
 import '../component/dialog.dart';
+import '../component/internet_connection_wrapper.dart';
 import '../component/shadow_container.dart';
 import '../core/helper/asset_helper.dart';
 
@@ -42,6 +43,7 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
   bool _isLoading = true;
   List<CoinPackage> _packages = [];
 
+  late String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
   int _currentPage = 1;
   bool _hasNextPage = true;
   final ScrollController _scrollController = ScrollController();
@@ -99,8 +101,8 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
   }
 
   Future<void> _loadHideBalance() async {
-    bool? hideBalance =
-        await LocalStorageHelper.getValue(LocalStorageKey.isHiddenBalance);
+    bool? hideBalance = await LocalStorageHelper.getValue(
+        LocalStorageKey.isHiddenBalance, currentEmail);
     _logger.i('Hide balance: $hideBalance');
     setState(() {
       _hideBalance = hideBalance ?? false;
@@ -111,7 +113,7 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
     setState(() {
       _hideBalance = !_hideBalance;
       LocalStorageHelper.setValue(
-          LocalStorageKey.isHiddenBalance, _hideBalance);
+          LocalStorageKey.isHiddenBalance, _hideBalance, currentEmail);
       _logger.i('Toggle hide balance: $_hideBalance');
     });
   }
@@ -365,31 +367,33 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBarCom(
-        leading: true,
-        appBarText: 'Fund in',
-        action: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: IconButton(
-              onPressed: () =>
-                  Navigator.of(context).pushNamed(WalletScreen.routeName),
-              icon: Icon(
-                Icons.wallet,
-                color: Theme.of(context).colorScheme.onSecondary,
+    return InternetConnectionWrapper(
+      child: Scaffold(
+        appBar: MyAppBar(
+          automaticallyImplyLeading: true,
+          title: 'Fund in',
+          action: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: IconButton(
+                onPressed: () =>
+                    Navigator.of(context).pushNamed(WalletScreen.routeName),
+                icon: Icon(
+                  Icons.wallet,
+                  color: Theme.of(context).colorScheme.onSecondary,
+                ),
+                iconSize: 21,
               ),
-              iconSize: 21,
-            ),
-          )
-        ],
+            )
+          ],
+        ),
+        body: _isLoading
+            ? const LoadingCircle(isHeight: false)
+            : Padding(
+                padding: const EdgeInsets.only(bottom: 20),
+                child: _buildBody(),
+              ),
       ),
-      body: _isLoading
-          ? const LoadingCircle(isHeight: false)
-          : Padding(
-              padding: const EdgeInsets.only(bottom: 20),
-              child: _buildBody(),
-            ),
     );
   }
 
@@ -593,6 +597,7 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
           content: Text(
             message,
             style: Theme.of(context).textTheme.bodySmall,
+            textAlign: TextAlign.justify,
           ),
         );
       },

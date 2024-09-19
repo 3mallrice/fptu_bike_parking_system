@@ -29,8 +29,8 @@ class CallBikeApi {
         log.e('Bai model is null');
         return APIResponse(message: 'Bai model is null');
       }
-
-      token = GetLocalHelper.getBearerToken() ?? "";
+      String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+      token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
 
       if (token.isEmpty) {
         log.e('Token is empty');
@@ -124,7 +124,8 @@ class CallBikeApi {
 
   Future<APIResponse<List<BaiModel>>> getBai() async {
     try {
-      token = GetLocalHelper.getBearerToken() ?? "";
+      String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+      token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
 
       if (token == "") {
         log.e('Token is empty');
@@ -210,7 +211,8 @@ class CallBikeApi {
   // Delete vehicle
   Future<APIResponse> deleteBai(String id) async {
     try {
-      token = GetLocalHelper.getBearerToken() ?? "";
+      String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+      token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
       if (token == "") {
         log.e('Token is empty');
         return APIResponse(
@@ -250,7 +252,8 @@ class CallBikeApi {
   // Update vehicle
   Future<APIResponse> updateBai(UpdateBaiModel updateBaiModel) async {
     try {
-      token = GetLocalHelper.getBearerToken() ?? "";
+      String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+      token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
       if (token == "") {
         log.e('Token is empty');
         return APIResponse(
@@ -267,16 +270,22 @@ class CallBikeApi {
         body: jsonEncode(updateBaiModel.toJson()),
       );
 
+      final responseJson = jsonDecode(response.body);
+
       if (response.statusCode == 200) {
         return APIResponse(
           message: Message.deleteSuccess(message: ListName.vehicle),
         );
       }
 
-      log.e('Failed to delete vehicle: ${response.statusCode}');
+      log.e(
+          'Failed to update vehicle: ${response.statusCode} ${response.body}');
       return APIResponse(
         statusCode: response.statusCode,
-        message: HttpErrorMapper.getErrorMessage(response.statusCode),
+        message: (responseJson['message'] == 'Plate Number is exist in system')
+            ? 'Plate Number is exist in system'
+            : HttpErrorMapper.getErrorMessage(response.statusCode,
+                serverMessage: responseJson['message']),
       );
     } catch (e) {
       log.e('Error during delete bai: $e');
@@ -291,7 +300,8 @@ class CallBikeApi {
   // Get vehicle by id
   Future<APIResponse<BaiModel>> getCustomerBaiById(String id) async {
     try {
-      token = GetLocalHelper.getBearerToken() ?? "";
+      String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+      token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
       if (token == "") {
         log.e('Token is empty');
         return APIResponse(

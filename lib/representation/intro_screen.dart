@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:bai_system/core/helper/asset_helper.dart';
 import 'package:bai_system/representation/login.dart';
+import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class IntroScreen extends StatefulWidget {
@@ -133,7 +133,10 @@ class _IntroScreenState extends State<IntroScreen> {
                   borderRadius: BorderRadius.circular(0),
                 ),
                 backgroundColor: Theme.of(context).colorScheme.primary,
-                minimumSize: const Size(double.infinity, 80),
+                minimumSize: Size(double.infinity,
+                    Theme.of(context).buttonTheme.height * 1.5),
+                maximumSize: Size(double.infinity,
+                    Theme.of(context).buttonTheme.height * 1.5),
               ),
               onPressed: () async {
                 Navigator.of(context)
@@ -149,12 +152,13 @@ class _IntroScreenState extends State<IntroScreen> {
           : Container(
               color: Theme.of(context).colorScheme.surface,
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              height: 80,
+              height: Theme.of(context).buttonTheme.height * 1.5,
               child: Row(
+                mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  TextButton(
-                    onPressed: () => controller.jumpToPage(2),
+                  GestureDetector(
+                    onTap: () => controller.jumpToPage(2),
                     child: Text(
                       'Skip',
                       style: Theme.of(context).textTheme.titleMedium,
@@ -176,8 +180,8 @@ class _IntroScreenState extends State<IntroScreen> {
                       ),
                     ),
                   ),
-                  TextButton(
-                    onPressed: () => controller.nextPage(
+                  GestureDetector(
+                    onTap: () => controller.nextPage(
                       duration: const Duration(microseconds: 500),
                       curve: Curves.easeInOut,
                     ),

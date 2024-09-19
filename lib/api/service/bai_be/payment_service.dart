@@ -22,7 +22,8 @@ class CallPaymentApi {
   //Deposit money to get coin via ZaloPay
   Future<APIResponse<ZaloPayModel>> depositCoinZaloPay(String packageId) async {
     try {
-      token = GetLocalHelper.getBearerToken() ?? "";
+      String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+      token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
 
       if (token == "") {
         log.e('Token is empty');
@@ -75,7 +76,8 @@ class CallPaymentApi {
   Future<APIResponse<VnPayResponse>> depositCoinVnPay(
       String packageId, String vnpBankcode) async {
     try {
-      token = GetLocalHelper.getBearerToken() ?? "";
+      String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+      token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
 
       if (token == "") {
         log.e('Token is empty');

@@ -97,7 +97,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                   child: Container(
                     margin: const EdgeInsets.only(top: 10),
                     decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                      borderRadius: const BorderRadius.all(Radius.circular(5)),
                       border: Border.all(
                         color: Theme.of(context).colorScheme.outline,
                         width: 0.5,

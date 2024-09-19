@@ -21,7 +21,8 @@ class FirebaseApi {
   // send FCM token to server
   Future<APIResponse<dynamic>> sendTokenToServer(String fcmToken) async {
     try {
-      token = GetLocalHelper.getBearerToken() ?? "";
+      String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+      token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
 
       if (token == "") {
         log.e('Token is empty');

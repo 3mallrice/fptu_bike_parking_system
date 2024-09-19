@@ -42,7 +42,7 @@ Future<void> getFcmToken() async {
     return;
   }
   //save token to local storage
-  await LocalStorageHelper.setValue(LocalStorageKey.fcmToken, fCMToken);
+  await LocalStorageHelper.setFCMTokenValue(fCMToken);
 
   // print the token (normally you would send this to your server)
   log.i('fcmToken: $fCMToken');

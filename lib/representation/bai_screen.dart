@@ -1,7 +1,6 @@
 import 'package:bai_system/api/model/bai_model/api_response.dart';
 import 'package:bai_system/component/empty_box.dart';
 import 'package:bai_system/component/response_handler.dart';
-import 'package:bai_system/core/const/utilities/util_helper.dart';
 import 'package:bai_system/representation/bai_details.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +14,7 @@ import '../component/image_not_found_component.dart';
 import '../component/loading_component.dart';
 import '../component/shadow_container.dart';
 import '../core/const/frontend/message.dart';
+import '../core/const/utilities/util_helper.dart';
 import '../core/helper/asset_helper.dart';
 import '../representation/add_bai_screen.dart';
 
@@ -36,10 +36,10 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
   @override
   void initState() {
     super.initState();
-    fetchBikes();
+    _fetchBikes();
   }
 
-  Future<void> fetchBikes() async {
+  Future<void> _fetchBikes() async {
     try {
       final APIResponse<List<BaiModel>> fetchedBikes = await api.getBai();
 
@@ -71,7 +71,7 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
   Widget build(BuildContext context) {
     return Scaffold(
       body: RefreshIndicator(
-        onRefresh: fetchBikes,
+        onRefresh: _fetchBikes,
         child: Stack(
           children: [
             SingleChildScrollView(
@@ -169,7 +169,15 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
             onTap: () {
               Navigator.of(context).pushNamed(
                 BaiDetails.routeName,
-                arguments: bai,
+                arguments: {
+                  'baiModel': bai,
+                  'onPopCallback': () =>
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        setState(() {
+                          _fetchBikes();
+                        });
+                      }),
+                },
               );
             },
             child: ShadowContainer(
@@ -301,6 +309,7 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
           content: Text(
             message,
             style: Theme.of(context).textTheme.bodySmall,
+            textAlign: TextAlign.justify,
           ),
           onClick: () {
             Navigator.of(context).pop();

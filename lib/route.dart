@@ -4,6 +4,8 @@ import 'package:bai_system/api/model/bai_model/wallet_model.dart';
 import 'package:bai_system/representation/about_screen.dart';
 import 'package:bai_system/representation/add_bai_screen.dart';
 import 'package:bai_system/representation/bai_details.dart';
+import 'package:bai_system/representation/cashless_hero.dart';
+import 'package:bai_system/representation/faq.dart';
 import 'package:bai_system/representation/feedback.dart';
 import 'package:bai_system/representation/fundin_screen.dart';
 import 'package:bai_system/representation/history.dart';
@@ -61,9 +63,11 @@ final Map<String, WidgetBuilder> routes = {
     );
   },
   BaiDetails.routeName: (context) {
-    final args = ModalRoute.of(context)!.settings.arguments as BaiModel;
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     return BaiDetails(
-      baiModel: args,
+      baiModel: args['baiModel'],
+      onPopCallback: args['onPopCallback'],
     );
   },
   InsightScreen.routeName: (context) => const InsightScreen(),
@@ -75,12 +79,14 @@ final Map<String, WidgetBuilder> routes = {
     );
   },
   NoInternetScreen.routeName: (context) => const NoInternetScreen(),
-  SupportScreen.routeName: (context) => const SupportScreen(),
+  SupportScreen.routeName: (context) => SupportScreen(),
   SettingScreen.routeName: (context) => const SettingScreen(),
   UpdateProfile.routeName: (context) {
     final args = ModalRoute.of(context)!.settings.arguments as String;
     return UpdateProfile(
       name: args,
     );
-  }
+  },
+  FAQScreen.routeName: (context) => const FAQScreen(),
+  CashlessHero.routeName: (context) => const CashlessHero(),
 };

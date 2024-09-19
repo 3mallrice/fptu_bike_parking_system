@@ -3,6 +3,7 @@ import 'package:logger/logger.dart';
 
 class UltilHelper {
   static final log = Logger();
+
   // Function to check if a date is today
   static bool _isToday(DateTime date) {
     final now = DateTime.now();

@@ -11,6 +11,7 @@ import '../component/app_bar_component.dart';
 import '../component/date_picker.dart';
 import '../component/dialog.dart';
 import '../component/empty_box.dart';
+import '../component/internet_connection_wrapper.dart';
 import '../component/loading_component.dart';
 import '../component/shadow_container.dart';
 import '../core/const/frontend/message.dart';
@@ -21,6 +22,7 @@ import 'navigation_bar.dart';
 
 class WalletScreen extends StatefulWidget {
   final int? walletType;
+
   const WalletScreen({
     super.key,
     this.walletType,
@@ -39,6 +41,8 @@ class _WalletScreenState extends State<WalletScreen>
   bool _hideBalance = false;
   var log = Logger();
   final CallWalletApi callWalletApi = CallWalletApi();
+  late final String _currentEmail =
+      LocalStorageHelper.getCurrentUserEmail() ?? '';
   late int mainBalance = 0;
   late int extraBalance = 0;
   DateTime? expiredDate;
@@ -49,8 +53,13 @@ class _WalletScreenState extends State<WalletScreen>
   String? mainErrorMessage;
   String? extraErrorMessage;
 
-  DateTime from = DateTime.now().subtract(const Duration(days: 7));
-  DateTime to = DateTime.now();
+  DateTime? from;
+  DateTime? to;
+  DateTime? extraFrom;
+  DateTime? extraTo;
+
+  bool isMainFiltered = false;
+  bool isExtraFiltered = false;
 
   int totalMainTransactions = 0;
   int totalExtraTransactions = 0;
@@ -73,8 +82,8 @@ class _WalletScreenState extends State<WalletScreen>
         vsync: this,
         initialIndex: walletType,
         animationDuration: const Duration(milliseconds: 300));
-    _hideBalance = GetLocalHelper.getHideBalance();
-    _pageSize = GetLocalHelper.getPageSize();
+    _hideBalance = GetLocalHelper.getHideBalance(_currentEmail);
+    _pageSize = GetLocalHelper.getPageSize(_currentEmail);
     _initializeData();
   }
 
@@ -122,6 +131,7 @@ class _WalletScreenState extends State<WalletScreen>
           content: Text(
             message,
             style: Theme.of(context).textTheme.bodySmall,
+            textAlign: TextAlign.justify,
           ),
         );
       },
@@ -169,6 +179,7 @@ class _WalletScreenState extends State<WalletScreen>
     try {
       final APIResponse<List<WalletModel>> result = await callWalletApi
           .getMainWalletTransactions(mainPageIndex, _pageSize, from, to);
+      log.d('Main transactions: ${result.data}');
       _catchError(result);
       if (!mounted) return;
       setState(() {
@@ -197,8 +208,9 @@ class _WalletScreenState extends State<WalletScreen>
       });
     }
     try {
-      final APIResponse<List<WalletModel>> result = await callWalletApi
-          .getExtraWalletTransactions(extraPageIndex, _pageSize, from, to);
+      final APIResponse<List<WalletModel>> result =
+          await callWalletApi.getExtraWalletTransactions(
+              extraPageIndex, _pageSize, extraFrom, extraTo);
       _catchError(result);
       if (!mounted) return;
       setState(() {
@@ -247,53 +259,55 @@ class _WalletScreenState extends State<WalletScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBarCom(
-        leading: true,
-        routeName: MyNavigationBar.routeName,
-        appBarText: 'My Wallet',
-        action: [
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
-            child: IconButton(
-              onPressed: () =>
-                  Navigator.of(context).pushNamed(FundinScreen.routeName),
-              icon: Icon(
-                Icons.input_rounded,
-                color: Theme.of(context).colorScheme.onSecondary,
+    return InternetConnectionWrapper(
+      child: Scaffold(
+        appBar: MyAppBar(
+          automaticallyImplyLeading: true,
+          routeName: MyNavigationBar.routeName,
+          title: 'My Wallet',
+          action: [
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
+              child: IconButton(
+                onPressed: () =>
+                    Navigator.of(context).pushNamed(FundinScreen.routeName),
+                icon: Icon(
+                  Icons.input_rounded,
+                  color: Theme.of(context).colorScheme.onSecondary,
+                ),
+                iconSize: 21,
               ),
-              iconSize: 21,
-            ),
-          )
-        ],
-      ),
-      body: Column(
-        children: [
-          TabBar(
-            controller: _tabController,
-            unselectedLabelColor: Theme.of(context).colorScheme.onSecondary,
-            tabAlignment: TabAlignment.fill,
-            automaticIndicatorColorAdjustment: true,
-            splashFactory: InkSparkle.constantTurbulenceSeedSplashFactory,
-            splashBorderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-            tabs: const [
-              Tab(text: 'Main Wallet'),
-              Tab(text: 'Extra Wallet'),
-            ],
-          ),
-          Expanded(
-            child: TabBarView(
+            )
+          ],
+        ),
+        body: Column(
+          children: [
+            TabBar(
               controller: _tabController,
-              children: [
-                _buildWalletContent(isMain: true),
-                _buildWalletContent(isMain: false),
+              unselectedLabelColor: Theme.of(context).colorScheme.onSecondary,
+              tabAlignment: TabAlignment.fill,
+              automaticIndicatorColorAdjustment: true,
+              splashFactory: InkSparkle.constantTurbulenceSeedSplashFactory,
+              splashBorderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+              tabs: const [
+                Tab(text: 'Main Wallet'),
+                Tab(text: 'Extra Wallet'),
               ],
             ),
-          ),
-        ],
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildWalletContent(isMain: true),
+                  _buildWalletContent(isMain: false),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -302,7 +316,16 @@ class _WalletScreenState extends State<WalletScreen>
     return SmartRefresher(
       enablePullDown: true,
       enablePullUp: true,
-      header: const ClassicHeader(),
+      header: ClassicHeader(
+        refreshingText: 'Refreshing...',
+        idleText: 'Pull down to refresh',
+        releaseText: 'Release to refresh',
+        completeText: 'Refreshed',
+        failedText: 'Failed to refresh',
+        textStyle: TextStyle(
+          color: Theme.of(context).colorScheme.onSecondary,
+        ),
+      ),
       footer: CustomFooter(
         builder: (BuildContext context, LoadStatus? mode) {
           Widget body;
@@ -316,7 +339,9 @@ class _WalletScreenState extends State<WalletScreen>
             );
           } else if (mode == LoadStatus.failed) {
             body = const Text('Load Failed!Click retry!');
-          } else if (mode == LoadStatus.canLoading) {
+          } else if (mode == LoadStatus.canLoading &&
+              (isMain ? mainPageIndex : extraPageIndex) * _pageSize <
+                  (isMain ? totalMainTransactions : totalExtraTransactions)) {
             body = const Text('release to load more');
           } else {
             body = const Text('No more Data');
@@ -388,7 +413,7 @@ class _WalletScreenState extends State<WalletScreen>
                 padding:
                     const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                 child: GestureDetector(
-                  onTap: showFilterDialog,
+                  onTap: () => showFilterDialog(isMain: isMain),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: Row(
@@ -405,29 +430,7 @@ class _WalletScreenState extends State<WalletScreen>
                                     fontWeight: FontWeight.bold,
                                   ),
                         ),
-                        Row(
-                          children: [
-                            Text(
-                              'FILTER',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall!
-                                  .copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .outline
-                                        .withOpacity(0.5),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                            ),
-                            const SizedBox(width: 5),
-                            Icon(
-                              Icons.filter_alt_outlined,
-                              color: Theme.of(context).colorScheme.onSecondary,
-                              size: 15,
-                            ),
-                          ],
-                        )
+                        _buildFilterIndicator(isMain: isMain),
                       ],
                     ),
                   ),
@@ -480,6 +483,7 @@ class _WalletScreenState extends State<WalletScreen>
                           transactions[index].type == 'IN'
                               ? Icons.attach_money_rounded
                               : Icons.local_parking_rounded,
+                          color: Theme.of(context).colorScheme.surface,
                         ),
                       ),
                       title: Text(
@@ -520,34 +524,94 @@ class _WalletScreenState extends State<WalletScreen>
           );
   }
 
-  void showFilterDialog() {
+  void showFilterDialog({required bool isMain}) {
+    DateTime? tempFrom = isMain ? from : extraFrom;
+    DateTime? tempTo = isMain ? to : extraTo;
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return OKDialog(
+        return ConfirmDialog(
           title: 'Filter by period',
-          content: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(context).size.width * 0.9,
-              maxHeight: MediaQuery.of(context).size.height * 0.9,
-            ),
-            child: DatePicker(
-              fromDate: from,
-              toDate: to,
-              onDateSelected: (startDate, endDate) {
-                setState(() {
-                  from = startDate;
-                  to = endDate;
-                });
-              },
-            ),
+          content: DatePicker(
+            fromDate:
+                tempFrom ?? DateTime.now().subtract(const Duration(days: 7)),
+            toDate: tempTo ?? DateTime.now(),
+            onDateSelected: (startDate, endDate) {
+              tempFrom = startDate;
+              tempTo = endDate;
+            },
           ),
-          onClick: () {
+          onConfirm: () {
+            setState(() {
+              if (isMain) {
+                from = tempFrom;
+                to = tempTo;
+                isMainFiltered = true;
+              } else {
+                extraFrom = tempFrom;
+                extraTo = tempTo;
+                isExtraFiltered = true;
+              }
+            });
             Navigator.of(context).pop();
-            _tabController.index == 0 ? _onMainRefresh() : _onExtraRefresh();
+            isMain ? _onMainRefresh() : _onExtraRefresh();
+          },
+          onCancel: () {
+            Navigator.of(context).pop();
           },
         );
       },
+    );
+  }
+
+  void clearFilter({required bool isMain}) {
+    setState(() {
+      if (isMain) {
+        from = null;
+        to = null;
+        isMainFiltered = false;
+      } else {
+        extraFrom = null;
+        extraTo = null;
+        isExtraFiltered = false;
+      }
+    });
+    isMain ? _onMainRefresh() : _onExtraRefresh();
+  }
+
+  Widget _buildFilterIndicator({required bool isMain}) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'FILTER',
+          style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+                fontWeight: FontWeight.bold,
+              ),
+        ),
+        const SizedBox(width: 5),
+        Icon(
+          Icons.filter_alt_outlined,
+          color: Theme.of(context).colorScheme.onSecondary,
+          size: 15,
+        ),
+        if (isMain ? isMainFiltered : isExtraFiltered)
+          Padding(
+            padding: const EdgeInsets.only(left: 5),
+            child: GestureDetector(
+              onTap: () => clearFilter(isMain: isMain),
+              child: Text(
+                'Clear',
+                style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 

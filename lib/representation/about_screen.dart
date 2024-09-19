@@ -1,15 +1,16 @@
 import 'package:bai_system/component/app_bar_component.dart';
-import 'package:bai_system/component/shadow_container.dart';
 import 'package:flutter/material.dart';
+import 'package:info_kit/info_kit.dart';
 import 'package:logger/logger.dart';
-import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../component/internet_connection_wrapper.dart';
 import '../core/helper/asset_helper.dart';
 
 class AboutUs extends StatefulWidget {
   const AboutUs({super.key});
 
-  static String routeName = '/about_screen';
+  static const String routeName = '/about_screen';
 
   @override
   State<AboutUs> createState() => _AboutUsState();
@@ -17,227 +18,253 @@ class AboutUs extends StatefulWidget {
 
 class _AboutUsState extends State<AboutUs> {
   final _log = Logger();
-  late PackageInfo _packageInfo = PackageInfo(
-    appName: 'Unknown',
-    packageName: 'Unknown',
-    version: 'Unknown',
-    buildNumber: 'Unknown',
-  );
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    _initPackageInfo();
-  }
-
-  Future<void> _initPackageInfo() async {
-    try {
-      final PackageInfo info = await PackageInfo.fromPlatform();
-      setState(() {
-        _packageInfo = info;
-      });
-    } catch (e) {
-      _log.e('Error: $e');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const AppBarCom(
-        leading: true,
-        appBarText: 'About Bai',
-      ),
-      body: SingleChildScrollView(
-        child: Align(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ShadowContainer(
-                width: MediaQuery.of(context).size.width * 0.9,
-                margin: const EdgeInsets.only(top: 20),
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Application Description
-                    aboutItem(
-                      'Application Description',
-                      subtitle: Text(
-                          'The FPTU parking management software streamlines checkout by allowing users to preload an e-wallet and pay automatically, reducing wait times and enhancing user experience.',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium!
-                              .copyWith(
-                                  fontWeight: FontWeight.normal,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSecondary),
-                          textAlign: TextAlign.justify),
-                      leading: Image.asset(
-                        AssetHelper.imgLogo,
-                        width: 24,
-                        fit: BoxFit.fitWidth,
-                      ),
-                    ),
-
-                    Divider(
-                      color: Theme.of(context).colorScheme.outlineVariant,
-                      thickness: 1,
-                    ),
-                    aboutItem(
-                      'Terms of Service',
-                      leading: const Icon(Icons.rule),
-                    ),
-                    Divider(
-                      color: Theme.of(context).colorScheme.outlineVariant,
-                      thickness: 1,
-                    ),
-                    aboutItem(
-                      'Privacy Policy',
-                      leading: const Icon(Icons.privacy_tip),
-                    ),
-                    Divider(
-                      color: Theme.of(context).colorScheme.outlineVariant,
-                      thickness: 1,
-                    ),
-                    aboutItem(
-                      'Contact Us',
-                      leading: const Icon(Icons.quick_contacts_mail_rounded),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 7),
-              ShadowContainer(
-                width: MediaQuery.of(context).size.width * 0.9,
-                margin: const EdgeInsets.only(top: 20, bottom: 20),
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    aboutItem(
-                      'Developer Information',
-                      subtitle: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // developer name
-                          Text('Developed by: Bai team',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium!
-                                  .copyWith(
-                                      fontWeight: FontWeight.normal,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSecondary)),
-
-                          // developer email
-                          Text('Email: bai@bai.com',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium!
-                                  .copyWith(
-                                      fontWeight: FontWeight.normal,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSecondary)),
-                        ],
-                      ),
-                      leading: const Icon(Icons.developer_board),
-                    ),
-                    Divider(
-                      color: Theme.of(context).colorScheme.outlineVariant,
-                      thickness: 1,
-                    ),
-                    aboutItem(
-                      'Application Information',
-                      subtitle: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // app name
-                          Text('App Name: ${_packageInfo.appName} App',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium!
-                                  .copyWith(
-                                      fontWeight: FontWeight.normal,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSecondary)),
-
-                          // version
-                          Text('Version: ${_packageInfo.version}',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium!
-                                  .copyWith(
-                                      fontWeight: FontWeight.normal,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSecondary)),
-
-                          // installer store
-                          Text(
-                            'Installer Store: ${_packageInfo.installerStore}',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(
-                                    fontWeight: FontWeight.normal,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSecondary),
-                          ),
-                        ],
-                      ),
-                      leading: const Icon(Icons.info),
-                    ),
-                  ],
-                ),
-              )
-            ],
+    return InternetConnectionWrapper(
+      child: Scaffold(
+        appBar: const MyAppBar(
+          automaticallyImplyLeading: true,
+          title: 'About Bai',
+        ),
+        body: SingleChildScrollView(
+          child: Container(
+            alignment: Alignment.center,
+            height: MediaQuery.of(context).size.height * 0.9,
+            color: Theme.of(context).colorScheme.outlineVariant,
+            child: Column(
+              children: [
+                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                _buildInfoSection(context),
+                _buildLinksSection(context),
+                _buildFooterSection(context),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget aboutItem(String title,
-      {Widget? subtitle,
-      Widget? leading,
-      void Function()? onTap,
-      bool? isEnable}) {
-    return ListTile(
-      title: Text(title,
-          style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                fontWeight: FontWeight.normal,
-                color: Theme.of(context).colorScheme.outline,
-                fontSize: 19,
-              )),
-      subtitle: subtitle != null
-          ? Padding(
-              padding: const EdgeInsets.symmetric(vertical: 5),
-              child: subtitle,
-            )
-          : null,
-      subtitleTextStyle: Theme.of(context).textTheme.titleMedium!.copyWith(
-            fontWeight: FontWeight.normal,
-            color: Theme.of(context).colorScheme.outline,
+  Widget _buildInfoSection(BuildContext context) {
+    return _buildCard(
+      context,
+      child: Column(
+        children: [
+          _buildLogo(context),
+          const SizedBox(height: 7),
+          Text(
+            'Version ${InfoKit.version}',
+            style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                  fontWeight: FontWeight.normal,
+                  color: Theme.of(context).colorScheme.outline,
+                ),
           ),
-      contentPadding: const EdgeInsets.all(10),
-      leading: leading != null
-          ? Padding(padding: const EdgeInsets.all(5), child: leading)
-          : null,
-      iconColor: Theme.of(context).colorScheme.outline,
-      enabled: isEnable ?? false,
-      onTap: onTap,
+          const _Divider(),
+          Text(
+            'Bai is a parking software that lets users preload an e-wallet for automatic payments, speeding up checkout.',
+            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  fontWeight: FontWeight.normal,
+                  color: Theme.of(context).colorScheme.onSecondary,
+                ),
+            textAlign: TextAlign.justify,
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLinksSection(BuildContext context) {
+    return _buildCard(
+      context,
+      margin: const EdgeInsets.only(top: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildLinkItem(context, 'Rate Bai', Icons.star_rate_rounded),
+          const _Divider(),
+          _buildLinkItem(context, 'Terms of Service', Icons.rule),
+          const _Divider(),
+          _buildLinkItem(context, 'Privacy Policy', Icons.privacy_tip_outlined),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFooterSection(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.9,
+      margin: const EdgeInsets.only(top: 50),
+      child: Column(
+        children: [
+          Text(
+            'BAI PARKING TEAM',
+            style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.outline,
+                  fontSize: 16,
+                ),
+          ),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            child: Text(
+              'Lot E2a-7, D1 Street, Hi-Tech Park, Long Thanh My Ward, Thu Duc City, Ho Chi Minh City',
+              style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                    color: Theme.of(context).colorScheme.outline,
+                    fontSize: 13,
+                  ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: 10),
+          GestureDetector(
+            onTap: () => _launchUrl(Uri.parse('tel:028.73005585')),
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: 'Hotline: ',
+                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                          fontSize: 13,
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                  ),
+                  TextSpan(
+                    text: '028.73005585',
+                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue,
+                        ),
+                  ),
+                ],
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          GestureDetector(
+            onTap: () => _launchUrl(Uri.parse(
+                'mailto:baiparking.system@gmail.com?subject=[Support Request][]&body=I want to request support for...')),
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: 'Email: ',
+                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                          fontSize: 13,
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                  ),
+                  TextSpan(
+                    text: 'baiparking.system@gmail.com',
+                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue,
+                        ),
+                  ),
+                ],
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Text(
+              '© 2024 Bai. All rights reserved.\nTerms | Privacy Policy',
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    fontWeight: FontWeight.normal,
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCard(BuildContext context,
+      {required Widget child, EdgeInsetsGeometry? margin}) {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.9,
+      margin: margin,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: child,
+    );
+  }
+
+  Widget _buildLogo(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(5),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.onSecondary.withOpacity(0.2),
+            offset: const Offset(0, 3),
+            blurRadius: 6,
+          ),
+        ],
+      ),
+      child: Image.asset(
+        AssetHelper.imgLogo,
+        width: 30,
+        fit: BoxFit.fitWidth,
+      ),
+    );
+  }
+
+  Widget _buildLinkItem(BuildContext context, String title, IconData icon) {
+    return ListTile(
+      title: Text(
+        title,
+        style: Theme.of(context).textTheme.titleLarge!.copyWith(
+              fontWeight: FontWeight.normal,
+              color: Theme.of(context).colorScheme.outline,
+              fontSize: 16,
+            ),
+      ),
+      leading: Icon(icon, color: Theme.of(context).colorScheme.outline),
+      // contentPadding: const EdgeInsets.all(10),
+      horizontalTitleGap: 25,
       visualDensity: VisualDensity.compact,
+    );
+  }
+
+  Future<void> _launchUrl(Uri uri) async {
+    _log.d('Attempting to launch URL: $uri');
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
+        _log.i('Successfully launched URL: $uri');
+      } else {
+        _log.w('Could not launch URL: $uri');
+      }
+    } catch (e) {
+      _log.e('Error launching URL: $uri', error: e);
+    }
+  }
+}
+
+class _Divider extends StatelessWidget {
+  const _Divider();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Divider(
+        color: Theme.of(context).colorScheme.outlineVariant,
+        thickness: 1,
+      ),
     );
   }
 }

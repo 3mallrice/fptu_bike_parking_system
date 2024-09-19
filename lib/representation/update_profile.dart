@@ -7,11 +7,13 @@ import 'package:flutter/material.dart';
 
 import '../api/service/bai_be/customer_service.dart';
 import '../component/dialog.dart';
+import '../component/internet_connection_wrapper.dart';
 import '../component/snackbar.dart';
 import '../core/helper/loading_overlay_helper.dart';
 
 class UpdateProfile extends StatefulWidget {
   final String name;
+
   const UpdateProfile({super.key, required this.name});
 
   static const String routeName = '/update_profile';
@@ -24,8 +26,11 @@ class _UpdateProfileState extends State<UpdateProfile> with ApiResponseHandler {
   late TextEditingController textController;
   bool isSuccessful = false;
   bool isUpdating = false;
+  final _overlayHelper = LoadingOverlayHelper();
 
   final callCustomerApi = CallCustomerApi();
+  late final String _currentEmail =
+      LocalStorageHelper.getCurrentUserEmail() ?? '';
 
   @override
   void initState() {
@@ -36,103 +41,106 @@ class _UpdateProfileState extends State<UpdateProfile> with ApiResponseHandler {
   @override
   void dispose() {
     textController.dispose();
+    _overlayHelper.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const AppBarCom(
-        leading: true,
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width * 0.05,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'How would you like to be addressed?',
-                    style: Theme.of(context).textTheme.displayLarge!.copyWith(
-                          color: Theme.of(context).colorScheme.outline,
-                          letterSpacing: 1,
-                          textBaseline: TextBaseline.alphabetic,
-                        ),
-                    textAlign: TextAlign.left,
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'E.g. \'Mr President\'',
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          color: Theme.of(context).colorScheme.outlineVariant,
-                          fontSize: 16,
-                          fontWeight: FontWeight.normal,
-                        ),
-                    textAlign: TextAlign.left,
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Padding(
+    return InternetConnectionWrapper(
+      child: Scaffold(
+        appBar: const MyAppBar(
+          automaticallyImplyLeading: true,
+        ),
+        body: SafeArea(
+          child: Column(
+            children: [
+              Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: MediaQuery.of(context).size.width * 0.05,
                 ),
-                child: Center(
-                  child: TextField(
-                    controller: textController,
-                    textAlign: TextAlign.center,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide.none,
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide.none,
-                      ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'How would you like to be addressed?',
+                      style: Theme.of(context).textTheme.displayLarge!.copyWith(
+                            color: Theme.of(context).colorScheme.outline,
+                            letterSpacing: 1,
+                            textBaseline: TextBaseline.alphabetic,
+                          ),
+                      textAlign: TextAlign.left,
                     ),
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          color: Theme.of(context).colorScheme.outline,
-                          fontSize: 25,
-                          fontWeight: FontWeight.normal,
+                    const SizedBox(height: 10),
+                    Text(
+                      'E.g. \'Mr President\'',
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                            color: Theme.of(context).colorScheme.outlineVariant,
+                            fontSize: 16,
+                            fontWeight: FontWeight.normal,
+                          ),
+                      textAlign: TextAlign.left,
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width * 0.05,
+                  ),
+                  child: Center(
+                    child: TextField(
+                      controller: textController,
+                      textAlign: TextAlign.center,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5),
+                          borderSide: BorderSide.none,
                         ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                            color: Theme.of(context).colorScheme.outline,
+                            fontSize: 25,
+                            fontWeight: FontWeight.normal,
+                          ),
+                    ),
                   ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    showAlertDialog();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    backgroundColor: Theme.of(context).colorScheme.outline,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      showAlertDialog();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      backgroundColor: Theme.of(context).colorScheme.outline,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    LabelMessage.save,
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          color: Theme.of(context).colorScheme.surface,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    child: Text(
+                      LabelMessage.save,
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                            color: Theme.of(context).colorScheme.surface,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -141,7 +149,7 @@ class _UpdateProfileState extends State<UpdateProfile> with ApiResponseHandler {
   // Cập nhật dữ liệu người dùng
   Future<bool> updateUserData() async {
     try {
-      LoadingOverlayHelper.show(context);
+      _overlayHelper.show(context);
 
       final response =
           await callCustomerApi.updateCustomerInfo(textController.text);
@@ -162,13 +170,13 @@ class _UpdateProfileState extends State<UpdateProfile> with ApiResponseHandler {
         isSuccessful = true;
       });
 
-      await SetLocalHelper.setUserData(textController.text);
+      await SetLocalHelper.setUserData(textController.text, _currentEmail);
 
       return true;
     } catch (e) {
       return false;
     } finally {
-      LoadingOverlayHelper.hide();
+      _overlayHelper.hide();
     }
   }
 
@@ -204,6 +212,7 @@ class _UpdateProfileState extends State<UpdateProfile> with ApiResponseHandler {
           content: Text(
             message,
             style: Theme.of(context).textTheme.bodySmall,
+            textAlign: TextAlign.justify,
           ),
         );
       },

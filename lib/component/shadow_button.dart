@@ -42,7 +42,7 @@ class ShadowButton extends StatelessWidget {
       margin: margin,
       padding: padding ?? const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(borderRadius ?? 10),
+        borderRadius: BorderRadius.circular(borderRadius ?? 5),
         color: backgroundColor ?? Theme.of(context).colorScheme.primary,
         boxShadow: [
           BoxShadow(
@@ -55,7 +55,10 @@ class ShadowButton extends StatelessWidget {
       ),
       child: Text(
         buttonTitle,
-        style: textStyle ?? Theme.of(context).textTheme.displayLarge,
+        style: textStyle ??
+            Theme.of(context).textTheme.titleMedium!.copyWith(
+                  color: titleColor ?? Theme.of(context).colorScheme.surface,
+                ),
         textAlign: TextAlign.center,
       ),
     );

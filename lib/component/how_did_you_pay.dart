@@ -45,7 +45,7 @@ class HowDidYouPay extends StatelessWidget {
               show: false,
             ),
             sectionsSpace: 2,
-            centerSpaceRadius: 20,
+            centerSpaceRadius: 10,
             centerSpaceColor: Theme.of(context).colorScheme.surface,
             startDegreeOffset: 180,
           ),

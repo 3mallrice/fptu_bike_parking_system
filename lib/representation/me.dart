@@ -2,6 +2,8 @@ import 'package:bai_system/api/model/bai_model/login_model.dart';
 import 'package:bai_system/component/shadow_container.dart';
 import 'package:bai_system/core/helper/local_storage_helper.dart';
 import 'package:bai_system/representation/about_screen.dart';
+import 'package:bai_system/representation/cashless_hero.dart';
+import 'package:bai_system/representation/faq.dart';
 import 'package:bai_system/representation/feedback.dart';
 import 'package:bai_system/representation/settings.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +22,7 @@ class _MeScreenState extends State<MeScreen> {
   var log = Logger();
 
   late final UserData? userData;
+  late final _currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? '';
 
   void goToPageHelper({String? routeName}) {
     routeName != null
@@ -30,7 +33,7 @@ class _MeScreenState extends State<MeScreen> {
   @override
   void initState() {
     super.initState();
-    userData = GetLocalHelper.getUserData();
+    userData = GetLocalHelper.getUserData(_currentEmail);
   }
 
   @override
@@ -130,6 +133,38 @@ class _MeScreenState extends State<MeScreen> {
                           thickness: 1,
                         ),
                         _meItem(
+                          Icons.stars_outlined,
+                          Text(
+                            'Heroic Achievements',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(fontSize: 16),
+                          ),
+                          onTap: () =>
+                              goToPageHelper(routeName: CashlessHero.routeName),
+                        ),
+                        Divider(
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                          thickness: 1,
+                        ),
+                        _meItem(
+                          Icons.help_outlined,
+                          Text(
+                            'Help Center',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(fontSize: 16),
+                          ),
+                          onTap: () =>
+                              goToPageHelper(routeName: FAQScreen.routeName),
+                        ),
+                        Divider(
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                          thickness: 1,
+                        ),
+                        _meItem(
                           Icons.info_outlined,
                           Text(
                             'About Bai',
@@ -164,7 +199,7 @@ class _MeScreenState extends State<MeScreen> {
     return initials.toUpperCase();
   }
 
-  Widget _meItem(IconData? iconData, Widget content,
+  Widget _meItem(IconData iconData, Widget content,
       {VoidCallback? onTap, Widget? trailing}) {
     return ListTile(
       horizontalTitleGap: 13,

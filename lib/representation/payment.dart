@@ -16,6 +16,7 @@ import 'package:vnpay_client/vnpay_client.dart';
 
 import '../api/model/bai_model/payment_model.dart';
 import '../component/dialog.dart';
+import '../component/internet_connection_wrapper.dart';
 import '../component/snackbar.dart';
 import '../core/const/utilities/util_helper.dart';
 import '../core/helper/asset_helper.dart';
@@ -40,6 +41,7 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
   late final CoinPackage _package = widget.package;
   final log = Logger();
   final CallPaymentApi paymentApi = CallPaymentApi();
+  final _overlayHelper = LoadingOverlayHelper();
   late ZaloPayModel zaloPayModel;
   String payResult = "";
   int type = 0;
@@ -48,45 +50,53 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
   bool isCanPop = true;
 
   @override
+  void dispose() {
+    super.dispose();
+    _overlayHelper.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const AppBarCom(
-        leading: true,
-        appBarText: 'Payment',
-      ),
-      body: PopScope(
-        onPopInvoked: (didPop) {
-          if (isOverload) {
-            LoadingOverlayHelper.hide();
-          }
-          if (!isCanPop) {
-            return;
-          }
-        },
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildTransactionDetails(),
-                      const SizedBox(height: 30),
-                      Text(
-                        'Select your payment options',
-                        style: Theme.of(context).textTheme.titleSmall,
-                      ),
-                      const SizedBox(height: 10),
-                      _buildPaymentOptions(),
-                    ],
+    return InternetConnectionWrapper(
+      child: Scaffold(
+        appBar: const MyAppBar(
+          automaticallyImplyLeading: true,
+          title: 'Payment',
+        ),
+        body: PopScope(
+          onPopInvoked: (didPop) {
+            if (isOverload) {
+              _overlayHelper.hide();
+            }
+            if (!isCanPop) {
+              return;
+            }
+          },
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildTransactionDetails(),
+                        const SizedBox(height: 30),
+                        Text(
+                          'Select your payment options',
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                        const SizedBox(height: 10),
+                        _buildPaymentOptions(),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            _buildBottomButtons(),
-          ],
+              _buildBottomButtons(),
+            ],
+          ),
         ),
       ),
     );
@@ -103,7 +113,7 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.outline,
               borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(10)),
+                  const BorderRadius.vertical(top: Radius.circular(5)),
             ),
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Row(
@@ -201,7 +211,7 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
       children: [
         _buildRadioButton(
           1,
-          AssetHelper.zaloLogo,
+          AssetHelper.zaloPayLogo,
           'ZaloPay E-Wallet',
           isImage: true,
         ),
@@ -309,7 +319,7 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.primary,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
+                  borderRadius: BorderRadius.circular(5)),
               padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 10),
             ),
             child: Text(
@@ -331,7 +341,7 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
       return;
     }
 
-    LoadingOverlayHelper.show(context);
+    _overlayHelper.show(context);
     setState(() => isOverload = true);
 
     try {
@@ -345,7 +355,7 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
       showSnackBar('An error occurred during payment. Please try again.');
     } finally {
       if (isOverload) {
-        LoadingOverlayHelper.hide();
+        _overlayHelper.hide();
         setState(() => isOverload = false);
       }
     }
@@ -365,7 +375,7 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
     await getPaymentUrl(_package.id, vnpBankCode);
 
     if (isOverload) {
-      LoadingOverlayHelper.hide();
+      _overlayHelper.hide();
       setState(() => isOverload = false);
     }
 
@@ -534,23 +544,31 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 15),
-        ExpansionTile(
-          title: const Text('Package Information'),
-          tilePadding: const EdgeInsets.all(0),
-          visualDensity: VisualDensity.comfortable,
-          childrenPadding: const EdgeInsets.only(bottom: 10),
-          children: [
-            _buildReceiptInfoRow('Package', package.packageName),
-            _buildReceiptInfoRow('Amount',
-                '${UltilHelper.formatMoney(int.parse(package.amount))} coins'),
-            _buildReceiptInfoRow(
-              'Extra',
-              package.extraCoin != null
-                  ? '${UltilHelper.formatMoney(package.extraCoin ?? 0)} coins'
-                  : null,
+        Theme(
+          data: ThemeData(
+            dividerColor: Colors.transparent,
+          ),
+          child: ExpansionTile(
+            title: Text(
+              'Package Information',
+              style: Theme.of(context).textTheme.titleMedium,
             ),
-            _buildReceiptInfoRow('EXP Date', '${package.extraEXP} days'),
-          ],
+            tilePadding: const EdgeInsets.all(0),
+            visualDensity: VisualDensity.comfortable,
+            childrenPadding: const EdgeInsets.only(bottom: 10),
+            children: [
+              _buildReceiptInfoRow('Package', package.packageName),
+              _buildReceiptInfoRow('Amount',
+                  '${UltilHelper.formatMoney(int.parse(package.amount))} coins'),
+              _buildReceiptInfoRow(
+                'Extra',
+                package.extraCoin != null
+                    ? '${UltilHelper.formatMoney(package.extraCoin ?? 0)} coins'
+                    : null,
+              ),
+              _buildReceiptInfoRow('EXP Date', '${package.extraEXP} days'),
+            ],
+          ),
         ),
         const SizedBox(height: 5),
         const Divider(),
@@ -640,6 +658,7 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
           content: Text(
             message,
             style: Theme.of(context).textTheme.bodySmall,
+            textAlign: TextAlign.justify,
           ),
         );
       },

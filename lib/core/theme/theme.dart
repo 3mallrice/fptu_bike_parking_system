@@ -41,7 +41,9 @@ ThemeData lightMode = ThemeData(
     onError: ColorLightMode.success,
     primaryContainer: ColorLightMode.zaloPay,
     onBackground: ColorLightMode.backgroundGreen,
-    onSecondaryContainer: ColorLightMode.darkgreen,
+    onTertiary: ColorLightMode.darkgreen,
+    onPrimary: ColorLightMode.primaryBlue,
+    onSurface: ColorLightMode.backgroundBlue,
   ),
   dividerColor: ColorLightMode.primaryText,
   useMaterial3: true,
@@ -89,6 +91,13 @@ ThemeData lightMode = ThemeData(
     titleMedium: TextStyle(
       color: ColorLightMode.primaryText,
       fontSize: 15,
+      fontWeight: FontWeight.w700,
+      fontFamily: GoogleFonts.roboto().fontFamily,
+    ),
+
+    titleSmall: TextStyle(
+      color: ColorLightMode.primaryText,
+      fontSize: 14,
       fontWeight: FontWeight.w700,
       fontFamily: GoogleFonts.roboto().fontFamily,
     ),

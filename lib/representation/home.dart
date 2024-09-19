@@ -34,6 +34,7 @@ class HomeAppScreen extends StatefulWidget {
 }
 
 class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
+  late final _currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
   bool _hideBalance = false;
   bool isAllowLocation = false;
   bool isReloading = false;
@@ -82,8 +83,8 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
   }
 
   Future<void> _loadHideBalance() async {
-    bool? hideBalance =
-        await LocalStorageHelper.getValue(LocalStorageKey.isHiddenBalance);
+    bool? hideBalance = await LocalStorageHelper.getValue(
+        LocalStorageKey.isHiddenBalance, _currentEmail);
     setState(() {
       _hideBalance = hideBalance ?? false;
     });
@@ -358,7 +359,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           shape: BoxShape.rectangle,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(5),
         ),
         child: Column(
           children: [
@@ -410,36 +411,62 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
         ),
         Row(
           children: [
-            Text(
-              isAllowLocation
-                  ? (isReloading
-                      ? 'Loading...'
-                      : '${weatherData?.name ?? '...'}, ${weatherData?.sys.country ?? '...'}')
-                  : 'Enable location permission',
-              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    fontSize: 12,
-                    color: Theme.of(context).colorScheme.onSecondary,
-                  ),
+            GestureDetector(
+              onTap: () async {
+                if (!isAllowLocation) {
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return ConfirmDialog(
+                          title: 'Enable location service',
+                          content: Text(
+                            'Please enable location service to get weather information. After enabling, please refresh the page.',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          positiveLabel: 'Open settings',
+                          onConfirm: () {
+                            Geolocator.openAppSettings();
+
+                            Navigator.of(context).pop();
+                          },
+                        );
+                      });
+                }
+
+                log.d('is Clicked!: $isAllowLocation');
+              },
+              child: Text(
+                isAllowLocation
+                    ? (isReloading
+                        ? 'Loading...'
+                        : '${weatherData?.name ?? '...'}, ${weatherData?.sys.country ?? '...'}')
+                    : 'Enable location permission',
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      fontSize: 12,
+                      color: Theme.of(context).colorScheme.onSecondary,
+                    ),
+              ),
             ),
             const SizedBox(width: 5),
-            GestureDetector(
-              onTap: getWeather,
-              child: isReloading
-                  ? Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 5),
-                      width: 10,
-                      height: 10,
-                      child: CircularProgressIndicator(
+            if (isAllowLocation)
+              GestureDetector(
+                onTap: getWeather,
+                child: isReloading
+                    ? Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 5),
+                        width: 10,
+                        height: 10,
+                        child: CircularProgressIndicator(
+                          color: Theme.of(context).colorScheme.primary,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : Icon(
+                        Icons.refresh_rounded,
                         color: Theme.of(context).colorScheme.primary,
-                        strokeWidth: 2,
+                        size: 18,
                       ),
-                    )
-                  : Icon(
-                      Icons.refresh_rounded,
-                      color: Theme.of(context).colorScheme.primary,
-                      size: 18,
-                    ),
-            ),
+              ),
           ],
         ),
       ],
@@ -703,6 +730,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
           content: Text(
             message,
             style: Theme.of(context).textTheme.bodySmall,
+            textAlign: TextAlign.justify,
           ),
         );
       },

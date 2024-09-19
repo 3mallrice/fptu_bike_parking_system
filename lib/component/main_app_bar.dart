@@ -14,7 +14,8 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     var log = Logger();
-    late UserData? userData = GetLocalHelper.getUserData();
+    String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+    late UserData? userData = GetLocalHelper.getUserData(currentEmail);
     log.i('$userData');
     return SafeArea(
       child: AppBar(
@@ -50,7 +51,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                               )
                             : ClipOval(
                                 child: Image.network(
-                                  userData.avatar ?? '',
+                                  userData.avatar,
                                   fit: BoxFit.fill,
                                 ),
                               ),
@@ -67,7 +68,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                         ),
                         Text(
                           userData != null
-                              ? userData.name?.toUpperCase() ?? 'Anonymous'
+                              ? userData.name.toUpperCase()
                               : 'Anonymous',
                           style:
                               Theme.of(context).textTheme.bodyMedium!.copyWith(

@@ -15,7 +15,8 @@ class WidgetToImageTemplate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    UserData? userData = GetLocalHelper.getUserData();
+    String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+    UserData? userData = GetLocalHelper.getUserData(currentEmail);
     return Container(
       // padding: const EdgeInsets.symmetric(vertical: 10),
       color: Theme.of(context).colorScheme.surface,
