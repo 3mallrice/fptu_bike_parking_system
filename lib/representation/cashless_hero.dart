@@ -46,7 +46,7 @@ class _CashlessHeroState extends State<CashlessHero> with ApiResponseHandler {
       log.d('Pay response: $payResponse');
 
       if (!mounted) return;
-      final isPayResValid = await handleApiResponse(
+      final isPayResValid = await handleApiResponseBool(
         context: context,
         response: payResponse,
         showErrorDialog: _showErrorDialog,

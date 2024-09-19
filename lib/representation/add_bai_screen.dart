@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:bai_system/api/model/bai_model/bai_model.dart';
 import 'package:bai_system/api/service/bai_be/bai_service.dart';
 import 'package:bai_system/component/shadow_container.dart';
+import 'package:bai_system/representation/login.dart';
 import 'package:bai_system/representation/navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -45,7 +46,7 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
   void initState() {
     super.initState();
     _log.i('AddBai widget initialized');
-    _fetchVehicleType();
+    _fetchVehicleType(isAlone: true);
   }
 
   @override
@@ -55,15 +56,19 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
     _onSuccessful = Theme.of(context).colorScheme.onError;
   }
 
-  Future<void> _fetchVehicleType() async {
+  Future<void> _fetchVehicleType(
+      {Set<String>? errors, bool isAlone = false}) async {
     try {
       APIResponse<List<VehicleTypeModel>> vehicleTypes =
           await _api.getVehicleType();
 
       if (vehicleTypes.data == null && vehicleTypes.message != null) {
-        _log.e('Vehicle type is null');
-        return _showErrorDialog(
-            vehicleTypes.message ?? ErrorMessage.somethingWentWrong);
+        errors?.add(vehicleTypes.message ?? ErrorMessage.somethingWentWrong);
+        if (isAlone) {
+          _showErrorDialog(
+              vehicleTypes.message ?? ErrorMessage.somethingWentWrong);
+        }
+        return;
       }
 
       if (mounted) {
@@ -72,8 +77,11 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
         });
       }
     } catch (e) {
+      errors?.add('Failed to load vehicle types. Please try again.');
+      if (isAlone) {
+        _showErrorDialog('Failed to load vehicle types. Please try again.');
+      }
       _log.e('Error fetching vehicle type: $e');
-      _showErrorDialog('Failed to load vehicle types. Please try again.');
     }
   }
 
@@ -135,13 +143,15 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
     }
   }
 
-  Future<void> _saveVehicleRegistration() async {
+  Future<void> _saveVehicleRegistration(
+      {Set<String>? errors, bool isAlone = false}) async {
     if (_imageUrl == null ||
         _selectedVehicleTypeId == null ||
         _plateNumberController.text.isEmpty) {
-      setState(() {
-        _errorMessage = 'Please fill in all required fields';
-      });
+      errors?.add('Please fill in all required fields');
+      if (isAlone) {
+        _showErrorDialog('Please fill in all required fields');
+      }
       return;
     }
 
@@ -153,41 +163,57 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
       );
 
       _log.i('Saving vehicle registration: $addBaiModel');
-
       _overlayHelper.show(context);
       final APIResponse<AddBaiRespModel> result =
           await _api.createBai(addBaiModel);
       _overlayHelper.hide();
 
       if (result.statusCode == 409) {
-        setState(() {
-          _errorMessage = 'Plate number already exists';
-        });
+        errors?.add('Plate number already exists');
+        if (isAlone) {
+          _showErrorDialog('Plate number already exists');
+        }
         return;
       } else if (result.statusCode == 404) {
-        setState(() {
-          _errorMessage = 'Vehicle type not found';
-        });
+        errors?.add('Vehicle type not found');
+        if (isAlone) {
+          _showErrorDialog('Vehicle type not found');
+        }
         return;
       }
 
       if (!mounted) return;
 
-      final bool isResponseValid = await handleApiResponse(
+      final String? errorMessage = await handleApiResponse(
         context: context,
         response: result,
-        showErrorDialog: _showErrorDialog,
       );
 
-      if (!isResponseValid) return;
+      if (errorMessage != null) {
+        if (errorMessage == ApiResponseHandler.invalidToken) {
+          _goToPage(LoginScreen.routeName);
+          _showSnackBar(
+            message: ErrorMessage.tokenInvalid,
+            isSuccessful: false,
+          );
+        }
+
+        errors?.add(errorMessage);
+        if (isAlone) {
+          _showErrorDialog(errorMessage);
+        }
+      }
 
       _showSuccessSnackBar(Message.actionSuccessfully(
           action: LabelMessage.add(message: ListName.bai)));
 
       _goToPage(MyNavigationBar.routeName, index: 1);
     } catch (e) {
+      errors?.add(ErrorMessage.somethingWentWrong);
+      if (isAlone) {
+        _showErrorDialog(ErrorMessage.somethingWentWrong);
+      }
       _log.e('Error saving vehicle registration: $e');
-      _showErrorDialog(ErrorMessage.somethingWentWrong);
     }
   }
 
@@ -520,5 +546,32 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
     _plateNumberController.dispose();
     _overlayHelper.dispose();
     super.dispose();
+  }
+
+  void _showSnackBar({required String message, required bool isSuccessful}) {
+    Color background = Theme.of(context).colorScheme.surface;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: MySnackBar(
+          prefix: isSuccessful
+              ? Icon(
+                  Icons.check_circle_rounded,
+                  color: background,
+                )
+              : Icon(
+                  Icons.cancel_rounded,
+                  color: background,
+                ),
+          message: message,
+          backgroundColor: isSuccessful
+              ? Theme.of(context).colorScheme.onError
+              : Theme.of(context).colorScheme.error,
+        ),
+        backgroundColor: Colors.transparent,
+        behavior: SnackBarBehavior.floating,
+        elevation: 0,
+        padding: const EdgeInsets.all(10),
+      ),
+    );
   }
 }

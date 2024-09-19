@@ -155,7 +155,7 @@ class _UpdateProfileState extends State<UpdateProfile> with ApiResponseHandler {
           await callCustomerApi.updateCustomerInfo(textController.text);
 
       if (!mounted) return false;
-      final bool isResponseValid = await handleApiResponse(
+      final bool isResponseValid = await handleApiResponseBool(
         context: context,
         response: response,
         showErrorDialog: _showErrorDialog,

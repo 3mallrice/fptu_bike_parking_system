@@ -45,7 +45,7 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
 
       if (!mounted) return;
 
-      final bool isResponseValid = await handleApiResponse(
+      final bool isResponseValid = await handleApiResponseBool(
         context: context,
         response: fetchedBikes,
         showErrorDialog: _showErrorDialog,
@@ -170,7 +170,7 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
               Navigator.of(context).pushNamed(
                 BaiDetails.routeName,
                 arguments: {
-                  'baiModel': bai,
+                  'baiId': bai.id,
                   'onPopCallback': () =>
                       WidgetsBinding.instance.addPostFrameCallback((_) {
                         setState(() {

@@ -66,7 +66,7 @@ final Map<String, WidgetBuilder> routes = {
     final args =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     return BaiDetails(
-      baiModel: args['baiModel'],
+      baiId: args['baiId'],
       onPopCallback: args['onPopCallback'],
     );
   },

@@ -446,7 +446,7 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
 
       if (!mounted) return;
 
-      final bool isResponseValid = await handleApiResponse(
+      final bool isResponseValid = await handleApiResponseBool(
         context: context,
         response: response,
         showErrorDialog: _showErrorDialog,
@@ -468,7 +468,7 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
 
       if (!mounted) return;
 
-      final bool isResponseValid = await handleApiResponse(
+      final bool isResponseValid = await handleApiResponseBool(
         context: context,
         response: response,
         showErrorDialog: _showErrorDialog,
