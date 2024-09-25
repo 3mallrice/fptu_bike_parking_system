@@ -15,6 +15,7 @@ import '../component/dialog.dart';
 import '../component/empty_box.dart';
 import '../component/loading_component.dart';
 import '../component/response_handler.dart';
+import '../component/shadow_container.dart';
 import '../component/snackbar.dart';
 import '../component/widget_to_image_template.dart';
 import '../core/const/frontend/message.dart';
@@ -183,68 +184,78 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
         onRefresh: () async {
           await getCustomerHistories(isRefresh: true);
         },
-        child: isLoading
-            ? const Center(
-                child: LoadingCircle(),
-              )
-            : histories.isEmpty
-                ? EmptyBox(
-                    message: EmptyBoxMessage.emptyList(label: ListName.history))
-                : Center(
-                    child: Container(
-                      margin: EdgeInsets.symmetric(
-                        horizontal: MediaQuery.of(context).size.width * 0.05,
-                      ),
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        itemCount: histories.length + 1,
-                        itemBuilder: (context, index) {
-                          if (index < histories.length) {
-                            final history = histories[index];
-                            return GestureDetector(
-                              onTap: () {
-                                if (!history.isFeedback) {
-                                  addFeedbackDialog(history.id);
-                                } else {
-                                  viewFeedbackDialog(
-                                      history.title, history.description);
-                                }
-                              },
-                              child: historyCard(history),
-                            );
-                          } else if (_hasNextPage) {
-                            return _isLoadMoreRunning
-                                ? const Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Align(
-                                        alignment: Alignment.bottomCenter,
-                                        child: LoadingCircle(
-                                          size: 30,
-                                          isHeight: false,
-                                        )),
-                                  )
-                                : const SizedBox();
-                          } else if (_hasNextPage == false) {
-                            return Container(
-                              padding: const EdgeInsets.all(8.0),
-                              margin: const EdgeInsets.only(
-                                  bottom: 10, left: 10, right: 10),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
-                                color: Theme.of(context).colorScheme.secondary,
-                              ),
-                              child: Text(
-                                Message.noMore(message: ListName.history),
-                                style: Theme.of(context).textTheme.bodyMedium,
-                                textAlign: TextAlign.center,
-                              ),
-                            );
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                  ),
+        child: Column(
+          children: [
+            _buildTotalHistoryContainer(context),
+            Expanded(
+              child: isLoading
+                  ? const Center(
+                      child: LoadingCircle(),
+                    )
+                  : histories.isEmpty
+                      ? EmptyBox(
+                          message: EmptyBoxMessage.emptyList(
+                              label: ListName.history))
+                      : Container(
+                          alignment: Alignment.center,
+                          margin: EdgeInsets.symmetric(
+                            horizontal:
+                                MediaQuery.of(context).size.width * 0.05,
+                          ),
+                          child: ListView.builder(
+                            controller: _scrollController,
+                            itemCount: histories.length + 1,
+                            itemBuilder: (context, index) {
+                              if (index < histories.length) {
+                                final history = histories[index];
+                                return GestureDetector(
+                                  onTap: () {
+                                    if (!history.isFeedback) {
+                                      addFeedbackDialog(history.id);
+                                    } else {
+                                      viewFeedbackDialog(
+                                          history.title, history.description);
+                                    }
+                                  },
+                                  child: historyCard(history),
+                                );
+                              } else if (_hasNextPage) {
+                                return _isLoadMoreRunning
+                                    ? const Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Align(
+                                            alignment: Alignment.bottomCenter,
+                                            child: LoadingCircle(
+                                              size: 30,
+                                              isHeight: false,
+                                            )),
+                                      )
+                                    : const SizedBox();
+                              } else if (_hasNextPage == false) {
+                                return Container(
+                                  padding: const EdgeInsets.all(8.0),
+                                  margin: const EdgeInsets.only(
+                                      bottom: 10, left: 10, right: 10),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    color:
+                                        Theme.of(context).colorScheme.secondary,
+                                  ),
+                                  child: Text(
+                                    Message.noMore(message: ListName.history),
+                                    style:
+                                        Theme.of(context).textTheme.bodyMedium,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                );
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -376,18 +387,9 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
                             ),
                       ),
                       history.amount != null
-                          ? Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Image.asset(
-                                  AssetHelper.bic,
-                                  width: 25,
-                                  fit: BoxFit.fitWidth,
-                                ),
-                                const SizedBox(width: 5),
-                                Text(
-                                  '${UltilHelper.formatMoney(history.amount!)} bic',
+                          ? history.paymentMethod == 'CASH'
+                              ? Text(
+                                  '${UltilHelper.formatMoney(history.amount!)} VND',
                                   style: Theme.of(context)
                                       .textTheme
                                       .displayMedium!
@@ -395,8 +397,27 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
                                         fontSize: 14,
                                       ),
                                 )
-                              ],
-                            )
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Image.asset(
+                                      AssetHelper.bic,
+                                      width: 25,
+                                      fit: BoxFit.fitWidth,
+                                    ),
+                                    const SizedBox(width: 5),
+                                    Text(
+                                      '${UltilHelper.formatMoney(history.amount!)} bic',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .displayMedium!
+                                          .copyWith(
+                                            fontSize: 14,
+                                          ),
+                                    )
+                                  ],
+                                )
                           : history.moneyEstimated != null
                               ? Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
@@ -484,6 +505,38 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
         backgroundColor: Colors.transparent,
         elevation: 0,
         padding: const EdgeInsets.all(10),
+      ),
+    );
+  }
+
+  Widget _buildTotalHistoryContainer(BuildContext context) {
+    return ShadowContainer(
+      margin: EdgeInsets.symmetric(
+          vertical: MediaQuery.of(context).size.height * 0.01),
+      width: MediaQuery.of(context).size.width * 0.9,
+      height: MediaQuery.of(context).size.height * 0.1,
+      padding: const EdgeInsets.all(0),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 5,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'Total History',
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '${histories.length}',
+                  style: Theme.of(context).textTheme.displayMedium,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

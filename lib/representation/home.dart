@@ -19,6 +19,7 @@ import '../api/model/bai_model/api_response.dart';
 import '../api/model/weather/weather.dart';
 import '../api/service/weather/open_weather_api.dart';
 import '../component/dialog.dart';
+import '../component/full_screen_image_helper.dart';
 import '../component/shadow_container.dart';
 import '../component/snackbar.dart';
 import '../core/const/frontend/message.dart';
@@ -117,7 +118,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
       String errorMessage;
 
       if (errorMessages.length > 1) {
-        errorMessage = errorMessages.map((e) => '\u2022 $e').join('\n');
+        errorMessage = errorMessages.map((e) => '\u2022$e').join('\n');
       } else {
         errorMessage = errorMessages.first;
       }
@@ -933,27 +934,6 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
         behavior: SnackBarBehavior.floating,
         elevation: 0,
         padding: const EdgeInsets.all(10),
-      ),
-    );
-  }
-}
-
-class FullScreenImageDialog extends StatelessWidget {
-  final String imagePath;
-
-  const FullScreenImageDialog({super.key, required this.imagePath});
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      alignment: Alignment.center,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Image.asset(
-          imagePath,
-          fit: BoxFit.cover,
-        ),
       ),
     );
   }

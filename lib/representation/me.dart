@@ -9,6 +9,8 @@ import 'package:bai_system/representation/settings_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
+import '../component/full_screen_image_helper.dart';
+
 class MeScreen extends StatefulWidget {
   const MeScreen({super.key});
 
@@ -23,6 +25,7 @@ class _MeScreenState extends State<MeScreen> {
 
   late final UserData? userData;
   late final _currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? '';
+  late final _currentCustomerType = userData?.customerType;
 
   void goToPageHelper({String? routeName}) {
     routeName != null
@@ -51,7 +54,6 @@ class _MeScreenState extends State<MeScreen> {
                 children: [
                   const SizedBox(height: 20),
                   Container(
-                    // padding: const EdgeInsets.all(1),
                     height: MediaQuery.of(context).size.width * 0.36,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
@@ -73,10 +75,23 @@ class _MeScreenState extends State<MeScreen> {
                                   color: Theme.of(context).colorScheme.surface,
                                 ),
                           )
-                        : ClipOval(
-                            child: Image.network(
-                              userData?.avatar ?? '',
-                              fit: BoxFit.fill,
+                        : GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return FullScreenImageDialog(
+                                    imagePath: userData?.avatar ?? '',
+                                    isAssetImage: false,
+                                  );
+                                },
+                              );
+                            },
+                            child: ClipOval(
+                              child: Image.network(
+                                userData?.avatar ?? '',
+                                fit: BoxFit.fill,
+                              ),
                             ),
                           ),
                   ),
@@ -132,22 +147,24 @@ class _MeScreenState extends State<MeScreen> {
                           color: Theme.of(context).colorScheme.outlineVariant,
                           thickness: 1,
                         ),
-                        _meItem(
-                          Icons.stars_outlined,
-                          Text(
-                            'Heroic Achievements',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium!
-                                .copyWith(fontSize: 16),
+                        if (_currentCustomerType == CustomerType.paid)
+                          _meItem(
+                            Icons.stars_outlined,
+                            Text(
+                              'Heroic Achievements',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium!
+                                  .copyWith(fontSize: 16),
+                            ),
+                            onTap: () => goToPageHelper(
+                                routeName: CashlessHero.routeName),
                           ),
-                          onTap: () =>
-                              goToPageHelper(routeName: CashlessHero.routeName),
-                        ),
-                        Divider(
-                          color: Theme.of(context).colorScheme.outlineVariant,
-                          thickness: 1,
-                        ),
+                        if (_currentCustomerType == CustomerType.paid)
+                          Divider(
+                            color: Theme.of(context).colorScheme.outlineVariant,
+                            thickness: 1,
+                          ),
                         _meItem(
                           Icons.help_outlined,
                           Text(

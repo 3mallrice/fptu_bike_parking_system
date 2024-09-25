@@ -1,7 +1,9 @@
 import 'package:bai_system/api/model/bai_model/api_response.dart';
+import 'package:bai_system/api/model/bai_model/login_model.dart';
 import 'package:bai_system/component/empty_box.dart';
 import 'package:bai_system/component/response_handler.dart';
 import 'package:bai_system/representation/bai_details.dart';
+import 'package:bai_system/representation/support.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/web.dart';
@@ -16,6 +18,7 @@ import '../component/shadow_container.dart';
 import '../core/const/frontend/message.dart';
 import '../core/const/utilities/util_helper.dart';
 import '../core/helper/asset_helper.dart';
+import '../core/helper/local_storage_helper.dart';
 import '../representation/add_bai_screen.dart';
 
 class BaiScreen extends StatefulWidget {
@@ -28,6 +31,10 @@ class BaiScreen extends StatefulWidget {
 }
 
 class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
+  late final _currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+  late final _currentCustomerType = LocalStorageHelper.getValue(
+      LocalStorageKey.currentCustomerType, _currentEmail);
+
   var log = Logger();
   CallBikeApi api = CallBikeApi();
   bool isCalling = true;
@@ -110,7 +117,7 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  'Total bike',
+                  'Total Bai',
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 const SizedBox(height: 8),
@@ -121,28 +128,29 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
               ],
             ),
           ),
-          Expanded(
-            flex: 1,
-            child: Container(
-              height: double.infinity,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
-                borderRadius: const BorderRadius.only(
-                  topRight: Radius.circular(5),
-                  bottomRight: Radius.circular(5),
+          if (_currentCustomerType == CustomerType.paid)
+            Expanded(
+              flex: 1,
+              child: Container(
+                height: double.infinity,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                  borderRadius: const BorderRadius.only(
+                    topRight: Radius.circular(5),
+                    bottomRight: Radius.circular(5),
+                  ),
+                ),
+                child: IconButton(
+                  onPressed: () =>
+                      Navigator.of(context).pushNamed(AddBai.routeName),
+                  icon: const Icon(
+                    Icons.add_rounded,
+                    color: Colors.white,
+                    size: 35,
+                  ),
                 ),
               ),
-              child: IconButton(
-                onPressed: () =>
-                    Navigator.of(context).pushNamed(AddBai.routeName),
-                icon: const Icon(
-                  Icons.add_rounded,
-                  color: Colors.white,
-                  size: 35,
-                ),
-              ),
-            ),
-          )
+            )
         ],
       ),
     );
@@ -152,8 +160,12 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
     if (!isCalling && (bikes == null || bikes!.isEmpty)) {
       return EmptyBox(
         message: EmptyBoxMessage.emptyList(label: ListName.bai),
-        buttonMessage: LabelMessage.add(message: ListName.bai),
-        buttonAction: () => Navigator.of(context).pushNamed(AddBai.routeName),
+        buttonMessage: _currentCustomerType == CustomerType.paid
+            ? LabelMessage.add(message: ListName.bai)
+            : "Need help?",
+        buttonAction: () => _currentCustomerType == CustomerType.paid
+            ? Navigator.of(context).pushNamed(AddBai.routeName)
+            : Navigator.of(context).pushNamed(SupportScreen.routeName),
       );
     }
 
@@ -194,7 +206,9 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
                       ),
                       child: CachedNetworkImage(
                         width: double.infinity,
-                        imageUrl: bai.plateImage,
+                        imageUrl: _currentCustomerType == CustomerType.paid
+                            ? bai.plateImage
+                            : 'https://img.freepik.com/premium-photo/guinea-pig-riding-toy-train-cartoon-style_714091-95319.jpg?w=900',
                         fit: BoxFit.cover,
                         placeholder: (context, url) => Shimmer.fromColors(
                           baseColor: Theme.of(context).colorScheme.background,

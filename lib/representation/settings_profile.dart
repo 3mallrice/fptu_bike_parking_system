@@ -5,6 +5,7 @@ import 'package:logger/logger.dart';
 import '../api/model/bai_model/login_model.dart';
 import '../api/service/bai_be/auth_service.dart';
 import '../component/app_bar_component.dart';
+import '../component/full_screen_image_helper.dart';
 import '../component/internet_connection_wrapper.dart';
 import '../core/helper/local_storage_helper.dart';
 import 'login.dart';
@@ -24,6 +25,7 @@ class _SettingAndProfileScreenState extends State<SettingAndProfileScreen> {
   late int _pageSize = 10;
   late final _currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? '';
   late final UserData? userData = GetLocalHelper.getUserData(_currentEmail);
+  late final _currentCustomerType = userData?.customerType;
   var log = Logger();
 
   Future<void> _toggleHideBalance() async {
@@ -77,36 +79,50 @@ class _SettingAndProfileScreenState extends State<SettingAndProfileScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
-                    margin: const EdgeInsets.symmetric(vertical: 10),
-                    height: MediaQuery.of(context).size.width * 0.25,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Theme.of(context).colorScheme.primary,
-                        width: 2,
+                  GestureDetector(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return FullScreenImageDialog(
+                            imagePath: userData?.avatar ?? '',
+                            isAssetImage: false,
+                          );
+                        },
+                      );
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 10),
+                      height: MediaQuery.of(context).size.width * 0.25,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.primary,
+                          width: 2,
+                        ),
+                        color: Theme.of(context).colorScheme.outline,
                       ),
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
-                    child: userData == null
-                        ? Text(
-                            getInitials(userData?.name ?? 'Anonymous User'),
-                            style: Theme.of(context)
-                                .textTheme
-                                .displayLarge!
-                                .copyWith(
-                                  fontSize: 64,
-                                  fontWeight: FontWeight.w900,
-                                  color:
-                                      Theme.of(context).colorScheme.background,
-                                ),
-                          )
-                        : ClipOval(
-                            child: Image.network(
-                              userData?.avatar ?? '',
-                              fit: BoxFit.fill,
+                      child: userData == null
+                          ? Text(
+                              getInitials(userData?.name ?? 'Anonymous User'),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .displayLarge!
+                                  .copyWith(
+                                    fontSize: 64,
+                                    fontWeight: FontWeight.w900,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .background,
+                                  ),
+                            )
+                          : ClipOval(
+                              child: Image.network(
+                                userData?.avatar ?? '',
+                                fit: BoxFit.fill,
+                              ),
                             ),
-                          ),
+                    ),
                   ),
                   Container(
                       margin: const EdgeInsets.symmetric(vertical: 10),
@@ -176,36 +192,37 @@ class _SettingAndProfileScreenState extends State<SettingAndProfileScreen> {
                       child: Divider(
                           height: 1,
                           color: Theme.of(context).colorScheme.outlineVariant)),
-                  _settingItem(
-                    !_hideBalance
-                        ? Icons.visibility_off_outlined
-                        : Icons.visibility_outlined,
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          !_hideBalance ? 'Hide Balance' : 'Show Balance',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium!
-                              .copyWith(fontSize: 15),
-                        ),
-                        Text(
-                          '\u2022 Your balances on home screen will appear as ${_hideBalance ? '12345' : '*****'}\n\u2022 To reveal, hold on your balance',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall!
-                              .copyWith(
-                                color:
-                                    Theme.of(context).colorScheme.onSecondary,
-                                fontSize: 12,
-                              ),
-                        ),
-                      ],
+                  if (_currentCustomerType == CustomerType.paid)
+                    _settingItem(
+                      !_hideBalance
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            !_hideBalance ? 'Hide Balance' : 'Show Balance',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(fontSize: 15),
+                          ),
+                          Text(
+                            '\u2022 Your balances on home screen will appear as ${_hideBalance ? '12345' : '*****'}\n\u2022 To reveal, hold on your balance',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall!
+                                .copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.onSecondary,
+                                  fontSize: 12,
+                                ),
+                          ),
+                        ],
+                      ),
+                      onTap: _toggleHideBalance,
                     ),
-                    onTap: _toggleHideBalance,
-                  ),
                   _settingItem(
                     Icons.pageview_outlined,
                     trailing: Container(
