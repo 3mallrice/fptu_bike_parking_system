@@ -76,6 +76,7 @@ dependencies:
   internet_connection_checker_plus: ^2.5.1
   url_launcher: ^6.3.0
   carousel_slider: ^5.0.0
+  flutter_cache_manager: ^3.4.1
 
 dev_dependencies:
   flutter_test:

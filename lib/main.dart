@@ -43,7 +43,7 @@ Future<void> main() async {
     // Lấy token FCM
     await getFcmToken();
 
-    await GeoPermission().checkLocationPermission();
+    await GeoPermission().getCurrentPosition();
 
     await InfoKit.init(
       envEnabled: false,

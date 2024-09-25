@@ -17,6 +17,17 @@ class CallWalletApi {
   String token = "";
   var log = Logger();
 
+  // Cache for main wallet balance
+  static int? _mainWalletBalanceCache;
+  static DateTime? _mainWalletBalanceCacheTime;
+
+  // Cache for extra wallet balance
+  static ExtraBalanceModel? _extraWalletBalanceCache;
+  static DateTime? _extraWalletBalanceCacheTime;
+
+  // Cache 5p
+  static const Duration cacheDuration = Duration(minutes: 5);
+
   // GET: /api/wallet/transaction/main
   // Get all transaction of user's main wallet
   Future<APIResponse<List<WalletModel>>> getMainWalletTransactions(
@@ -129,6 +140,18 @@ class CallWalletApi {
   // Get balance of user's main wallet
   Future<APIResponse<int>> getMainWalletBalance() async {
     try {
+      // Check cache
+      if (_mainWalletBalanceCache != null &&
+          _mainWalletBalanceCacheTime != null &&
+          DateTime.now().difference(_mainWalletBalanceCacheTime!) <
+              cacheDuration) {
+        // Trả về dữ liệu từ cache
+        return APIResponse<int>(
+          data: _mainWalletBalanceCache,
+          message: 'Data from cache',
+        );
+      }
+
       String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
       token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
 
@@ -147,12 +170,17 @@ class CallWalletApi {
           'Content-Type': 'application/json',
         },
       );
+
       if (response.statusCode == 200) {
         final responseJson = jsonDecode(response.body);
         APIResponse<int> apiResponse = APIResponse.fromJson(
           responseJson,
           (json) => int.parse(json.toString()),
         );
+
+        // Save vào cache
+        _mainWalletBalanceCache = apiResponse.data;
+        _mainWalletBalanceCacheTime = DateTime.now();
 
         return apiResponse;
       } else if (response.statusCode == 401) {
@@ -163,8 +191,9 @@ class CallWalletApi {
       } else {
         log.e('Failed to get main wallet balance: ${response.statusCode}');
         return APIResponse(
-            statusCode: response.statusCode,
-            message: HttpErrorMapper.getErrorMessage(response.statusCode));
+          statusCode: response.statusCode,
+          message: HttpErrorMapper.getErrorMessage(response.statusCode),
+        );
       }
     } catch (e) {
       log.e('Error during get main wallet balance: $e');
@@ -180,6 +209,18 @@ class CallWalletApi {
   // Get balance of user's extra wallet
   Future<APIResponse<ExtraBalanceModel>> getExtraWalletBalance() async {
     try {
+      // Check cache
+      if (_extraWalletBalanceCache != null &&
+          _extraWalletBalanceCacheTime != null &&
+          DateTime.now().difference(_extraWalletBalanceCacheTime!) <
+              cacheDuration) {
+        // Trả về dữ liệu từ cache
+        return APIResponse<ExtraBalanceModel>(
+          data: _extraWalletBalanceCache,
+          message: 'Data from cache',
+        );
+      }
+
       String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
       token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
 
@@ -198,6 +239,7 @@ class CallWalletApi {
           'Content-Type': 'application/json',
         },
       );
+
       if (response.statusCode == 200) {
         final responseJson = jsonDecode(response.body);
         APIResponse<ExtraBalanceModel> apiResponse = APIResponse.fromJson(
@@ -205,12 +247,22 @@ class CallWalletApi {
           (json) => ExtraBalanceModel.fromJson(json as Map<String, dynamic>),
         );
 
+        // Save vào cache
+        _extraWalletBalanceCache = apiResponse.data;
+        _extraWalletBalanceCacheTime = DateTime.now();
+
         return apiResponse;
+      } else if (response.statusCode == 401) {
+        return APIResponse(
+          message: ErrorMessage.tokenInvalid,
+          isTokenValid: false,
+        );
       } else {
         log.e('Failed to get extra wallet balance: ${response.statusCode}');
         return APIResponse(
-            statusCode: response.statusCode,
-            message: HttpErrorMapper.getErrorMessage(response.statusCode));
+          statusCode: response.statusCode,
+          message: HttpErrorMapper.getErrorMessage(response.statusCode),
+        );
       }
     } catch (e) {
       log.e('Error during get extra wallet balance: $e');
