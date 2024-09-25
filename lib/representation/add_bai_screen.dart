@@ -46,7 +46,7 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
   void initState() {
     super.initState();
     _log.i('AddBai widget initialized');
-    _fetchVehicleType(isAlone: true);
+    _fetchVehicleType();
   }
 
   @override
@@ -56,18 +56,15 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
     _onSuccessful = Theme.of(context).colorScheme.onError;
   }
 
-  Future<void> _fetchVehicleType(
-      {Set<String>? errors, bool isAlone = false}) async {
+  Future<void> _fetchVehicleType() async {
     try {
       APIResponse<List<VehicleTypeModel>> vehicleTypes =
           await _api.getVehicleType();
 
       if (vehicleTypes.data == null && vehicleTypes.message != null) {
-        errors?.add(vehicleTypes.message ?? ErrorMessage.somethingWentWrong);
-        if (isAlone) {
-          _showErrorDialog(
-              vehicleTypes.message ?? ErrorMessage.somethingWentWrong);
-        }
+        _showErrorDialog(
+            vehicleTypes.message ?? ErrorMessage.somethingWentWrong);
+
         return;
       }
 
@@ -77,10 +74,7 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
         });
       }
     } catch (e) {
-      errors?.add('Failed to load vehicle types. Please try again.');
-      if (isAlone) {
-        _showErrorDialog('Failed to load vehicle types. Please try again.');
-      }
+      _showErrorDialog('Failed to load vehicle types. Please try again.');
       _log.e('Error fetching vehicle type: $e');
     }
   }
@@ -143,15 +137,14 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
     }
   }
 
-  Future<void> _saveVehicleRegistration(
-      {Set<String>? errors, bool isAlone = false}) async {
+  Future<void> _saveVehicleRegistration() async {
     if (_imageUrl == null ||
         _selectedVehicleTypeId == null ||
         _plateNumberController.text.isEmpty) {
-      errors?.add('Please fill in all required fields');
-      if (isAlone) {
-        _showErrorDialog('Please fill in all required fields');
-      }
+      setState(() {
+        _errorMessage = 'Please fill all required fields';
+      });
+
       return;
     }
 
@@ -162,28 +155,17 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
         vehicleTypeId: _selectedVehicleTypeId!,
       );
 
-      _log.i('Saving vehicle registration: $addBaiModel');
+      _log.d('Saving vehicle registration: $addBaiModel');
       _overlayHelper.show(context);
       final APIResponse<AddBaiRespModel> result =
           await _api.createBai(addBaiModel);
       _overlayHelper.hide();
 
       if (result.statusCode == 409) {
-        errors?.add('Plate number already exists');
-        if (isAlone) {
-          _showErrorDialog('Plate number already exists');
-        }
-        return;
-      } else if (result.statusCode == 404) {
-        errors?.add('Vehicle type not found');
-        if (isAlone) {
-          _showErrorDialog('Vehicle type not found');
-        }
-        return;
+        _clearAllInputFields();
       }
 
       if (!mounted) return;
-
       final String? errorMessage = await handleApiResponse(
         context: context,
         response: result,
@@ -198,10 +180,11 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
           );
         }
 
-        errors?.add(errorMessage);
-        if (isAlone) {
-          _showErrorDialog(errorMessage);
-        }
+        setState(() {
+          _errorMessage = errorMessage;
+        });
+
+        return;
       }
 
       _showSuccessSnackBar(Message.actionSuccessfully(
@@ -209,11 +192,19 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
 
       _goToPage(MyNavigationBar.routeName, index: 1);
     } catch (e) {
-      errors?.add(ErrorMessage.somethingWentWrong);
-      if (isAlone) {
-        _showErrorDialog(ErrorMessage.somethingWentWrong);
-      }
+      _showErrorDialog(ErrorMessage.somethingWentWrong);
+
       _log.e('Error saving vehicle registration: $e');
+    }
+  }
+
+  void _clearAllInputFields() {
+    if (mounted) {
+      setState(() {
+        _imageUrl = null;
+        _selectedVehicleTypeId = null;
+        _plateNumberController.clear();
+      });
     }
   }
 
@@ -380,11 +371,14 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
                   ),
                 ],
               )
-            : Image.file(
-                File(_imageUrl!),
-                fit: BoxFit.cover,
-                width: double.infinity,
-                height: double.infinity,
+            : ClipRRect(
+                borderRadius: BorderRadius.circular(5),
+                child: Image.file(
+                  File(_imageUrl!),
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
+                ),
               ),
       ),
     );
@@ -458,23 +452,21 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
                 ? () => _selectImage(subTitle: 'Select image first')
                 : null,
             onEditingComplete: () {
-              _plateNumberController.text =
-                  _plateNumberController.text.trim().toUpperCase();
-
               String currentValue = _plateNumberController.text
                   .trim()
                   .replaceAll('-', '')
                   .replaceAll('.', '')
                   .replaceAll(' ', '')
                   .toUpperCase();
+
+              _log.i('Plate number: $currentValue');
+
               if (mounted) {
                 setState(() {
+                  _plateNumberController.text = currentValue;
                   _errorMessage = Regex.plateRegExp.hasMatch(currentValue)
                       ? null
                       : 'Invalid plate number';
-                  if (_errorMessage != null) {
-                    _plateNumberController.text = currentValue;
-                  }
                 });
                 FocusScope.of(context).unfocus();
               }
@@ -503,15 +495,14 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
       children: [
         Visibility(
           visible: _errorMessage != null,
-          child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
             child: Text(
               _errorMessage ?? '',
               style: Theme.of(context).textTheme.bodySmall!.copyWith(
                     color: Theme.of(context).colorScheme.error,
                   ),
               textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
             ),
           ),
         ),

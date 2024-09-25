@@ -75,10 +75,12 @@ class CallBikeApi {
           (json) => AddBaiRespModel.fromJson(json as Map<String, dynamic>),
         );
       } else {
-        log.e('Failed to create bai: ${response.statusCode}');
+        log.e(
+            'Failed to create bai: ${response.statusCode}, ${responseJson['message']}');
         return APIResponse(
           statusCode: response.statusCode,
-          message: HttpErrorMapper.getErrorMessage(response.statusCode),
+          message: HttpErrorMapper.getErrorMessage(response.statusCode,
+              serverMessage: responseJson['message']),
         );
       }
     } catch (e) {

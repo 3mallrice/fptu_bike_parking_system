@@ -26,7 +26,7 @@ class HttpErrorMapper {
           "This Image not contain any plate number" =>
             "Conflict Detected: The provided image does not contain a recognizable plate number. Please upload a valid image and try again.",
           "Plate Number is exist in system" =>
-            "Conflict Detected: The plate number you are trying to register already exists in the system. Please use a different plate number.",
+            "Conflict Detected: The plate number you are trying to register already exists in the system. Please use a different vehicle.",
           _ =>
             "A conflict occurred during the process. Please review the details and try again."
         },

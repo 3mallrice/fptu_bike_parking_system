@@ -234,8 +234,8 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
       useRootNavigator: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(10),
-          topRight: Radius.circular(10),
+          topLeft: Radius.circular(5),
+          topRight: Radius.circular(5),
         ),
       ),
       builder: (context) => ConstrainedBox(
@@ -573,21 +573,34 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                    '${UltilHelper.formatMoney(int.parse(package.amount) + (package.extraCoin ?? 0))} bic',
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text:
+                              '${UltilHelper.formatMoney(int.parse(package.amount) + (package.extraCoin ?? 0))} ',
+                          style:
+                              Theme.of(context).textTheme.titleMedium!.copyWith(
+                                    fontSize: 14,
+                                  ),
                         ),
+                        TextSpan(
+                          text: 'bic',
+                          style:
+                              Theme.of(context).textTheme.titleMedium!.copyWith(
+                                    fontSize: 12,
+                                  ),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 3),
                   if (package.extraEXP != null)
                     Text(
-                      '+${package.extraEXP} days',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyLarge!
-                          .copyWith(fontSize: 12),
+                      '${package.extraEXP} days',
+                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          fontSize: 11,
+                          color: Theme.of(context).colorScheme.onSecondary),
                       textAlign: TextAlign.left,
                     ),
                 ],
@@ -600,8 +613,8 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.primary,
                   borderRadius: const BorderRadius.only(
-                    topRight: Radius.circular(10),
-                    bottomRight: Radius.circular(10),
+                    topRight: Radius.circular(5),
+                    bottomRight: Radius.circular(5),
                   ),
                 ),
                 child: Center(

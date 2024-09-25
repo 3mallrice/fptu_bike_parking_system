@@ -40,15 +40,15 @@ class UltilHelper {
   }
 
   // Function to format date
-  static String formatDate(DateTime? date) {
+  static String formatDate(DateTime? date, {bool showTime = true}) {
     if (date == null) {
       return '';
     } else if (_isToday(date)) {
-      return 'Today, ${formatDTS(date)}';
+      return 'Today, ${showTime ? formatDTS(date) : formatDateOnly(date)}';
     } else if (_isYesterday(date)) {
-      return 'Yesterday, ${formatDTS(date)}';
+      return 'Yesterday, ${showTime ? formatDTS(date) : formatDateOnly(date)}';
     } else {
-      return formatDTS(date);
+      return showTime ? formatDTS(date) : formatDateOnly(date);
     }
   }
 

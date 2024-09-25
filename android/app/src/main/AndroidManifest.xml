@@ -67,7 +67,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="mailto" />
                 <data
                     android:host="app"
                     android:scheme="demozpdk" />

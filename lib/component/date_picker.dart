@@ -82,39 +82,32 @@ class _DatePickerState extends State<DatePicker> {
               thickness: 1,
             ),
           ),
-          ListTile(
-            title: const Text(
-              'The date range you want to view, maximum 30 days.',
-              textAlign: TextAlign.center,
-            ),
-            horizontalTitleGap: 5,
-            titleTextStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                  color: Theme.of(context).colorScheme.onSecondary,
-                  fontSize: 12,
-                ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-            minVerticalPadding: 0,
-          )
+          // ListTile(
+          //   title: const Text(
+          //     'The date range you want to view, maximum 30 days.',
+          //     textAlign: TextAlign.center,
+          //   ),
+          //   horizontalTitleGap: 5,
+          //   titleTextStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
+          //         color: Theme.of(context).colorScheme.onSecondary,
+          //         fontSize: 12,
+          //       ),
+          //   contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+          //   minVerticalPadding: 0,
+          // )
         ],
       ),
     );
   }
 
   Future<void> _selectDate(BuildContext context, bool isFromDate) async {
+    DateTime now = DateTime.now();
     DateTime initialDate = isFromDate ? fromDate : toDate;
-    DateTime firstDate = isFromDate ? DateTime(2024) : fromDate;
-    DateTime lastDate = isFromDate ? toDate : DateTime.now();
+    DateTime firstDate = DateTime(1900);
+    DateTime lastDate = now;
 
-    // Limit the date range to 30 days
-    if (isFromDate) {
-      lastDate = toDate.isBefore(initialDate.add(const Duration(days: 30)))
-          ? toDate
-          : initialDate.add(const Duration(days: 30));
-    } else {
-      firstDate =
-          fromDate.isAfter(initialDate.subtract(const Duration(days: 30)))
-              ? fromDate
-              : initialDate.subtract(const Duration(days: 30));
+    if (initialDate.isAfter(lastDate)) {
+      initialDate = lastDate;
     }
 
     final DateTime? picked = await showDatePicker(
@@ -176,18 +169,10 @@ class _DatePickerState extends State<DatePicker> {
 
     if (picked != null) {
       setState(() {
-        if (isSelectingFromDate) {
+        if (isFromDate) {
           fromDate = picked;
-          // Ensure toDate is within 30 days of fromDate
-          if (toDate.isAfter(fromDate.add(const Duration(days: 30)))) {
-            toDate = fromDate.add(const Duration(days: 30));
-          }
         } else {
           toDate = picked;
-          // Ensure fromDate is within 30 days of toDate
-          if (fromDate.isBefore(toDate.subtract(const Duration(days: 30)))) {
-            fromDate = toDate.subtract(const Duration(days: 30));
-          }
         }
       });
 

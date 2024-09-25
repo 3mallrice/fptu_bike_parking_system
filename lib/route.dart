@@ -18,7 +18,7 @@ import 'package:bai_system/representation/no_connection_screen.dart';
 import 'package:bai_system/representation/notification_screen.dart';
 import 'package:bai_system/representation/payment.dart';
 import 'package:bai_system/representation/receipt.dart';
-import 'package:bai_system/representation/settings.dart';
+import 'package:bai_system/representation/settings&profile.dart';
 import 'package:bai_system/representation/splash_screen.dart';
 import 'package:bai_system/representation/support.dart';
 import 'package:bai_system/representation/update_profile.dart';
@@ -80,7 +80,8 @@ final Map<String, WidgetBuilder> routes = {
   },
   NoInternetScreen.routeName: (context) => const NoInternetScreen(),
   SupportScreen.routeName: (context) => SupportScreen(),
-  SettingScreen.routeName: (context) => const SettingScreen(),
+  SettingAndProfileScreen.routeName: (context) =>
+      const SettingAndProfileScreen(),
   UpdateProfile.routeName: (context) {
     final args = ModalRoute.of(context)!.settings.arguments as String;
     return UpdateProfile(

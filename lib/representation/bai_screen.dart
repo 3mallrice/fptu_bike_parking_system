@@ -128,8 +128,8 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.primary,
                 borderRadius: const BorderRadius.only(
-                  topRight: Radius.circular(10),
-                  bottomRight: Radius.circular(10),
+                  topRight: Radius.circular(5),
+                  bottomRight: Radius.circular(5),
                 ),
               ),
               child: IconButton(
@@ -189,8 +189,8 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
                     height: MediaQuery.of(context).size.height * 0.25,
                     child: ClipRRect(
                       borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(10),
-                        topRight: Radius.circular(10),
+                        topLeft: Radius.circular(5),
+                        topRight: Radius.circular(5),
                       ),
                       child: CachedNetworkImage(
                         width: double.infinity,
@@ -282,7 +282,7 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
                       padding: const EdgeInsets.only(
                           left: 20, right: 20, bottom: 10),
                       child: Text(
-                        'Please park your vehicle in our facility for the first time to activate it.',
+                        'To activate your registration, please park your vehicle at our facility for the first time.',
                         style: Theme.of(context).textTheme.labelSmall!.copyWith(
                               color: Theme.of(context).colorScheme.primary,
                             ),
