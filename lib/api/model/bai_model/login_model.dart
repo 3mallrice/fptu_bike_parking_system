@@ -39,5 +39,7 @@ class UserData {
   }
 }
 
-// ignore: constant_identifier_names
-enum CustomerType { PAID, NONPAID }
+class CustomerType {
+  static const String paid = "PAID";
+  static const String nonPaid = "NONPAID";
+}

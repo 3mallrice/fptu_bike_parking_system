@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bai_system/api/model/bai_model/login_model.dart';
 import 'package:bai_system/api/model/bai_model/wallet_model.dart';
 import 'package:bai_system/api/service/bai_be/wallet_service.dart';
 import 'package:bai_system/component/response_handler.dart';
@@ -36,7 +37,14 @@ class HomeAppScreen extends StatefulWidget {
 }
 
 class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
+  final String _info = "INFO";
+  final String _success = "SUCCESS";
+  final String _fail = "FAILED";
+
   late final _currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+  late final _currentCustomerType = LocalStorageHelper.getValue(
+      LocalStorageKey.currentCustomerType, _currentEmail);
+
   bool _hideBalance = false;
   bool isAllowLocation = false;
   bool isReloading = false;
@@ -78,11 +86,15 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
 
     setState(() => isReloading = true);
 
-    await Future.wait([
-      getWeather(errors: errorMessages, isAlone: false),
-      getBalance(errors: errorMessages, isAlone: false),
-      getExtraBalance(errors: errorMessages, isAlone: false),
-    ]);
+    if (_currentCustomerType == CustomerType.paid) {
+      await Future.wait([
+        getWeather(errors: errorMessages, isAlone: false),
+        getBalance(errors: errorMessages, isAlone: false),
+        getExtraBalance(errors: errorMessages, isAlone: false),
+      ]);
+    } else {
+      await getWeather(errors: errorMessages, isAlone: true);
+    }
 
     if (errorMessages.isNotEmpty) {
       String errorMessage;
@@ -165,7 +177,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
       _goToPage(routeName: LoginScreen.routeName);
       _showSnackBar(
         message: ErrorMessage.tokenInvalid,
-        isSuccessful: false,
+        isFor: _fail,
       );
     }
 
@@ -313,7 +325,9 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
       width: MediaQuery.of(context).size.width * 0.9,
       child: Column(
         children: [
-          _buildBalanceRow(),
+          (_currentCustomerType == CustomerType.paid)
+              ? _buildBalanceRow()
+              : const SizedBox(),
           _buildQuickAccessButtons(),
         ],
       ),
@@ -388,13 +402,23 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
       ),
       QuickAccessItem(
         icon: Icons.wallet,
+        iconColor: _currentCustomerType == CustomerType.nonPaid
+            ? Theme.of(context).colorScheme.onSecondary
+            : null,
         title: 'Wallet',
-        onTap: () => Navigator.of(context).pushNamed(WalletScreen.routeName),
+        onTap: () => _currentCustomerType == CustomerType.paid
+            ? Navigator.of(context).pushNamed(WalletScreen.routeName)
+            : _showOnlyPaidSnackBar(),
       ),
       QuickAccessItem(
         icon: Icons.insert_chart_outlined_rounded,
+        iconColor: _currentCustomerType == CustomerType.nonPaid
+            ? Theme.of(context).colorScheme.onSecondary
+            : null,
         title: 'Insights',
-        onTap: () => Navigator.of(context).pushNamed(InsightScreen.routeName),
+        onTap: () => _currentCustomerType == CustomerType.paid
+            ? Navigator.of(context).pushNamed(InsightScreen.routeName)
+            : _showOnlyPaidSnackBar(),
       ),
       QuickAccessItem(
         icon: Icons.motorcycle_rounded,
@@ -434,7 +458,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
               ),
               child: Icon(
                 item.icon,
-                color: Theme.of(context).colorScheme.primary,
+                color: item.iconColor ?? Theme.of(context).colorScheme.primary,
               ),
             ),
             const SizedBox(height: 5),
@@ -801,30 +825,46 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
     );
   }
 
+  // This feature is only for paid Customer
+  void _showOnlyPaidSnackBar() {
+    _showSnackBar(
+        message: "This feature is only for paid customer!", isFor: _info);
+  }
+
   void _goToPage({String? routeName}) {
     routeName != null
         ? Navigator.of(context).pushNamed(routeName)
         : Navigator.of(context).pop();
   }
 
-  void _showSnackBar({required String message, required bool isSuccessful}) {
+  void _showSnackBar({
+    required String message,
+    String? isFor,
+  }) {
     Color background = Theme.of(context).colorScheme.surface;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: MySnackBar(
-          prefix: isSuccessful
+          prefix: isFor == _info
               ? Icon(
-                  Icons.check_circle_rounded,
+                  Icons.info_rounded,
                   color: background,
                 )
-              : Icon(
-                  Icons.cancel_rounded,
-                  color: background,
-                ),
+              : isFor == _success
+                  ? Icon(
+                      Icons.check_circle_rounded,
+                      color: background,
+                    )
+                  : Icon(
+                      Icons.cancel_rounded,
+                      color: background,
+                    ),
           message: message,
-          backgroundColor: isSuccessful
-              ? Theme.of(context).colorScheme.onError
-              : Theme.of(context).colorScheme.error,
+          backgroundColor: isFor == _info
+              ? Theme.of(context).colorScheme.outline
+              : isFor == _fail
+                  ? Theme.of(context).colorScheme.error
+                  : Theme.of(context).colorScheme.onError,
         ),
         backgroundColor: Colors.transparent,
         behavior: SnackBarBehavior.floating,
@@ -858,11 +898,16 @@ class FullScreenImageDialog extends StatelessWidget {
 
 class QuickAccessItem {
   final IconData icon;
+  final Color? iconColor;
   final String title;
   final VoidCallback onTap;
 
-  QuickAccessItem(
-      {required this.icon, required this.title, required this.onTap});
+  QuickAccessItem({
+    required this.icon,
+    this.iconColor,
+    required this.title,
+    required this.onTap,
+  });
 }
 
 class WeatherDetailItem {
