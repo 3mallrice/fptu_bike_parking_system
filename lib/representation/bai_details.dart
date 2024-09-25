@@ -1,3 +1,4 @@
+import 'package:bai_system/api/model/bai_model/login_model.dart';
 import 'package:bai_system/api/service/bai_be/bai_service.dart';
 import 'package:bai_system/component/dialog.dart';
 import 'package:bai_system/component/loading_component.dart';
@@ -20,6 +21,7 @@ import '../component/app_bar_component.dart';
 import '../component/image_not_found_component.dart';
 import '../component/internet_connection_wrapper.dart';
 import '../core/const/frontend/message.dart';
+import '../core/helper/local_storage_helper.dart';
 import 'login.dart';
 
 class BaiDetails extends StatefulWidget {
@@ -39,6 +41,9 @@ class BaiDetails extends StatefulWidget {
 }
 
 class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
+  late final _currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
+  late final _currentCustomerType = LocalStorageHelper.getValue(
+      LocalStorageKey.currentCustomerType, _currentEmail);
   late String baiId = widget.baiId;
 
   late BaiModel bai = BaiModel(
@@ -156,7 +161,9 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
                         ),
                         child: CachedNetworkImage(
                           width: double.infinity,
-                          imageUrl: bai.plateImage,
+                          imageUrl: _currentCustomerType == CustomerType.paid
+                              ? bai.plateImage
+                              : 'https://img.freepik.com/premium-photo/guinea-pig-riding-toy-train-cartoon-style_714091-95319.jpg?w=900',
                           fit: BoxFit.fill,
                           placeholder: (context, url) => Shimmer.fromColors(
                             baseColor: Theme.of(context).colorScheme.background,
@@ -259,36 +266,16 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
                                 ),
                               ),
                             const SizedBox(height: 10),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    deleteBaiDialog();
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSecondary,
-                                      borderRadius: BorderRadius.circular(14),
-                                    ),
-                                    child: Icon(
-                                      Icons.delete,
-                                      color:
-                                          Theme.of(context).colorScheme.surface,
-                                    ),
-                                  ),
-                                ),
-                                Visibility(
-                                  visible: bai.status == 'PENDING' ||
-                                      bai.status == 'REJECTED',
-                                  child: GestureDetector(
-                                    onTap: _showEditDialog,
+                            if (_currentCustomerType == CustomerType.paid)
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      deleteBaiDialog();
+                                    },
                                     child: Container(
                                       padding: const EdgeInsets.all(10),
-                                      margin: const EdgeInsets.only(left: 10),
                                       decoration: BoxDecoration(
                                         color: Theme.of(context)
                                             .colorScheme
@@ -296,16 +283,39 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
                                         borderRadius: BorderRadius.circular(14),
                                       ),
                                       child: Icon(
-                                        Icons.edit,
+                                        Icons.delete,
                                         color: Theme.of(context)
                                             .colorScheme
                                             .surface,
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
+                                  Visibility(
+                                    visible: bai.status == 'PENDING' ||
+                                        bai.status == 'REJECTED',
+                                    child: GestureDetector(
+                                      onTap: _showEditDialog,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(10),
+                                        margin: const EdgeInsets.only(left: 10),
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSecondary,
+                                          borderRadius:
+                                              BorderRadius.circular(14),
+                                        ),
+                                        child: Icon(
+                                          Icons.edit,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .surface,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                           ],
                         ),
                       ),

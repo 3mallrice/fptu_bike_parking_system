@@ -27,18 +27,20 @@ class _AboutUsState extends State<AboutUs> {
           automaticallyImplyLeading: true,
           title: 'About Bai',
         ),
-        body: SingleChildScrollView(
-          child: Container(
-            alignment: Alignment.center,
-            height: MediaQuery.of(context).size.height * 0.9,
-            color: Theme.of(context).colorScheme.outlineVariant,
-            child: Column(
-              children: [
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                _buildInfoSection(context),
-                _buildLinksSection(context),
-                _buildFooterSection(context),
-              ],
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Container(
+              alignment: Alignment.center,
+              height: MediaQuery.of(context).size.height * 0.9,
+              color: Theme.of(context).colorScheme.outlineVariant,
+              child: Column(
+                children: [
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                  _buildInfoSection(context),
+                  _buildLinksSection(context),
+                  _buildFooterSection(context),
+                ],
+              ),
             ),
           ),
         ),
