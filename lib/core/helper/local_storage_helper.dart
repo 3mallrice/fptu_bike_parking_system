@@ -98,6 +98,7 @@ class LocalStorageKey {
   static const String pageSize = 'pageSize';
   static const String storageKey = 'notifications';
   static const String currentUserEmailKey = 'currentUserEmail';
+  static const String currentCustomerType = 'currentCustomerType';
 }
 
 class GetLocalHelper {
@@ -119,6 +120,11 @@ class GetLocalHelper {
   static bool getHideBalance(String email) =>
       LocalStorageHelper.getValue(LocalStorageKey.isHiddenBalance, email) ??
       false;
+
+  static String? getCurrentCustomerType(String email) {
+    UserData? userData = getUserData(email);
+    return userData?.customerType;
+  }
 }
 
 class SetLocalHelper {
@@ -138,5 +144,11 @@ class SetLocalHelper {
   static Future<void> setHideBalance(String email, bool isHidden) async {
     await LocalStorageHelper.setValue(
         LocalStorageKey.isHiddenBalance, isHidden, email);
+  }
+
+  static Future<void> setCurrentCustomerType(
+      String email, String customerType) async {
+    await LocalStorageHelper.setValue(
+        LocalStorageKey.isHiddenBalance, customerType, email);
   }
 }

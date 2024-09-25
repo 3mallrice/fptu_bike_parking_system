@@ -39,6 +39,11 @@ class CallAuthApi {
 
           await LocalStorageHelper.setValue(
               LocalStorageKey.userData, apiResponseJson['data'], currentEmail);
+
+          await LocalStorageHelper.setValue(LocalStorageKey.currentCustomerType,
+              apiResponse.data?.customerType, currentEmail);
+          log.d('Current customer type: ${apiResponse.data?.customerType}');
+
           log.i('Login success');
         } else {
           log.e('Login failed. ${apiResponse.message}');
