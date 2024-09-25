@@ -485,6 +485,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
                           content: Text(
                             'Please enable location service to get weather information. After enabling, please refresh the page.',
                             style: Theme.of(context).textTheme.bodyMedium,
+                            textAlign: TextAlign.justify,
                           ),
                           positiveLabel: 'Open settings',
                           onConfirm: () {
@@ -741,7 +742,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
           ),
           Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(11),
+              borderRadius: BorderRadius.circular(5),
             ),
             child: const Image(
               image: AssetImage(AssetHelper.poster),

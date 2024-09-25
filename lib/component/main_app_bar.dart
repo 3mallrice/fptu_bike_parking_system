@@ -1,7 +1,7 @@
 import 'package:bai_system/api/model/bai_model/login_model.dart';
 import 'package:bai_system/core/helper/local_storage_helper.dart';
-import 'package:bai_system/representation/navigation_bar.dart';
 import 'package:bai_system/representation/notification_screen.dart';
+import 'package:bai_system/representation/settings&profile.dart';
 import 'package:bai_system/representation/support.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -36,10 +36,8 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        Navigator.of(context).pushNamed(
-                          MyNavigationBar.routeName,
-                          arguments: 3, //me screen
-                        );
+                        Navigator.of(context)
+                            .pushNamed(SettingAndProfileScreen.routeName);
                       },
                       child: CircleAvatar(
                         radius: 20,

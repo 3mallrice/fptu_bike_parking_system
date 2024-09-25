@@ -9,7 +9,7 @@ import zpdk
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     // Khởi tạo ZaloPay SDK
-    ZaloPaySDK.sharedInstance()?.initWithAppId(2553, uriScheme: "demozpdk://app", environment: .sandbox) // NOTE: Nếu muốn sử dụng môi trường production, hãy thay thế .sandbox bằng .production
+    ZaloPaySDK.sharedInstance()?.initWithAppId(2554, uriScheme: "demozpdk://app", environment: .sandbox) // NOTE: Nếu muốn sử dụng môi trường production, hãy thay thế .sandbox bằng .production
 
     GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)

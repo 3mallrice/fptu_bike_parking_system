@@ -90,12 +90,13 @@
                <string>com.flutterzalopay.flutterZaloSdkExample</string>
                <key>CFBundleURLSchemes</key>
                <array>
-                   <string>zp-redirect-2553</string>
+                   <string>zp-redirect-2554</string>
                </array>
            </dict>
        </array>
        <key>NSPhotoLibraryAddUsageDescription</key>
        <string>Editor</string>
+
        <key>LSApplicationQueriesSchemes</key>
        <array>
            <string>zalo</string>
@@ -106,6 +107,7 @@
        <array>
            <string>sms</string>
            <string>tel</string>
+           <string>mailto</string>
        </array>
    </dict>
 </plist>

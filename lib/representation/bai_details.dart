@@ -1,5 +1,6 @@
 import 'package:bai_system/api/service/bai_be/bai_service.dart';
 import 'package:bai_system/component/dialog.dart';
+import 'package:bai_system/component/loading_component.dart';
 import 'package:bai_system/component/response_handler.dart';
 import 'package:bai_system/component/shadow_container.dart';
 import 'package:bai_system/component/snackbar.dart';
@@ -40,7 +41,16 @@ class BaiDetails extends StatefulWidget {
 class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
   late String baiId = widget.baiId;
 
-  late BaiModel bai;
+  late BaiModel bai = BaiModel(
+    id: '',
+    plateNumber: '',
+    vehicleType: '',
+    status: 'ACTIVE',
+    createDate: DateTime.now(),
+    plateImage:
+        'https://fuparking.khangbpa.com/_next/static/media/Bai_Logo.06963b4e.svg',
+  );
+
   final callVehicleApi = CallBikeApi();
 
   final plateNumberController = TextEditingController();
@@ -53,6 +63,8 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
   late TextStyle titleTextStyle;
   late TextStyle contentTextStyle;
   late Color color;
+
+  bool isLoaded = false;
 
   @override
   void initState() {
@@ -77,6 +89,12 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
 
     if (errors.isNotEmpty) {
       _showErrorDialog(errors.map((e) => '\u2022 $e').join('\n'));
+    }
+
+    if (mounted) {
+      setState(() {
+        isLoaded = true;
+      });
     }
   }
 
@@ -124,166 +142,177 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
           title: 'Bai Details',
           automaticallyImplyLeading: true,
         ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Column(
-              children: [
-                ConstrainedBox(
-                  constraints: const BoxConstraints(
-                    maxHeight: 300,
-                    minHeight: 200,
-                  ),
-                  child: CachedNetworkImage(
-                    width: double.infinity,
-                    imageUrl: bai.plateImage,
-                    fit: BoxFit.fill,
-                    placeholder: (context, url) => Shimmer.fromColors(
-                      baseColor: Theme.of(context).colorScheme.background,
-                      highlightColor:
-                          Theme.of(context).colorScheme.outlineVariant,
-                      child: Container(color: Colors.grey),
-                    ),
-                    errorWidget: (context, url, error) => const ImageNotFound(),
-                  ),
-                ),
-                const SizedBox(height: 30),
-                ShadowContainer(
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  padding: const EdgeInsets.all(20),
+        body: !isLoaded
+            ? const LoadingCircle()
+            : SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        UltilHelper.formatPlateNumber(bai.plateNumber),
-                        style: titleTextStyle,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Created at:',
-                            style: contentTextStyle,
-                            textAlign: TextAlign.center,
-                          ),
-                          Text(
-                            UltilHelper.formatDateMMMddyyyy(bai.createDate),
-                            style: contentTextStyle,
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 5),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Vehicle type:',
-                            style: contentTextStyle,
-                            textAlign: TextAlign.center,
-                          ),
-                          Text(
-                            bai.vehicleType,
-                            style: contentTextStyle,
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 5),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Status:',
-                            style: contentTextStyle,
-                            textAlign: TextAlign.center,
-                          ),
-                          Text(
-                            bai.status,
-                            style: contentTextStyle.copyWith(
-                                color: color, fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 5),
-                      if (bai.status == 'REJECTED')
-                        SizedBox(
-                          child: Text(
-                            'Wrong information. Please check again.',
-                            style: contentTextStyle.copyWith(
-                              color: Theme.of(context).colorScheme.error,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 2,
-                            textAlign: TextAlign.justify,
-                          ),
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(
+                          maxHeight: 300,
+                          minHeight: 200,
                         ),
-                      if (bai.status == 'PENDING')
-                        SizedBox(
-                          child: Text(
-                            'Please park your vehicle in our facility for the first time to activate it.',
-                            style: contentTextStyle.copyWith(
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 2,
-                            textAlign: TextAlign.justify,
+                        child: CachedNetworkImage(
+                          width: double.infinity,
+                          imageUrl: bai.plateImage,
+                          fit: BoxFit.fill,
+                          placeholder: (context, url) => Shimmer.fromColors(
+                            baseColor: Theme.of(context).colorScheme.background,
+                            highlightColor:
+                                Theme.of(context).colorScheme.outlineVariant,
+                            child: Container(color: Colors.grey),
                           ),
+                          errorWidget: (context, url, error) =>
+                              const ImageNotFound(),
                         ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              deleteBaiDialog();
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color:
-                                    Theme.of(context).colorScheme.onSecondary,
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                              child: Icon(
-                                Icons.delete,
-                                color: Theme.of(context).colorScheme.surface,
-                              ),
+                      ),
+                      const SizedBox(height: 30),
+                      ShadowContainer(
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              UltilHelper.formatPlateNumber(bai.plateNumber),
+                              style: titleTextStyle,
+                              textAlign: TextAlign.center,
                             ),
-                          ),
-                          Visibility(
-                            visible: bai.status == 'PENDING' ||
-                                bai.status == 'REJECTED',
-                            child: GestureDetector(
-                              onTap: _showEditDialog,
-                              child: Container(
-                                padding: const EdgeInsets.all(10),
-                                margin: const EdgeInsets.only(left: 10),
-                                decoration: BoxDecoration(
-                                  color:
-                                      Theme.of(context).colorScheme.onSecondary,
-                                  borderRadius: BorderRadius.circular(14),
+                            const SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Created at:',
+                                  style: contentTextStyle,
+                                  textAlign: TextAlign.center,
                                 ),
-                                child: Icon(
-                                  Icons.edit,
-                                  color: Theme.of(context).colorScheme.surface,
+                                Text(
+                                  UltilHelper.formatDateMMMddyyyy(
+                                      bai.createDate),
+                                  style: contentTextStyle,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 5),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Vehicle type:',
+                                  style: contentTextStyle,
+                                  textAlign: TextAlign.center,
+                                ),
+                                Text(
+                                  bai.vehicleType,
+                                  style: contentTextStyle,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 5),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Status:',
+                                  style: contentTextStyle,
+                                  textAlign: TextAlign.center,
+                                ),
+                                Text(
+                                  bai.status,
+                                  style: contentTextStyle.copyWith(
+                                      color: color,
+                                      fontWeight: FontWeight.bold),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 5),
+                            if (bai.status == 'REJECTED')
+                              SizedBox(
+                                child: Text(
+                                  'Wrong information. Please check again.',
+                                  style: contentTextStyle.copyWith(
+                                    color: Theme.of(context).colorScheme.error,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                  textAlign: TextAlign.justify,
                                 ),
                               ),
+                            if (bai.status == 'PENDING')
+                              SizedBox(
+                                child: Text(
+                                  'To activate your registration, please park your vehicle at our facility for the first time.',
+                                  style: contentTextStyle.copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                  textAlign: TextAlign.justify,
+                                ),
+                              ),
+                            const SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    deleteBaiDialog();
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSecondary,
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                    child: Icon(
+                                      Icons.delete,
+                                      color:
+                                          Theme.of(context).colorScheme.surface,
+                                    ),
+                                  ),
+                                ),
+                                Visibility(
+                                  visible: bai.status == 'PENDING' ||
+                                      bai.status == 'REJECTED',
+                                  child: GestureDetector(
+                                    onTap: _showEditDialog,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(10),
+                                      margin: const EdgeInsets.only(left: 10),
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondary,
+                                        borderRadius: BorderRadius.circular(14),
+                                      ),
+                                      child: Icon(
+                                        Icons.edit,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .surface,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ],
-            ),
-          ),
-        ),
+              ),
       ),
     );
   }

@@ -6,7 +6,6 @@ import 'package:bai_system/component/my_radio_button.dart';
 import 'package:bai_system/component/response_handler.dart';
 import 'package:bai_system/component/shadow_container.dart';
 import 'package:bai_system/core/const/frontend/message.dart';
-import 'package:bai_system/representation/receipt.dart';
 import 'package:bai_system/representation/wallet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -366,7 +365,7 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
     showSnackBar(payResult, type: type);
     if (type == 1) {
       if (!mounted) return;
-      Navigator.of(context).pushReplacementNamed(ReceiptScreen.routeName);
+      Navigator.of(context).pushReplacementNamed(WalletScreen.routeName);
     }
   }
 

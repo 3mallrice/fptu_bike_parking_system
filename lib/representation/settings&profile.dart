@@ -9,16 +9,17 @@ import '../core/helper/google_auth.dart';
 import '../core/helper/local_storage_helper.dart';
 import 'login.dart';
 
-class SettingScreen extends StatefulWidget {
-  const SettingScreen({super.key});
+class SettingAndProfileScreen extends StatefulWidget {
+  const SettingAndProfileScreen({super.key});
 
   static const String routeName = '/setting_screen';
 
   @override
-  State<SettingScreen> createState() => _SettingScreenState();
+  State<SettingAndProfileScreen> createState() =>
+      _SettingAndProfileScreenState();
 }
 
-class _SettingScreenState extends State<SettingScreen> {
+class _SettingAndProfileScreenState extends State<SettingAndProfileScreen> {
   bool _hideBalance = false;
   late int _pageSize = 10;
   late final _currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? '';

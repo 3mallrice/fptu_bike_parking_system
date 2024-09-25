@@ -9,6 +9,7 @@ import '../api/model/bai_model/wallet_model.dart';
 
 class ReceiptScreen extends StatefulWidget {
   final WalletModel transaction;
+
   const ReceiptScreen({
     super.key,
     required this.transaction,
@@ -112,8 +113,8 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                           decoration: BoxDecoration(
                             color: statusColor,
                             borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(10),
-                              topRight: Radius.circular(10),
+                              topLeft: Radius.circular(5),
+                              topRight: Radius.circular(5),
                             ),
                           ),
                           padding: const EdgeInsets.all(6),

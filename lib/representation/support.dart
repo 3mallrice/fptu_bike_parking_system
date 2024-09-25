@@ -83,7 +83,7 @@ class SupportScreen extends StatelessWidget {
                   context,
                   Icon(Icons.phone,
                       color: Theme.of(context).colorScheme.outline),
-                  'Hotline in Vietnam',
+                  'Hotline',
                   '028.73005585',
                   () => _launchUrl(Uri.parse('tel:028.73005585')),
                 ),
