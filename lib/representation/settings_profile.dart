@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
 import '../api/model/bai_model/login_model.dart';
+import '../api/service/bai_be/auth_service.dart';
 import '../component/app_bar_component.dart';
 import '../component/internet_connection_wrapper.dart';
-import '../core/helper/google_auth.dart';
 import '../core/helper/local_storage_helper.dart';
 import 'login.dart';
 
@@ -46,9 +46,7 @@ class _SettingAndProfileScreenState extends State<SettingAndProfileScreen> {
 
   //log out
   Future<void> _logout() async {
-    await LocalStorageHelper.clearCurrentUser();
-    await GoogleAuthApi.signOut();
-    log.i('Logout success: ${LocalStorageKey.userData}');
+    await CallAuthApi().logout();
 
     if (!mounted) return;
     Navigator.pushNamedAndRemoveUntil(

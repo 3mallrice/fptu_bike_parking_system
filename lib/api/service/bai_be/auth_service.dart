@@ -6,6 +6,7 @@ import 'package:bai_system/core/const/frontend/message.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
+import '../../../core/helper/google_auth.dart';
 import '../../../core/helper/local_storage_helper.dart';
 import '../../model/bai_model/api_response.dart';
 import '../../model/bai_model/login_model.dart';
@@ -58,5 +59,12 @@ class CallAuthApi {
         message: ErrorMessage.somethingWentWrong,
       );
     }
+  }
+
+  //log out
+  Future<void> logout() async {
+    await LocalStorageHelper.clearCurrentUser();
+    await GoogleAuthApi.signOut();
+    log.i('Logout success: ${LocalStorageKey.userData}');
   }
 }

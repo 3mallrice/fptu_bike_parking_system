@@ -3,12 +3,14 @@ class UserData {
   String name;
   String email;
   String avatar;
+  String customerType;
 
   UserData({
     required this.bearerToken,
     required this.name,
     required this.email,
     required this.avatar,
+    required this.customerType,
   });
 
   factory UserData.fromJson(Map<String, dynamic> json) {
@@ -17,6 +19,7 @@ class UserData {
       name: json['name'],
       email: json['email'],
       avatar: json['avatar'],
+      customerType: json['customerType'],
     );
   }
 
@@ -26,11 +29,15 @@ class UserData {
       'name': name,
       'email': email,
       'avatar': avatar,
+      'customerType': customerType,
     };
   }
 
   @override
   String toString() {
-    return 'UserData {bearerToken: $bearerToken, name: $name, email: $email, avartar: $avatar}';
+    return 'UserData {bearerToken: $bearerToken, name: $name, email: $email, avatar: $avatar, customerType: $customerType}';
   }
 }
+
+// ignore: constant_identifier_names
+enum CustomerType { PAID, NONPAID }

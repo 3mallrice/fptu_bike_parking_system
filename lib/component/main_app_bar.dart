@@ -1,7 +1,7 @@
 import 'package:bai_system/api/model/bai_model/login_model.dart';
 import 'package:bai_system/core/helper/local_storage_helper.dart';
 import 'package:bai_system/representation/notification_screen.dart';
-import 'package:bai_system/representation/settings&profile.dart';
+import 'package:bai_system/representation/settings_profile.dart';
 import 'package:bai_system/representation/support.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';

@@ -14,8 +14,6 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  late final _currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? '';
-
   @override
   void initState() {
     super.initState();
@@ -34,15 +32,13 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void redirectIntro() async {
-    final ignoreIntroScreen = await LocalStorageHelper.getValue(
-        LocalStorageKey.ignoreIntroScreen, _currentEmail) as bool?;
+    final ignoreIntroScreen = LocalStorageHelper.getIgnoreIntroScreen();
     await Future.delayed(const Duration(milliseconds: 2000));
 
     if (ignoreIntroScreen != null && ignoreIntroScreen) {
       redirectTo(LoginScreen.routeName);
     } else {
-      LocalStorageHelper.setValue(
-          LocalStorageKey.ignoreIntroScreen, true, _currentEmail);
+      await LocalStorageHelper.setIgnoreIntroScreen();
       redirectTo(IntroScreen.routeName);
     }
   }

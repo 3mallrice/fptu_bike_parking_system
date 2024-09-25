@@ -55,6 +55,20 @@ class LocalStorageHelper {
     return fcmToken;
   }
 
+  // get ignore intro screen from local storage
+  static bool? getIgnoreIntroScreen() {
+    bool? ignoreIntroScreen =
+        _shared.hiveBox?.get(LocalStorageKey.ignoreIntroScreen);
+    _shared.log.i('Get ignore intro screen: $ignoreIntroScreen');
+    return ignoreIntroScreen;
+  }
+
+  // save ignore intro screen to local storage
+  static Future<void> setIgnoreIntroScreen() async {
+    await _shared.hiveBox?.put(LocalStorageKey.ignoreIntroScreen, true);
+    _shared.log.i('Set ignore intro screen');
+  }
+
   // save current email to local storage
   static Future<void> setCurrentUserEmail(String email) async {
     await _shared.hiveBox?.put(LocalStorageKey.currentUserEmailKey, email);
