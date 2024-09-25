@@ -5,7 +5,7 @@ import 'package:bai_system/representation/about_screen.dart';
 import 'package:bai_system/representation/cashless_hero.dart';
 import 'package:bai_system/representation/faq.dart';
 import 'package:bai_system/representation/feedback.dart';
-import 'package:bai_system/representation/settings&profile.dart';
+import 'package:bai_system/representation/settings_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 

@@ -18,7 +18,7 @@ import 'package:bai_system/representation/no_connection_screen.dart';
 import 'package:bai_system/representation/notification_screen.dart';
 import 'package:bai_system/representation/payment.dart';
 import 'package:bai_system/representation/receipt.dart';
-import 'package:bai_system/representation/settings&profile.dart';
+import 'package:bai_system/representation/settings_profile.dart';
 import 'package:bai_system/representation/splash_screen.dart';
 import 'package:bai_system/representation/support.dart';
 import 'package:bai_system/representation/update_profile.dart';

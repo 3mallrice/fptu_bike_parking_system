@@ -36,7 +36,7 @@ class PaymentScreen extends StatefulWidget {
 }
 
 class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
-  int selectedPaymentOption = 0;
+  int selectedPaymentOption = 1;
   late final CoinPackage _package = widget.package;
   final log = Logger();
   final CallPaymentApi paymentApi = CallPaymentApi();
