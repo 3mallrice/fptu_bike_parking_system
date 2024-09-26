@@ -17,14 +17,6 @@ class CallWalletApi {
   String token = "";
   var log = Logger();
 
-  // Cache for main wallet balance
-  static int? _mainWalletBalanceCache;
-  static DateTime? _mainWalletBalanceCacheTime;
-
-  // Cache for extra wallet balance
-  static ExtraBalanceModel? _extraWalletBalanceCache;
-  static DateTime? _extraWalletBalanceCacheTime;
-
   // Cache 5p
   static const Duration cacheDuration = Duration(minutes: 5);
 
@@ -140,18 +132,6 @@ class CallWalletApi {
   // Get balance of user's main wallet
   Future<APIResponse<int>> getMainWalletBalance() async {
     try {
-      // Check cache
-      if (_mainWalletBalanceCache != null &&
-          _mainWalletBalanceCacheTime != null &&
-          DateTime.now().difference(_mainWalletBalanceCacheTime!) <
-              cacheDuration) {
-        // Trả về dữ liệu từ cache
-        return APIResponse<int>(
-          data: _mainWalletBalanceCache,
-          message: 'Data from cache',
-        );
-      }
-
       String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
       token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
 
@@ -177,10 +157,6 @@ class CallWalletApi {
           responseJson,
           (json) => int.parse(json.toString()),
         );
-
-        // Save vào cache
-        _mainWalletBalanceCache = apiResponse.data;
-        _mainWalletBalanceCacheTime = DateTime.now();
 
         return apiResponse;
       } else if (response.statusCode == 401) {
@@ -209,18 +185,6 @@ class CallWalletApi {
   // Get balance of user's extra wallet
   Future<APIResponse<ExtraBalanceModel>> getExtraWalletBalance() async {
     try {
-      // Check cache
-      if (_extraWalletBalanceCache != null &&
-          _extraWalletBalanceCacheTime != null &&
-          DateTime.now().difference(_extraWalletBalanceCacheTime!) <
-              cacheDuration) {
-        // Trả về dữ liệu từ cache
-        return APIResponse<ExtraBalanceModel>(
-          data: _extraWalletBalanceCache,
-          message: 'Data from cache',
-        );
-      }
-
       String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
       token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
 
@@ -246,10 +210,6 @@ class CallWalletApi {
           responseJson,
           (json) => ExtraBalanceModel.fromJson(json as Map<String, dynamic>),
         );
-
-        // Save vào cache
-        _extraWalletBalanceCache = apiResponse.data;
-        _extraWalletBalanceCacheTime = DateTime.now();
 
         return apiResponse;
       } else if (response.statusCode == 401) {
