@@ -69,6 +69,7 @@ class _WalletScreenState extends State<WalletScreen>
   int mainPageIndex = 1;
   int extraPageIndex = 1;
   late int _pageSize = 10;
+  String _errorMessage = '';
 
   final RefreshController _mainRefreshController =
       RefreshController(initialRefresh: false);
@@ -409,10 +410,6 @@ class _WalletScreenState extends State<WalletScreen>
               tabAlignment: TabAlignment.fill,
               automaticIndicatorColorAdjustment: true,
               splashFactory: InkSparkle.constantTurbulenceSeedSplashFactory,
-              splashBorderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
               tabs: const [
                 Tab(text: 'Main Wallet'),
                 Tab(text: 'Extra Wallet'),
@@ -511,7 +508,7 @@ class _WalletScreenState extends State<WalletScreen>
                         ),
                         if (!isMain && expiredDate != null)
                           Text(
-                            '${UltilHelper.formatMoney(extraBalance)} bic will expire on ${UltilHelper.formatDate(expiredDate!)}',
+                            '${UltilHelper.formatMoney(extraBalance)} bic will expire on ${UltilHelper.formatDate(expiredDate!, showTime: false)}',
                             style: Theme.of(context)
                                 .textTheme
                                 .bodySmall!
@@ -652,34 +649,65 @@ class _WalletScreenState extends State<WalletScreen>
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return ConfirmDialog(
-          title: 'Filter by period',
-          content: DatePicker(
-            fromDate:
-                tempFrom ?? DateTime.now().subtract(const Duration(days: 7)),
-            toDate: tempTo ?? DateTime.now(),
-            onDateSelected: (startDate, endDate) {
-              tempFrom = startDate;
-              tempTo = endDate;
-            },
-          ),
-          onConfirm: () {
-            setState(() {
-              if (isMain) {
-                from = tempFrom;
-                to = tempTo;
-                isMainFiltered = true;
-              } else {
-                extraFrom = tempFrom;
-                extraTo = tempTo;
-                isExtraFiltered = true;
-              }
-            });
-            Navigator.of(context).pop();
-            isMain ? _onMainRefresh() : _onExtraRefresh();
-          },
-          onCancel: () {
-            Navigator.of(context).pop();
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return ConfirmDialog(
+              title: 'Filter by period',
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  DatePicker(
+                    fromDate: tempFrom ??
+                        DateTime.now().subtract(const Duration(days: 7)),
+                    toDate: tempTo ?? DateTime.now(),
+                    onDateSelected: (startDate, endDate) {
+                      setState(() {
+                        // Ensure _errorMessage is updated within StatefulBuilder's setState
+                        if (startDate.isAfter(endDate)) {
+                          _errorMessage = 'From date cannot be after to date!';
+                        } else {
+                          _errorMessage = '';
+                          tempFrom = startDate;
+                          tempTo = endDate;
+                        }
+                      });
+                    },
+                  ),
+                  Visibility(
+                    visible: _errorMessage.isNotEmpty,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5),
+                      child: Text(
+                        _errorMessage,
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              onConfirm: () {
+                if (_errorMessage.isEmpty) {
+                  setState(() {
+                    if (isMain) {
+                      from = tempFrom;
+                      to = tempTo;
+                      isMainFiltered = true;
+                    } else {
+                      extraFrom = tempFrom;
+                      extraTo = tempTo;
+                      isExtraFiltered = true;
+                    }
+                  });
+                  Navigator.of(context).pop();
+                  isMain ? _onMainRefresh() : _onExtraRefresh();
+                }
+              },
+              onCancel: () {
+                Navigator.of(context).pop();
+              },
+            );
           },
         );
       },

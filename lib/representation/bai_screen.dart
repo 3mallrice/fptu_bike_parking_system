@@ -106,8 +106,9 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
   Widget _buildTotalBikeContainer(BuildContext context) {
     return ShadowContainer(
       width: MediaQuery.of(context).size.width * 0.9,
-      height: MediaQuery.of(context).size.height * 0.1,
+      height: 100,
       padding: const EdgeInsets.all(0),
+      margin: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
         children: [
           Expanded(
@@ -132,7 +133,7 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
             Expanded(
               flex: 1,
               child: Container(
-                height: double.infinity,
+                height: 100,
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.primary,
                   borderRadius: const BorderRadius.only(
