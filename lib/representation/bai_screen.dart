@@ -323,8 +323,8 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
 
   Color _getStatusColor(String status, BuildContext context) {
     return switch (status) {
-      'ACTIVE' => Theme.of(context).colorScheme.onError,
-      'PENDING' => Theme.of(context).colorScheme.primary,
+      'ACTIVE' => Theme.of(context).colorScheme.primary,
+      'PENDING' => Theme.of(context).colorScheme.onError,
       'REJECTED' => Theme.of(context).colorScheme.error,
       _ => Theme.of(context).colorScheme.outline,
     };
