@@ -11,6 +11,7 @@ import '../api/model/bai_model/feedback_model.dart';
 import '../api/model/bai_model/history_model.dart';
 import '../api/service/bai_be/feedback_service.dart';
 import '../api/service/bai_be/history_service.dart';
+import '../component/date_picker.dart';
 import '../component/dialog.dart';
 import '../component/empty_box.dart';
 import '../component/loading_component.dart';
@@ -44,9 +45,15 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
   bool _hasNextPage = true;
   bool _isLoadMoreRunning = false;
 
+  DateTime? from;
+  DateTime? to;
+  bool isFilted = false;
+
   var log = Logger();
   CallHistoryAPI callHistoryAPI = CallHistoryAPI();
   bool isLoading = false;
+
+  String _errorMessage = '';
 
   List<HistoryModel> histories = [];
 
@@ -64,7 +71,8 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
     return errorMessage;
   }
 
-  Future<void> getCustomerHistories({bool isRefresh = false}) async {
+  Future<void> getCustomerHistories(
+      {bool isRefresh = false, DateTime? startDate, DateTime? endDate}) async {
     setState(() {
       isLoading = true;
     });
@@ -75,7 +83,8 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
 
     try {
       final APIResponse<List<HistoryModel>> result =
-          await callHistoryAPI.getCustomerHistories(_pageSize, pageIndex);
+          await callHistoryAPI.getCustomerHistories(_pageSize, pageIndex,
+              startDate: startDate, endDate: endDate);
 
       if (!mounted) return;
 
@@ -511,11 +520,10 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
 
   Widget _buildTotalHistoryContainer(BuildContext context) {
     return ShadowContainer(
-      margin: EdgeInsets.symmetric(
-          vertical: MediaQuery.of(context).size.height * 0.01),
       width: MediaQuery.of(context).size.width * 0.9,
-      height: MediaQuery.of(context).size.height * 0.1,
+      height: 100,
       padding: const EdgeInsets.all(0),
+      margin: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
         children: [
           Expanded(
@@ -536,9 +544,121 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
               ],
             ),
           ),
+          Expanded(
+            flex: 1,
+            child: Container(
+              height: 100,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
+                borderRadius: const BorderRadius.only(
+                  topRight: Radius.circular(5),
+                  bottomRight: Radius.circular(5),
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  IconButton(
+                    onPressed: () => _showFilterDialog(),
+                    icon: const Icon(
+                      Icons.filter_alt_outlined,
+                      color: Colors.white,
+                      size: 35,
+                    ),
+                  ),
+                  Visibility(
+                    visible: isFilted,
+                    child: GestureDetector(
+                      onTap: () => _clearFilter(),
+                      child: Text(
+                        'Clear',
+                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                              color: Theme.of(context).colorScheme.surface,
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          )
         ],
       ),
     );
+  }
+
+  void _showFilterDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ConfirmDialog(
+          title: 'Filter by period',
+          content: StatefulBuilder(
+            builder: (context, setState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  DatePicker(
+                    fromDate: from ??
+                        DateTime.now().subtract(const Duration(days: 7)),
+                    toDate: to ?? DateTime.now(),
+                    onDateSelected: (startDate, endDate) {
+                      setState(() {
+                        if (startDate.isAfter(endDate)) {
+                          _errorMessage = 'From date cannot be after to date!';
+                        } else {
+                          _errorMessage = '';
+                          from = startDate;
+                          to = endDate;
+                        }
+                      });
+                    },
+                  ),
+                  Visibility(
+                    visible: _errorMessage.isNotEmpty,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5),
+                      child: Text(
+                        _errorMessage,
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+          onConfirm: () {
+            if (_errorMessage.isEmpty) {
+              Navigator.of(context).pop();
+              setState(() {
+                isFilted = true;
+              });
+
+              getCustomerHistories(
+                  isRefresh: true, startDate: from, endDate: to);
+            }
+          },
+          onCancel: () {
+            Navigator.of(context).pop();
+          },
+        );
+      },
+    );
+  }
+
+  void _clearFilter() {
+    setState(() {
+      from = null;
+      to = null;
+      isFilted = !isFilted;
+    });
+    getCustomerHistories(isRefresh: true);
   }
 
   //dialog add feedback

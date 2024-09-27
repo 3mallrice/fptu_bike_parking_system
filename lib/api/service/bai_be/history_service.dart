@@ -20,7 +20,8 @@ class CallHistoryAPI {
   // GET: /api/session/history
   // Get all user's history
   Future<APIResponse<List<HistoryModel>>> getCustomerHistories(
-      int pageSize, int pageIndex) async {
+      int pageSize, int pageIndex,
+      {DateTime? startDate, DateTime? endDate}) async {
     try {
       String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
       token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
@@ -34,12 +35,16 @@ class CallHistoryAPI {
       }
 
       final response = await http.get(
-        Uri.parse('$api/history?PageIndex=$pageIndex&PageSize=$pageSize'),
+        Uri.parse(
+            '$api/history?PageIndex=$pageIndex&PageSize=$pageSize&StartDate=${startDate ?? ''}&EndDate=${endDate ?? ''}'),
         headers: {
           'Authorization': token,
           'Content-Type': 'application/json',
         },
       );
+
+      log.d(response.request?.url.toString());
+
       if (response.statusCode == 200) {
         final responseJson = jsonDecode(response.body);
 

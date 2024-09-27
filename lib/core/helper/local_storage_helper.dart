@@ -51,7 +51,7 @@ class LocalStorageHelper {
 
   static String? getFCMTokenValue() {
     String? fcmToken = _shared.hiveBox?.get(LocalStorageKey.fcmToken);
-    _shared.log.i('Get FCM token: $fcmToken');
+    _shared.log.i('FCM token: $fcmToken');
     return fcmToken;
   }
 

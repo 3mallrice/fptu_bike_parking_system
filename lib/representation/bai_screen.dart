@@ -106,8 +106,9 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
   Widget _buildTotalBikeContainer(BuildContext context) {
     return ShadowContainer(
       width: MediaQuery.of(context).size.width * 0.9,
-      height: MediaQuery.of(context).size.height * 0.1,
+      height: 100,
       padding: const EdgeInsets.all(0),
+      margin: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
         children: [
           Expanded(
@@ -132,7 +133,7 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
             Expanded(
               flex: 1,
               child: Container(
-                height: double.infinity,
+                height: 100,
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.primary,
                   borderRadius: const BorderRadius.only(
@@ -275,36 +276,20 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
                       ],
                     ),
                   ),
-                  if (bai.status == 'REJECTED')
-                    Container(
-                      alignment: Alignment.centerLeft,
-                      padding: const EdgeInsets.only(
-                          left: 20, right: 20, bottom: 10),
-                      child: Text(
-                        'Wrong information. Please check again.',
-                        style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                              color: Theme.of(context).colorScheme.error,
-                            ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
-                        textAlign: TextAlign.justify,
-                      ),
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    padding:
+                        const EdgeInsets.only(left: 20, right: 20, bottom: 10),
+                    child: Text(
+                      _messageSwitch(bai.status),
+                      style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                            color: _getStatusColor(bai.status, context),
+                          ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                      textAlign: TextAlign.justify,
                     ),
-                  if (bai.status == 'PENDING')
-                    Container(
-                      alignment: Alignment.centerLeft,
-                      padding: const EdgeInsets.only(
-                          left: 20, right: 20, bottom: 10),
-                      child: Text(
-                        'To activate your registration, please park your vehicle at our facility for the first time.',
-                        style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
-                        textAlign: TextAlign.justify,
-                      ),
-                    ),
+                  ),
                 ],
               ),
             ),
@@ -338,10 +323,22 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
 
   Color _getStatusColor(String status, BuildContext context) {
     return switch (status) {
-      'ACTIVE' => Theme.of(context).colorScheme.primary,
-      'PENDING' => Theme.of(context).colorScheme.onError,
+      'ACTIVE' => Theme.of(context).colorScheme.onError,
+      'PENDING' => Theme.of(context).colorScheme.primary,
       'REJECTED' => Theme.of(context).colorScheme.error,
       _ => Theme.of(context).colorScheme.outline,
+    };
+  }
+
+  String _messageSwitch(String status) {
+    return switch (status) {
+      'PENDING' =>
+        'To activate your registration, please park your vehicle at our facility for the first time!',
+      'REJECTED' => 'Wrong information. Please correct it!',
+      'INACTIVE' =>
+        'While your vehicle is inactive, it remains usable, but the wallet feature for paying parking fees will be disabled.',
+      'ACTIVE' => 'Your vehicle is active and ready for use. Enjoy your ride!',
+      _ => 'Unknown status, please contact support!',
     };
   }
 }

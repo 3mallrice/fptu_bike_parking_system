@@ -112,40 +112,30 @@ class EmptyBoxMessage {
 
 class ZaloPayMessage {
   static const String openApp = "Open ZaloPay";
-  static const String cancelled = "Payment has been cancelled.";
-  static const String success = "Payment was successful!";
-  static const String failed = "Payment failed. Please try again.";
+  static const String cancelled = "Payment has been cancelled";
+  static const String success = "Payment was successful";
+  static const String failed = "Payment failed. Please try again";
   static const String processing = "Payment is processing...";
 }
 
 String packageDetail(CoinPackage package) {
-  final totalCoins = UltilHelper.formatMoney(
-      int.parse(package.amount) + (package.extraCoin ?? 0));
-
   List<String> details = [];
 
   details.add('If you purchase the ${package.packageName}, you will get:');
   details.add(
-      '  • ${UltilHelper.formatMoney(int.parse(package.amount))} bic (Main Wallet).');
+      '\u2022 ${UltilHelper.formatMoney(int.parse(package.amount))} bic (Main Wallet).');
 
   if (package.extraCoin != null) {
     details.add(
-        '  • ${UltilHelper.formatMoney(package.extraCoin!)} Extra bic (Extra Wallet).');
+        '\u2022 ${UltilHelper.formatMoney(package.extraCoin!)} Extra bic (Extra Wallet).');
   }
 
-  if (package.extraEXP != null) {
+  if (package.extraEXP != null && package.extraEXP! > 0) {
     details.add(
-        '  • Your Extra Wallet\'s expiration period will increase by ${UltilHelper.formatMoney(package.extraEXP!)} days.\n');
+        '\u2022 Your Extra Wallet\'s expiration period will increase by ${UltilHelper.formatMoney(package.extraEXP!)} days.');
   }
 
-  details.add('Total Coins to Spend: $totalCoins bic.');
-
-  if (package.extraEXP != null) {
-    details.add(
-        'Expiration Extension: +${package.extraEXP} days added to the current expiration date of your Extra Wallet coins.\n');
-  }
-
-  details.add('Keep in mind:');
+  details.add('\nKeep in mind:');
   details.add(
       'Each purchase extends the expiration of all your extra coins by the specified days, giving you more flexibility to use them.');
 

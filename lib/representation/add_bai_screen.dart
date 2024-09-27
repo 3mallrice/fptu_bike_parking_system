@@ -448,30 +448,19 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
             readOnly: _imageUrl == null,
             keyboardType: TextInputType.text,
             textInputAction: TextInputAction.done,
+            autofocus: false,
+            textCapitalization: TextCapitalization.sentences,
             onTap: _imageUrl == null
-                ? () => _selectImage(subTitle: 'Select image first')
+                ? () => setState(() {
+                      _errorMessage = 'Please select image first';
+                    })
                 : null,
-            onEditingComplete: () {
-              String currentValue = _plateNumberController.text
-                  .trim()
-                  .replaceAll('-', '')
-                  .replaceAll('.', '')
-                  .replaceAll(' ', '')
-                  .toUpperCase();
-
-              _log.i('Plate number: $currentValue');
-
-              if (mounted) {
-                setState(() {
-                  _plateNumberController.text = currentValue;
-                  _errorMessage = Regex.plateRegExp.hasMatch(currentValue)
-                      ? null
-                      : 'Invalid plate number';
-                });
-                FocusScope.of(context).unfocus();
-              }
+            onSubmitted: (String value) {
+              _onTextFieldDone();
             },
+            onEditingComplete: _onTextFieldDone(),
             style: Theme.of(context).textTheme.bodyMedium,
+            maxLength: 10,
             decoration: InputDecoration(
               suffixIcon: Icon(
                 Icons.edit_rounded,
@@ -483,11 +472,35 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
                 ),
               ),
               hintText: 'ex: 37A012345',
+              counterText: '', // disable character counter
             ),
           ),
         )
       ],
     );
+  }
+
+  void Function()? _onTextFieldDone() {
+    return () {
+      String currentValue = _plateNumberController.text
+          .trim()
+          .replaceAll('-', '')
+          .replaceAll('.', '')
+          .replaceAll(' ', '')
+          .toUpperCase();
+
+      _log.i('Plate number: $currentValue');
+
+      if (mounted) {
+        setState(() {
+          _plateNumberController.text = currentValue;
+          _errorMessage = Regex.plateRegExp.hasMatch(currentValue)
+              ? null
+              : 'Invalid plate number';
+        });
+        FocusScope.of(context).unfocus();
+      }
+    };
   }
 
   Widget _buildAddButton() {
