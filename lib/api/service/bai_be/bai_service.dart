@@ -20,6 +20,10 @@ class CallBikeApi {
 
   String token = "";
   var log = Logger();
+  List<BaiModel>? _baiCache;
+  DateTime? _baiCacheTime;
+
+  Duration cacheDuration = const Duration(minutes: 5);
 
   // Post vehicle
   Future<APIResponse<AddBaiRespModel>> createBai(
@@ -126,6 +130,16 @@ class CallBikeApi {
 
   Future<APIResponse<List<BaiModel>>> getBai() async {
     try {
+      // Check cache
+      if (_baiCache != null &&
+          _baiCacheTime != null &&
+          DateTime.now().difference(_baiCacheTime!) < cacheDuration) {
+        return APIResponse<List<BaiModel>>(
+          data: _baiCache,
+          message: 'Data from cache',
+        );
+      }
+
       String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
       token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
 
@@ -153,6 +167,11 @@ class CallBikeApi {
               .map((item) => BaiModel.fromJson(item as Map<String, dynamic>))
               .toList(),
         );
+
+        // Save vào cache
+        _baiCache = apiResponse.data;
+        _baiCacheTime = DateTime.now();
+
         return apiResponse;
       } else {
         log.e('Failed to get vehicle: ${response.statusCode} ${response.body}');

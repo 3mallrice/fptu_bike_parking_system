@@ -57,14 +57,6 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
   var log = Logger();
   late FocusNode _focusNode;
 
-  bool isLoadingWeather = false;
-  bool isLoadingBalance = false;
-  bool isLoadingExtraBalance = false;
-
-  String? weatherError;
-  String? balanceError;
-  String? extraBalanceError;
-
   // Default location: FPT University HCM Hi-tech park Campus
   double lat = 10.8411276;
   double lon = 106.809883;
@@ -93,22 +85,13 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
   Future<void> _fetchData() async {
     Set<String> errorMessages = {};
 
-    setState(() {
-      isReloading = true;
-      isLoadingWeather = true;
-      isLoadingBalance = true;
-      isLoadingExtraBalance = true;
-
-      weatherError = null;
-      balanceError = null;
-      extraBalanceError = null;
-    });
+    setState(() => isReloading = true);
 
     if (_currentCustomerType == CustomerType.paid) {
       await Future.wait([
-        getWeather(errors: errorMessages, isAlone: true),
-        getBalance(errors: errorMessages, isAlone: true),
-        getExtraBalance(errors: errorMessages, isAlone: true),
+        getWeather(errors: errorMessages, isAlone: false),
+        getBalance(errors: errorMessages, isAlone: false),
+        getExtraBalance(errors: errorMessages, isAlone: false),
       ]);
     } else {
       await getWeather(errors: errorMessages, isAlone: true);
@@ -138,7 +121,7 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
     });
   }
 
-  Future<void> getLocation({Set<String>? errors, bool isAlone = false}) async {
+  Future<void> getLocation() async {
     final permission = await Geolocator.checkPermission();
 
     if (permission == LocationPermission.denied) {
@@ -166,26 +149,22 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
   Future<void> getWeather({Set<String>? errors, bool isAlone = false}) async {
     try {
       await getLocation();
-      if (!isAllowLocation) {
-        setState(() {
-          isLoadingWeather = false;
-        });
-        return;
-      }
+      if (!isAllowLocation) return;
 
       weatherData = await OpenWeatherApi.fetchWeather(lat, lon);
       aqi = await OpenWeatherApi.fetchAirQuality(lat, lon);
       visibility = (weatherData!.visibility / 1000).toStringAsFixed(2);
 
-      setState(() {
-        isLoadingWeather = false;
-      });
+      if (mounted) {
+        setState(() {});
+      }
     } catch (e) {
       log.e('Error during get weather: $e');
-      setState(() {
-        isLoadingWeather = false;
-        weatherError = 'Error during get weather';
-      });
+      errors?.add('Error during get weather');
+      if (isAlone) {
+        _showErrorDialog(
+            'Error during get weather: ${ErrorMessage.somethingWentWrong}');
+      }
     }
   }
 
@@ -212,23 +191,25 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
 
       final error = await _catchError(result);
       if (error != null) {
-        setState(() {
-          isLoadingBalance = false;
-          balanceError = error;
-        });
+        errors?.add(error);
+        if (isAlone) {
+          _showErrorDialog(error);
+        }
         return;
       }
 
-      setState(() {
-        balance = result.data ?? 0;
-        isLoadingBalance = false;
-      });
+      if (mounted) {
+        setState(() {
+          balance = result.data ?? 0;
+        });
+      }
     } catch (e) {
       log.e('Error during get main wallet balance: $e');
-      setState(() {
-        isLoadingBalance = false;
-        balanceError = 'Load Main Balance: ${ErrorMessage.somethingWentWrong}';
-      });
+      errors?.add('Load Main Balance: ${ErrorMessage.somethingWentWrong}');
+      if (isAlone) {
+        _showErrorDialog(
+            'Load Main Balance: ${ErrorMessage.somethingWentWrong}');
+      }
     }
   }
 
@@ -240,24 +221,25 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
 
       final error = await _catchError(extraBalanceModel);
       if (error != null) {
-        setState(() {
-          isLoadingExtraBalance = false;
-          extraBalanceError = error;
-        });
+        errors?.add(error);
+        if (isAlone) {
+          _showErrorDialog(error);
+        }
         return;
       }
 
-      setState(() {
-        extraBalance = extraBalanceModel.data?.balance ?? 0;
-        isLoadingExtraBalance = false;
-      });
+      if (mounted && extraBalanceModel.data != null) {
+        setState(() {
+          extraBalance = extraBalanceModel.data!.balance;
+        });
+      }
     } catch (e) {
       log.e('Error during get extra balance: $e');
-      setState(() {
-        isLoadingExtraBalance = false;
-        extraBalanceError =
-            'Load Extra Balance: ${ErrorMessage.somethingWentWrong}';
-      });
+      errors?.add('Load Extra Balance: ${ErrorMessage.somethingWentWrong}');
+      if (isAlone) {
+        _showErrorDialog(
+            'Load Extra Balance: ${ErrorMessage.somethingWentWrong}');
+      }
     }
   }
 
@@ -372,21 +354,10 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
                   width: 30,
                 ),
                 const SizedBox(width: 5),
-                isLoadingBalance
-                    ? const CircularProgressIndicator(
-                        strokeWidth: 2,
-                      )
-                    : balanceError != null
-                        ? Icon(
-                            Icons.error,
-                            color: Theme.of(context).colorScheme.error,
-                          )
-                        : Text(
-                            _hideBalance
-                                ? '******'
-                                : UltilHelper.formatMoney(balance),
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
+                Text(
+                  _hideBalance ? '******' : UltilHelper.formatMoney(balance),
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
               ],
             ),
           ),
@@ -406,27 +377,15 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
                         fontSize: 14,
                       ),
                 ),
-                isLoadingExtraBalance
-                    ? const CircularProgressIndicator(
-                        strokeWidth: 2,
-                      )
-                    : extraBalanceError != null
-                        ? Icon(
-                            Icons.error,
-                            color: Theme.of(context).colorScheme.error,
-                          )
-                        : Text(
-                            _hideBalance
-                                ? '******'
-                                : UltilHelper.formatMoney(extraBalance),
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium!
-                                .copyWith(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 14,
-                                ),
-                          ),
+                Text(
+                  _hideBalance
+                      ? '******'
+                      : UltilHelper.formatMoney(extraBalance),
+                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                      ),
+                ),
               ],
             ),
           ),
@@ -604,36 +563,14 @@ class _HomeAppScreenState extends State<HomeAppScreen> with ApiResponseHandler {
   }
 
   Widget _buildWeatherContent() {
-    if (isLoadingWeather) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    } else if (weatherError != null) {
-      return Center(
-        child: Column(
-          children: [
-            Icon(
-              Icons.error,
-              color: Theme.of(context).colorScheme.error,
-            ),
-            const SizedBox(height: 10),
-            Text(
-              weatherError!,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ],
-        ),
-      );
-    } else {
-      return Column(
-        children: [
-          _buildWeatherOverview(),
-          const SizedBox(height: 10),
-          _buildWeatherDetails(),
-          _buildLastUpdated(),
-        ],
-      );
-    }
+    return Column(
+      children: [
+        _buildWeatherOverview(),
+        const SizedBox(height: 10),
+        _buildWeatherDetails(),
+        _buildLastUpdated(),
+      ],
+    );
   }
 
   Widget _buildWeatherOverview() {

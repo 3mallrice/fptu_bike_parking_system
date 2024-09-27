@@ -23,17 +23,18 @@ class OpenWeatherApi {
       // Check data trong cache
       final fileInfo = await cacheManager.getFileFromCache(url);
       if (fileInfo != null && fileInfo.validTill.isAfter(DateTime.now())) {
-        // Nếu trong cache có data và còn hsd
+        // Nếu dữ liệu trong cache còn hạn sử dụng
         final file = fileInfo.file;
         final jsonString = await file.readAsString();
         log.i('Loaded weather data from cache');
+        // Trả về dữ liệu từ cache
         return WeatherData.fromJson(json.decode(jsonString));
       } else {
-        // Trong cache không có data / đã hết hsd (30p)
+        // Data trong cache null or hết hsd nên reload
         final response = await http.get(Uri.parse(url));
         if (response.statusCode == 200) {
           log.i('Weather data loaded from API');
-          // Lưu vào cache
+          // Save data vào cache 30p
           await cacheManager.putFile(
             url,
             response.bodyBytes,
@@ -59,19 +60,20 @@ class OpenWeatherApi {
       // Check data trong cache
       final fileInfo = await cacheManager.getFileFromCache(url);
       if (fileInfo != null && fileInfo.validTill.isAfter(DateTime.now())) {
-        // Nếu trong cache có data và còn hsd
+        // Nếu data trong cache còn hạn sử dụng
         final file = fileInfo.file;
         final jsonString = await file.readAsString();
         String aqi =
             json.decode(jsonString)['list'][0]['main']['aqi'].toString();
         log.i('Loaded air quality data from cache: $aqi');
+        // Trả về dữ liệu từ cache
         return AirQuality.aqi[int.parse(aqi)] ?? 'Unknown';
       } else {
-        // Trong cache không có data / đã hết hsd (30p)
+        // Data trong cache null or hết hsd nên reload
         final response = await http.get(Uri.parse(url));
         if (response.statusCode == 200) {
           log.i('Air quality data loaded from API');
-          // Lưu vào cache
+          // Save data vào cache 30p
           await cacheManager.putFile(
             url,
             response.bodyBytes,
