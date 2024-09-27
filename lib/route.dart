@@ -73,7 +73,7 @@ final Map<String, WidgetBuilder> routes = {
   InsightScreen.routeName: (context) => const InsightScreen(),
   NotificationScreen.routeName: (context) => const NotificationScreen(),
   WalletScreen.routeName: (context) {
-    final args = ModalRoute.of(context)!.settings.arguments as int?;
+    final args = ModalRoute.of(context)?.settings.arguments as int?;
     return WalletScreen(
       walletType: args,
     );

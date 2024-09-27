@@ -578,31 +578,48 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
                       children: [
                         TextSpan(
                           text:
-                              '${UltilHelper.formatMoney(int.parse(package.amount) + (package.extraCoin ?? 0))} ',
+                              '${UltilHelper.formatMoney(int.parse(package.amount) ~/ 1000)}K ',
                           style:
                               Theme.of(context).textTheme.titleMedium!.copyWith(
-                                    fontSize: 14,
+                                    fontSize: 15,
                                   ),
                         ),
                         TextSpan(
                           text: 'bic',
                           style:
                               Theme.of(context).textTheme.titleMedium!.copyWith(
-                                    fontSize: 12,
+                                    fontSize: 13,
                                   ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 3),
-                  if (package.extraEXP != null)
-                    Text(
-                      '${package.extraEXP} days',
+                  if (package.extraCoin != null && package.extraCoin! > 0)
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text:
+                                '+${UltilHelper.formatMoney((package.extraCoin ?? 0) ~/ 1000)}K ',
+                          ),
+                          const TextSpan(
+                            text: 'bic',
+                          ),
+                        ],
+                      ),
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          fontSize: 11,
+                            fontSize: 10,
+                            color: Theme.of(context).colorScheme.onSecondary,
+                          ),
+                    ),
+                  if (package.extraEXP != null && package.extraEXP! > 0)
+                    Text(
+                      '+${package.extraEXP} days',
+                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          fontSize: 10,
                           color: Theme.of(context).colorScheme.onSecondary),
                       textAlign: TextAlign.left,
-                    ),
+                    )
                 ],
               ),
             ),
@@ -619,7 +636,7 @@ class _FundinScreenState extends State<FundinScreen> with ApiResponseHandler {
                 ),
                 child: Center(
                   child: Text(
-                    '${package.price ~/ 1000}K\nVND',
+                    '${UltilHelper.formatMoney(package.price ~/ 1000)}K\nVND',
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
                           color: Theme.of(context).colorScheme.background,
                         ),

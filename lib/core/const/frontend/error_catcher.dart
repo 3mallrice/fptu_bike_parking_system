@@ -39,3 +39,26 @@ class HttpErrorMapper {
     };
   }
 }
+
+Map<String, String> errorMessages = {
+  "00": "Transaction successful",
+  "07":
+      "Funds deducted successfully. Transaction is suspicious (related to fraud, unusual transactions)",
+  "09":
+      "Transaction failed due to: Customer's card/account has not registered for Internet Banking service at the bank",
+  "10":
+      "Transaction failed due to: Customer entered incorrect card/account information more than 3 times",
+  "11":
+      "Transaction failed due to: Payment session expired. Please try the transaction again",
+  "12": "Transaction failed due to: Customer's card/account is locked",
+  "13":
+      "Transaction failed due to: Incorrect OTP (transaction verification password). Please try again",
+  "24": "Transaction failed due to: Customer canceled the transaction",
+  "51": "Transaction failed due to: Insufficient funds in your account",
+  "65":
+      "Transaction failed due to: Your account has exceeded the daily transaction limit",
+  "75": "The payment bank is under maintenance. Please try again later",
+  "79":
+      "Transaction failed due to: Customer entered the wrong payment password too many times. Please try again",
+  "99": "Unknown error occurred. Please contact support",
+};

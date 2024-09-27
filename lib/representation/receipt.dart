@@ -83,7 +83,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                       Container(
                         alignment: Alignment.center,
                         child: Text(
-                          'ID: ${isCopied ? 'Copied' : 'Copy'}',
+                          'Session ID: ${isCopied ? 'Copied' : 'Copy'}',
                           style:
                               Theme.of(context).textTheme.bodyMedium!.copyWith(
                                     fontWeight: FontWeight.w500,

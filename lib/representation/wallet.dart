@@ -506,20 +506,24 @@ class _WalletScreenState extends State<WalletScreen>
                                 color: Theme.of(context).colorScheme.primary,
                               ),
                         ),
-                        if (!isMain && expiredDate != null)
-                          Text(
-                            '${UltilHelper.formatMoney(extraBalance)} bic will expire on ${UltilHelper.formatDate(expiredDate!, showTime: false)}',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall!
-                                .copyWith(
-                                  color:
-                                      Theme.of(context).colorScheme.onSecondary,
-                                  fontSize: 10,
-                                ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 2,
-                            textAlign: TextAlign.left,
+                        if (!isMain)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 5),
+                            child: Text(
+                              'Expire on ${UltilHelper.formatDate(expiredDate, showTime: false)}',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSecondary,
+                                    fontSize: 10,
+                                  ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                              textAlign: TextAlign.left,
+                            ),
                           ),
                       ],
                     ),

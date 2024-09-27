@@ -17,6 +17,7 @@ import '../api/model/bai_model/payment_model.dart';
 import '../component/dialog.dart';
 import '../component/internet_connection_wrapper.dart';
 import '../component/snackbar.dart';
+import '../core/const/frontend/error_catcher.dart';
 import '../core/const/utilities/util_helper.dart';
 import '../core/helper/asset_helper.dart';
 import '../core/helper/loading_overlay_helper.dart';
@@ -42,7 +43,7 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
   final CallPaymentApi paymentApi = CallPaymentApi();
   final _overlayHelper = LoadingOverlayHelper();
   late ZaloPayModel zaloPayModel;
-  String payResult = "";
+  String _payResult = "";
   int type = 0;
   bool isOverload = false;
   String paymentUrl = '';
@@ -211,7 +212,7 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
         _buildRadioButton(
           1,
           AssetHelper.zaloPayLogo,
-          'ZaloPay E-Wallet',
+          'ZaloPay e-Wallet',
           isImage: true,
         ),
         _buildRadioButton(
@@ -362,11 +363,9 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
 
   Future<void> _handleZaloPayPayment() async {
     await openZaloPayApp(_package);
-    showSnackBar(payResult, type: type);
-    if (type == 1) {
-      if (!mounted) return;
-      Navigator.of(context).pushReplacementNamed(WalletScreen.routeName);
-    }
+    showSnackBar(_payResult, type: type);
+    if (!mounted) return;
+    _showReceiptDialog(context, type == 1, _package, selectedPaymentOption);
   }
 
   Future<void> _handleVNPayPayment() async {
@@ -405,7 +404,7 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
   }
 
   void _handlePaymentResult(bool result, {Map<String, dynamic>? vnpayData}) =>
-      showReceiptDialog(
+      _showReceiptDialog(
         context,
         result,
         _package,
@@ -420,19 +419,19 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
     setState(() {
       switch (event) {
         case FlutterZaloPayStatus.success:
-          payResult = ZaloPayMessage.success;
+          _payResult = ZaloPayMessage.success;
           type = 1;
           break;
         case FlutterZaloPayStatus.failed:
-          payResult = ZaloPayMessage.failed;
+          _payResult = ZaloPayMessage.failed;
           type = 2;
           break;
         case FlutterZaloPayStatus.cancelled:
-          payResult = ZaloPayMessage.cancelled;
+          _payResult = ZaloPayMessage.cancelled;
           type = 0;
           break;
         default:
-          payResult = ZaloPayMessage.failed;
+          _payResult = ZaloPayMessage.failed;
           type = 2;
       }
     });
@@ -484,7 +483,7 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
     }
   }
 
-  void showReceiptDialog(
+  void _showReceiptDialog(
     BuildContext context,
     bool isSuccess,
     CoinPackage package,
@@ -506,13 +505,13 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
                 context, isSuccess, package, selectedPaymentOption,
                 vnpayData: vnpayData),
           ),
+          contentPadding: const EdgeInsets.all(20),
           onClick: () {
             isSuccess
                 ? Navigator.of(context)
                     .pushReplacementNamed(WalletScreen.routeName)
                 : Navigator.of(context).pop();
           },
-          contentPadding: const EdgeInsets.all(20),
         );
       },
     );
@@ -550,7 +549,9 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
           child: ExpansionTile(
             title: Text(
               'Package Information',
-              style: Theme.of(context).textTheme.titleMedium,
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    fontSize: 15,
+                  ),
             ),
             tilePadding: const EdgeInsets.all(0),
             visualDensity: VisualDensity.comfortable,
@@ -573,14 +574,30 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
         const Divider(),
         const SizedBox(height: 5),
         _buildReceiptInfoRow('Payment Method',
-            selectedPaymentOption == 1 ? 'ZaloPay' : 'VNPAY Gateway'),
-        _buildReceiptInfoRow('Transaction Date',
-            UltilHelper.formatVnPayDate(vnpayData?['vnp_PayDate'])),
+            selectedPaymentOption == 1 ? 'ZaloPay e-Wallet' : 'VNPAY Gateway'),
+        if (selectedPaymentOption == 2 || selectedPaymentOption == 3)
+          Flexible(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildReceiptInfoRow('Card Type', 'International Card'),
+                _buildReceiptInfoRow('Transaction Date',
+                    UltilHelper.formatVnPayDate(vnpayData?['vnp_PayDate'])),
+                _buildReceiptInfoRow(
+                    'Transaction No',
+                    vnpayData?['vnp_TransactionNo'] == '0'
+                        ? 'N/A'
+                        : vnpayData?['vnp_TransactionNo']),
+                _buildReceiptInfoRow('Bank', vnpayData?['vnp_BankCode']),
+                _buildReceiptInfoRow('Order Info', vnpayData?['vnp_OrderInfo']),
+              ],
+            ),
+          ),
         _buildReceiptInfoRow(
-            'Transaction No', vnpayData?['vnp_TransactionNo'] ?? ''),
-        _buildReceiptInfoRow('Bank', vnpayData?['vnp_BankCode'] ?? ''),
-        _buildReceiptInfoRow(
-            'Order Info', Uri.decodeFull(vnpayData?['vnp_OrderInfo'] ?? '')),
+            'Response',
+            selectedPaymentOption == 1
+                ? _payResult
+                : errorMessages[vnpayData?['vnp_ResponseCode'] ?? '99']),
       ],
     );
   }
@@ -589,6 +606,7 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: Theme.of(context).textTheme.bodyMedium),
@@ -612,8 +630,6 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
                       .bodyMedium
                       ?.copyWith(fontWeight: FontWeight.bold),
                   textAlign: TextAlign.right,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ),
