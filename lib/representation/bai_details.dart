@@ -113,13 +113,6 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
     contentTextStyle = Theme.of(context).textTheme.bodyMedium!.copyWith(
           color: Theme.of(context).colorScheme.outline,
         );
-    color = switch (bai.status) {
-      'ACTIVE' => Theme.of(context).colorScheme.primary,
-      'PENDING' => Theme.of(context).colorScheme.onError,
-      'REJECTED' => Theme.of(context).colorScheme.error,
-      'INACTIVE' => Theme.of(context).colorScheme.outline,
-      _ => contentTextStyle.color!,
-    };
   }
 
   Future<String?> _catchError(APIResponse response) async {
@@ -233,85 +226,47 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
                                 Text(
                                   bai.status,
                                   style: contentTextStyle.copyWith(
-                                      color: color,
+                                      color:
+                                          _getStatusColor(bai.status, context),
                                       fontWeight: FontWeight.bold),
                                   textAlign: TextAlign.center,
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 5),
-                            if (bai.status == 'REJECTED')
-                              SizedBox(
-                                child: Text(
-                                  'Wrong information. Please check again.',
-                                  style: contentTextStyle.copyWith(
-                                    color: Theme.of(context).colorScheme.error,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
-                                  textAlign: TextAlign.justify,
-                                ),
+                            const SizedBox(height: 10),
+                            Text(
+                              _messageSwitch(bai.status),
+                              style: contentTextStyle.copyWith(
+                                color: _getStatusColor(bai.status, context),
                               ),
-                            if (bai.status == 'PENDING')
-                              SizedBox(
-                                child: Text(
-                                  'To activate your registration, please park your vehicle at our facility for the first time.',
-                                  style: contentTextStyle.copyWith(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
-                                  textAlign: TextAlign.justify,
-                                ),
-                              ),
+                              textAlign: TextAlign.justify,
+                            ),
                             const SizedBox(height: 10),
                             if (_currentCustomerType == CustomerType.paid)
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      deleteBaiDialog();
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSecondary,
-                                        borderRadius: BorderRadius.circular(14),
-                                      ),
-                                      child: Icon(
-                                        Icons.delete,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .surface,
-                                      ),
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.delete,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .error
+                                          .withOpacity(0.8),
                                     ),
+                                    onPressed: () => deleteBaiDialog(),
                                   ),
                                   Visibility(
                                     visible: bai.status == 'PENDING' ||
                                         bai.status == 'REJECTED',
-                                    child: GestureDetector(
-                                      onTap: _showEditDialog,
-                                      child: Container(
-                                        padding: const EdgeInsets.all(10),
-                                        margin: const EdgeInsets.only(left: 10),
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSecondary,
-                                          borderRadius:
-                                              BorderRadius.circular(14),
-                                        ),
-                                        child: Icon(
-                                          Icons.edit,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .surface,
-                                        ),
+                                    child: IconButton(
+                                      icon: Icon(
+                                        Icons.edit,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondary,
                                       ),
+                                      onPressed: () => _showEditDialog(),
                                     ),
                                   ),
                                 ],
@@ -325,6 +280,27 @@ class _BaiDetailsState extends State<BaiDetails> with ApiResponseHandler {
               ),
       ),
     );
+  }
+
+  Color _getStatusColor(String status, BuildContext context) {
+    return switch (status) {
+      'ACTIVE' => Theme.of(context).colorScheme.primary,
+      'PENDING' => Theme.of(context).colorScheme.onError,
+      'REJECTED' => Theme.of(context).colorScheme.error,
+      _ => Theme.of(context).colorScheme.outline,
+    };
+  }
+
+  String _messageSwitch(String status) {
+    return switch (status) {
+      'PENDING' =>
+        'To activate your registration, please park your vehicle at our facility for the first time!',
+      'REJECTED' => 'Wrong information. Please correct it!',
+      'INACTIVE' =>
+        'While your vehicle is inactive, it remains usable, but the wallet feature for paying parking fees will be disabled.',
+      'ACTIVE' => 'Your vehicle is active and ready for use. Enjoy your ride!',
+      _ => 'Unknown status, please contact support!',
+    };
   }
 
   // edit Bai
