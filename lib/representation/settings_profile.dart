@@ -146,12 +146,46 @@ class _SettingAndProfileScreenState extends State<SettingAndProfileScreen> {
                                       Theme.of(context).colorScheme.onSecondary,
                                 ),
                           ),
-                          Text(
-                            userData?.name ?? "",
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium!
-                                .copyWith(fontSize: 15),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                userData?.name ?? "",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium!
+                                    .copyWith(fontSize: 15),
+                              ),
+                              const SizedBox(width: 5),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 5,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: userData != null &&
+                                          userData!.customerType ==
+                                              CustomerType.paid
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Theme.of(context).colorScheme.onError,
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                child: Text(
+                                  userData != null
+                                      ? userData!.customerType
+                                      : '',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .background,
+                                        fontSize: 8,
+                                      ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ), onTap: () {

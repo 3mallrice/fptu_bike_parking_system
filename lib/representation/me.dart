@@ -96,9 +96,38 @@ class _MeScreenState extends State<MeScreen> {
                           ),
                   ),
                   const SizedBox(height: 15),
-                  Text(
-                    userData?.name ?? 'Anonymous',
-                    style: Theme.of(context).textTheme.displayMedium,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        userData?.name ?? 'Anonymous',
+                        style: Theme.of(context).textTheme.displayMedium,
+                      ),
+                      const SizedBox(width: 5),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 5,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: userData != null &&
+                                  userData!.customerType == CustomerType.paid
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).colorScheme.onError,
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: Text(
+                          userData != null ? userData!.customerType : '',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall!
+                              .copyWith(
+                                color: Theme.of(context).colorScheme.background,
+                                fontSize: 8,
+                              ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 5),
                   Text(

@@ -204,7 +204,8 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
                   : histories.isEmpty
                       ? EmptyBox(
                           message: EmptyBoxMessage.emptyList(
-                              label: ListName.history))
+                              label: ListName.history),
+                        )
                       : Container(
                           alignment: Alignment.center,
                           margin: EdgeInsets.symmetric(

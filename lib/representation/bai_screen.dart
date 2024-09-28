@@ -81,20 +81,23 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
         onRefresh: _fetchBikes,
         child: Stack(
           children: [
-            SingleChildScrollView(
-              child: Align(
-                alignment: Alignment.center,
-                child: Container(
-                  margin: const EdgeInsets.only(top: 10),
-                  child: Column(
-                    children: [
-                      _buildTotalBikeContainer(context),
-                      const SizedBox(height: 30),
-                      _buildBikeInformation(context),
-                    ],
+            ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                Align(
+                  alignment: Alignment.center,
+                  child: Container(
+                    margin: const EdgeInsets.only(top: 10),
+                    child: Column(
+                      children: [
+                        _buildTotalBikeContainer(context),
+                        const SizedBox(height: 30),
+                        _buildBikeInformation(context),
+                      ],
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
             if (isCalling) const LoadingCircle()
           ],

@@ -64,14 +64,48 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                           'Welcome back,',
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
-                        Text(
-                          userData != null
-                              ? userData.name.toUpperCase()
-                              : 'Anonymous',
-                          style:
-                              Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              userData != null
+                                  ? userData.name.toUpperCase()
+                                  : 'Anonymous',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
                                     fontWeight: FontWeight.bold,
                                   ),
+                            ),
+                            const SizedBox(width: 5),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 5,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: userData != null &&
+                                        userData.customerType ==
+                                            CustomerType.paid
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Theme.of(context).colorScheme.onError,
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Text(
+                                userData != null ? userData.customerType : '',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .background,
+                                      fontSize: 8,
+                                    ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
