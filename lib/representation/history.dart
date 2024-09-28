@@ -97,6 +97,9 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
         setState(() {
           isLoading = false;
         });
+        if (mounted) {
+          _showErrorDialog('An error occurred while fetching histories.');
+        }
         return;
       }
 
@@ -193,79 +196,89 @@ class _HistoryScreenState extends State<HistoryScreen> with ApiResponseHandler {
         onRefresh: () async {
           await getCustomerHistories(isRefresh: true);
         },
-        child: Column(
+        child: Stack(
           children: [
-            _buildTotalHistoryContainer(context),
-            Expanded(
-              child: isLoading
-                  ? const Center(
-                      child: LoadingCircle(),
-                    )
-                  : histories.isEmpty
-                      ? EmptyBox(
-                          message: EmptyBoxMessage.emptyList(
-                              label: ListName.history),
-                        )
-                      : Container(
-                          alignment: Alignment.center,
-                          margin: EdgeInsets.symmetric(
-                            horizontal:
-                                MediaQuery.of(context).size.width * 0.05,
-                          ),
-                          child: ListView.builder(
-                            controller: _scrollController,
-                            itemCount: histories.length + 1,
-                            itemBuilder: (context, index) {
-                              if (index < histories.length) {
-                                final history = histories[index];
-                                return GestureDetector(
-                                  onTap: () {
-                                    if (!history.isFeedback) {
-                                      addFeedbackDialog(history.id);
-                                    } else {
-                                      viewFeedbackDialog(
-                                          history.title, history.description);
-                                    }
-                                  },
-                                  child: historyCard(history),
-                                );
-                              } else if (_hasNextPage) {
-                                return _isLoadMoreRunning
-                                    ? const Padding(
-                                        padding: EdgeInsets.all(8.0),
-                                        child: Align(
-                                            alignment: Alignment.bottomCenter,
-                                            child: LoadingCircle(
-                                              size: 30,
-                                              isHeight: false,
-                                            )),
-                                      )
-                                    : const SizedBox();
-                              } else if (_hasNextPage == false) {
-                                return Container(
-                                  padding: const EdgeInsets.all(8.0),
-                                  margin: const EdgeInsets.only(
-                                      bottom: 10, left: 10, right: 10),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5),
-                                    color:
-                                        Theme.of(context).colorScheme.secondary,
-                                  ),
-                                  child: Text(
-                                    Message.noMore(message: ListName.history),
-                                    style:
-                                        Theme.of(context).textTheme.bodyMedium,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                );
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
+            ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                Align(
+                  alignment: Alignment.center,
+                  child: Column(
+                    children: [
+                      _buildTotalHistoryContainer(context),
+                      const SizedBox(height: 20),
+                      _buildHistoryInformation(context),
+                    ],
+                  ),
+                ),
+              ],
             ),
+            if (isLoading) const Center(child: LoadingCircle()),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildHistoryInformation(BuildContext context) {
+    if (histories.isEmpty) {
+      return EmptyBox(
+        message: EmptyBoxMessage.emptyList(label: ListName.history),
+      );
+    }
+
+    return Container(
+      alignment: Alignment.center,
+      margin: EdgeInsets.symmetric(
+        horizontal: MediaQuery.of(context).size.width * 0.05,
+      ),
+      child: ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: histories.length + 1,
+        itemBuilder: (context, index) {
+          if (index < histories.length) {
+            final history = histories[index];
+            return GestureDetector(
+              onTap: () {
+                if (!history.isFeedback) {
+                  addFeedbackDialog(history.id);
+                } else {
+                  viewFeedbackDialog(history.title, history.description);
+                }
+              },
+              child: historyCard(history),
+            );
+          } else if (_hasNextPage) {
+            return _isLoadMoreRunning
+                ? const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: LoadingCircle(
+                        size: 30,
+                        isHeight: false,
+                      ),
+                    ),
+                  )
+                : const SizedBox();
+          } else if (_hasNextPage == false) {
+            return Container(
+              padding: const EdgeInsets.all(8.0),
+              margin: const EdgeInsets.only(bottom: 10, left: 10, right: 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                color: Theme.of(context).colorScheme.secondary,
+              ),
+              child: Text(
+                Message.noMore(message: ListName.history),
+                style: Theme.of(context).textTheme.bodyMedium,
+                textAlign: TextAlign.center,
+              ),
+            );
+          }
+          return null;
+        },
       ),
     );
   }

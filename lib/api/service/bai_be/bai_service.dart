@@ -48,7 +48,12 @@ class CallBikeApi {
       request.headers['Authorization'] = token;
 
       // Thêm các trường dữ liệu vào request
-      request.fields['PlateNumber'] = addBaiModel.plateNumber;
+      request.fields['PlateNumber'] = addBaiModel.plateNumber
+          .trim()
+          .replaceAll('-', '')
+          .replaceAll('.', '')
+          .replaceAll(' ', '')
+          .toUpperCase();
       request.fields['VehicleTypeId'] = addBaiModel.vehicleTypeId;
 
       // Thêm file ảnh vào request
@@ -130,16 +135,6 @@ class CallBikeApi {
 
   Future<APIResponse<List<BaiModel>>> getBai() async {
     try {
-      // Check cache
-      if (_baiCache != null &&
-          _baiCacheTime != null &&
-          DateTime.now().difference(_baiCacheTime!) < cacheDuration) {
-        return APIResponse<List<BaiModel>>(
-          data: _baiCache,
-          message: 'Data from cache',
-        );
-      }
-
       String currentEmail = LocalStorageHelper.getCurrentUserEmail() ?? "";
       token = GetLocalHelper.getBearerToken(currentEmail) ?? "";
 

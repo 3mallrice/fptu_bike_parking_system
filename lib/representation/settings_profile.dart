@@ -182,6 +182,7 @@ class _SettingAndProfileScreenState extends State<SettingAndProfileScreen> {
                                             .colorScheme
                                             .background,
                                         fontSize: 8,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                 ),
                               ),

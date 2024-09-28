@@ -212,6 +212,9 @@ class _WalletScreenState extends State<WalletScreen>
           extraBalance = extraBalanceModel.data!.balance;
           expiredDate = extraBalanceModel.data!.expiredDate;
         });
+
+        log.d('Extra balance: $extraBalance');
+        log.d('Expired date: $expiredDate');
       }
     } catch (e) {
       log.e('Error during get extra balance: $e');
@@ -506,7 +509,7 @@ class _WalletScreenState extends State<WalletScreen>
                                 color: Theme.of(context).colorScheme.primary,
                               ),
                         ),
-                        if (!isMain)
+                        if (!isMain && expiredDate != null)
                           Padding(
                             padding: const EdgeInsets.only(top: 5),
                             child: Text(

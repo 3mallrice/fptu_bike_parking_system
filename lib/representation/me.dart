@@ -124,6 +124,7 @@ class _MeScreenState extends State<MeScreen> {
                               .copyWith(
                                 color: Theme.of(context).colorScheme.background,
                                 fontSize: 8,
+                                fontWeight: FontWeight.bold,
                               ),
                         ),
                       ),
