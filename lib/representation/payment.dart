@@ -493,6 +493,7 @@ class _PaymentScreenState extends State<PaymentScreen> with ApiResponseHandler {
     log.i('Payment ${isSuccess ? 'success' : 'failure'}');
     showDialog(
       context: context,
+      barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return OKDialog(
           title: 'Payment ${isSuccess ? 'Success' : 'Failure'}',

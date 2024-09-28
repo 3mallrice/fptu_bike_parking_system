@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:bai_system/api/model/bai_model/bai_model.dart';
@@ -6,6 +7,7 @@ import 'package:bai_system/component/shadow_container.dart';
 import 'package:bai_system/representation/login.dart';
 import 'package:bai_system/representation/navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 
@@ -38,6 +40,8 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
   final CallBikeApi _api = CallBikeApi();
   List<VehicleTypeModel> _vehicleTypes = [];
   String? _errorMessage;
+
+  final FocusNode _focusNode = FocusNode();
 
   late Color _backgroundColor;
   late Color _onSuccessful;
@@ -81,6 +85,10 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
 
   Future<void> _selectImage({String? subTitle}) async {
     try {
+      setState(() {
+        _errorMessage = null;
+      });
+
       final ImageSource? source = await _showSourceDialog(subTitle: subTitle);
       if (source == null) return;
 
@@ -118,6 +126,9 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
           setState(() {
             _plateNumberController.text =
                 plateNumberResponse!.data!.plateNumber;
+
+            _focusNode.unfocus();
+            _onTextFieldDone();
           });
         }
       } else {
@@ -445,11 +456,16 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
           height: MediaQuery.of(context).size.height * 0.065,
           child: TextField(
             controller: _plateNumberController,
+            focusNode: _focusNode,
             readOnly: _imageUrl == null,
             keyboardType: TextInputType.text,
             textInputAction: TextInputAction.done,
             autofocus: false,
-            textCapitalization: TextCapitalization.sentences,
+            textCapitalization: TextCapitalization.characters,
+            inputFormatters: [
+              // FilteringTextInputFormatter.allow(Regex.plateRegExp),
+              UpperCaseTextFormatter(),
+            ],
             onTap: _imageUrl == null
                 ? () => setState(() {
                       _errorMessage = 'Please select image first';
@@ -458,7 +474,13 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
             onSubmitted: (String value) {
               _onTextFieldDone();
             },
-            onEditingComplete: _onTextFieldDone(),
+            onChanged: (value) {
+              if (!_focusNode.hasFocus) {
+                Timer(const Duration(milliseconds: 100), () {
+                  _onTextFieldDone();
+                });
+              }
+            },
             style: Theme.of(context).textTheme.bodyMedium,
             maxLength: 10,
             decoration: InputDecoration(
@@ -480,14 +502,13 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
     );
   }
 
-  void Function()? _onTextFieldDone() {
-    return () {
+  void _onTextFieldDone() {
+    {
       String currentValue = _plateNumberController.text
           .trim()
           .replaceAll('-', '')
           .replaceAll('.', '')
-          .replaceAll(' ', '')
-          .toUpperCase();
+          .replaceAll(' ', '');
 
       _log.i('Plate number: $currentValue');
 
@@ -500,7 +521,7 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
         });
         FocusScope.of(context).unfocus();
       }
-    };
+    }
   }
 
   Widget _buildAddButton() {
@@ -508,6 +529,9 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
       children: [
         Visibility(
           visible: _errorMessage != null,
+          maintainState: true,
+          maintainAnimation: true,
+          maintainSize: true,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
             child: Text(
@@ -536,7 +560,7 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
           child: const ShadowButton(
             buttonTitle: 'ADD',
             margin: EdgeInsets.symmetric(vertical: 10),
-            padding: EdgeInsets.symmetric(vertical: 10),
+            padding: EdgeInsets.symmetric(vertical: 0),
             height: 50,
             width: 100,
           ),
@@ -576,6 +600,31 @@ class _AddBaiState extends State<AddBai> with ApiResponseHandler {
         elevation: 0,
         padding: const EdgeInsets.all(10),
       ),
+    );
+  }
+}
+
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    String newText = newValue.text.toUpperCase();
+
+    int selectionOffset = newValue.selection.baseOffset;
+
+    if (newText.length < oldValue.text.length) {
+      selectionOffset = newValue.selection.baseOffset;
+    } else {
+      int oldLength = oldValue.text.length;
+      int addedLength = newText.length - oldLength;
+      selectionOffset = oldValue.selection.baseOffset + addedLength;
+    }
+
+    selectionOffset = selectionOffset.clamp(0, newText.length);
+
+    return TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: selectionOffset),
     );
   }
 }

@@ -1,6 +1,5 @@
 import 'package:bai_system/component/app_bar_component.dart';
 import 'package:flutter/material.dart';
-import 'package:info_kit/info_kit.dart';
 import 'package:logger/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -56,7 +55,7 @@ class _AboutUsState extends State<AboutUs> {
           _buildLogo(context),
           const SizedBox(height: 7),
           Text(
-            'Version ${InfoKit.version}',
+            'Version 2.0.6',
             style: Theme.of(context).textTheme.titleSmall!.copyWith(
                   fontWeight: FontWeight.normal,
                   color: Theme.of(context).colorScheme.outline,

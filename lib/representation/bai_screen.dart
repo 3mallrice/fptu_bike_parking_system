@@ -47,6 +47,10 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
   }
 
   Future<void> _fetchBikes() async {
+    setState(() {
+      isCalling = true;
+    });
+
     try {
       final APIResponse<List<BaiModel>> fetchedBikes = await api.getBai();
 
@@ -58,7 +62,12 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
         showErrorDialog: _showErrorDialog,
       );
 
-      if (!isResponseValid) return;
+      if (!isResponseValid) {
+        setState(() {
+          isCalling = false;
+        });
+        return;
+      }
 
       setState(() {
         bikes = fetchedBikes.data;
@@ -70,6 +79,7 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
         setState(() {
           isCalling = false;
         });
+        _showErrorDialog('Failed to fetch bikes. Please try again.');
       }
     }
   }
@@ -86,15 +96,12 @@ class _BaiScreenState extends State<BaiScreen> with ApiResponseHandler {
               children: [
                 Align(
                   alignment: Alignment.center,
-                  child: Container(
-                    margin: const EdgeInsets.only(top: 10),
-                    child: Column(
-                      children: [
-                        _buildTotalBikeContainer(context),
-                        const SizedBox(height: 30),
-                        _buildBikeInformation(context),
-                      ],
-                    ),
+                  child: Column(
+                    children: [
+                      _buildTotalBikeContainer(context),
+                      const SizedBox(height: 20),
+                      _buildBikeInformation(context),
+                    ],
                   ),
                 ),
               ],

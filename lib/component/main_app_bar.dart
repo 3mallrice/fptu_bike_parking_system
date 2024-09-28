@@ -102,6 +102,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                                           .colorScheme
                                           .background,
                                       fontSize: 8,
+                                      fontWeight: FontWeight.bold,
                                     ),
                               ),
                             ),

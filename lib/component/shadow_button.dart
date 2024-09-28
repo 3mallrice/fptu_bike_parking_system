@@ -10,6 +10,7 @@ class ShadowButton extends StatelessWidget {
   final EdgeInsetsGeometry? margin;
   final EdgeInsetsGeometry? padding;
   final double? borderRadius;
+  final AlignmentGeometry? alignment;
 
   const ShadowButton({
     /// A button widget that wraps a child with a shadow effect.
@@ -32,11 +33,13 @@ class ShadowButton extends StatelessWidget {
     this.margin,
     this.padding,
     this.borderRadius,
+    this.alignment,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      alignment: alignment ?? Alignment.center,
       width: width ?? MediaQuery.of(context).size.width * 0.9,
       height: height,
       margin: margin,
@@ -58,6 +61,7 @@ class ShadowButton extends StatelessWidget {
         style: textStyle ??
             Theme.of(context).textTheme.titleMedium!.copyWith(
                   color: titleColor ?? Theme.of(context).colorScheme.surface,
+                  fontWeight: FontWeight.bold,
                 ),
         textAlign: TextAlign.center,
       ),
